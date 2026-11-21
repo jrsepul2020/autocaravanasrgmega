@@ -76,7 +76,7 @@ export const seasons: Record<SeasonKey, { label: string; when: string; color: st
   media: {
     label: 'Temporada media',
     when: 'Abril, mayo, del 1 al 15 de junio y del 16 al 30 de septiembre (excepto Semana Santa, Feria, Rocío, puentes y festivos)',
-    color: '#FFC83C',
+    color: '#FAB02C',
   },
   alta: {
     label: 'Temporada alta',
@@ -86,7 +86,7 @@ export const seasons: Record<SeasonKey, { label: string; when: string; color: st
   especial: {
     label: 'Temporada especial',
     when: 'Navidad, Semana Santa, Feria de Sevilla, Romería de El Rocío, Gran Premio de Jerez, puentes y festivos',
-    color: '#F37B23',
+    color: '#C2560F',
   },
 };
 
