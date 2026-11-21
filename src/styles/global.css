@@ -10,10 +10,10 @@
   --sand-2: #EBE2CF; /* crema más intenso: fichas y separadores */
   --forest: #1F4A38; /* verde bosque: botones principales */
   --forest-2: #163A2B;
-  --price: #A9660A;  /* ámbar oscuro: precios (4,6:1 sobre blanco) */
-  --terra: #F6AE2D;
-  --terra-ink: #9A6406; /* ámbar oscuro para textos sobre fondo claro (contraste AA) */
-  --terra-2: #E89B12;
+  --price: #C2560F;  /* naranja oscuro: precios (4,5:1 sobre blanco) */
+  --terra: #F37B23;
+  --terra-ink: #B84F0C; /* naranja oscuro para textos sobre fondo claro (contraste AA) */
+  --terra-2: #D9661A;
   --sub: #FFC83C;     /* subtítulos (eyebrow) */
   --red: #D62828;     /* rojo oferta: precios y botones de reservar (5:1 con blanco) */
   --red-2: #B01E1E;
@@ -26,7 +26,7 @@
   --radius-sm: 10px;
   --shadow: 0 1px 2px rgba(34,57,46,.08), 0 12px 32px -12px rgba(34,57,46,.28);
   --shadow-lg: 0 2px 4px rgba(34,57,46,.08), 0 24px 48px -16px rgba(34,57,46,.38);
-  --glow-sun: radial-gradient(circle at 100% 0%, rgba(246,174,45,.22), transparent 42%), radial-gradient(circle at 0% 100%, rgba(79,122,100,.55), transparent 50%);
+  --glow-sun: radial-gradient(circle at 100% 0%, rgba(243,123,35,.22), transparent 42%), radial-gradient(circle at 0% 100%, rgba(79,122,100,.55), transparent 50%);
   --max: 1200px;
   --font: 'Inter Variable', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   --display: 'Jost Variable', 'Inter Variable', system-ui, sans-serif;

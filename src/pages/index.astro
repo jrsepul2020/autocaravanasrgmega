@@ -11,7 +11,6 @@ import CtaBand from '../components/CtaBand.astro';
 import PhotoCarousel from '../components/PhotoCarousel.astro';
 import PriceNote from '../components/PriceNote.astro';
 import { offers, heroPrice } from '../data/site';
-import { offerPriceLabel } from '../data/sheet';
 import { vehicles, getVehicle, fromPrice } from '../data/vehicles';
 import { rutas } from '../data/rutas';
 import { faqsBy } from '../data/faqs';
@@ -23,6 +22,7 @@ import imgAlgarve from '../assets/img/escapada-algarve.webp';
 
 const today = new Date().toISOString().slice(0, 10);
 const activeOffers = offers.filter((o) => o.until >= today);
+const untilLabel = (d: string) => (d && d < '2999' ? `Válida hasta el ${new Date(d + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}` : '');
 const camperBaja = getVehicle('camper').prices.baja.short;
 const heroV = getVehicle(heroPrice.vehicle);
 const heroText = heroPrice.text || `${heroV.short} desde`;
@@ -73,6 +73,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   </section>
 
   <!-- BUSCADOR -->
+  <div class="intro">
   <div class="container search-wrap">
     <form class="search" action="/calendario-disponibilidad/#presupuesto" method="get" aria-label="Buscar disponibilidad">
       <label class="search__f">
@@ -96,13 +97,36 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
       {ventajas.map((v) => <li><Icon name={v.icon} /><span>{v.t}</span></li>)}
     </ul>
   </div>
+  </div>
 
   <!-- OFERTAS -->
-  <section class="container offers" aria-label="Ofertas" data-offers hidden={activeOffers.length === 0}>
-    <template><a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/"><span class="offer__tag">Oferta</span><strong data-f="title"></strong><span class="offer__text" data-f="text"></span><em class="offer__price" data-f="price"></em><Icon name="arrow" /></a></template>
-    {activeOffers.map((o) => (
-      <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/"><span class="offer__tag">Oferta</span><strong>{o.title}</strong><span class="offer__text">{o.text}</span><em class="offer__price" hidden={!o.price}>{offerPriceLabel(o)}</em><Icon name="arrow" /></a>
-    ))}
+  <section class="section offers-sec" aria-labelledby="ofertas-t" data-offers-wrap hidden={activeOffers.length === 0}>
+    <div class="container">
+      <div class="offers-head">
+        <h2 id="ofertas-t">Ofertas del momento</h2>
+        <a class="more-link" href="/ofertas-alquiler-autocaravana-sevilla/">Ver todas las ofertas <Icon name="arrow" /></a>
+      </div>
+      <div class="offers" data-offers>
+        <template><a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/"><span class="offer__body"><span class="offer__tag"><Icon name="star" /> Oferta</span><strong class="offer__title" data-f="title"></strong><span class="offer__text" data-f="text"></span><span class="offer__until" data-f="until"></span><span class="offer__cta">Reservar esta oferta <Icon name="arrow" /></span></span><span class="offer__stamp"><small class="offer__veh" data-f="vehicle"></small><span class="offer__from">desde</span><b><span data-f="amount"></span>€</b><small>/día</small></span></a></template>
+        {activeOffers.map((o) => (
+          <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/">
+            <span class="offer__body">
+              <span class="offer__tag"><Icon name="star" /> Oferta</span>
+              <strong class="offer__title">{o.title}</strong>
+              <span class="offer__text">{o.text}</span>
+              <span class="offer__until" hidden={!untilLabel(o.until)}>{untilLabel(o.until)}</span>
+              <span class="offer__cta">Reservar esta oferta <Icon name="arrow" /></span>
+            </span>
+            <span class="offer__stamp" hidden={!o.price}>
+              <small class="offer__veh" hidden={!o.vehicle}>{o.vehicle}</small>
+              <span class="offer__from">desde</span>
+              <b><span>{o.price}</span>€</b>
+              <small>/día</small>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
   </section>
 
   <!-- FLOTA -->
@@ -220,7 +244,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
     linear-gradient(90deg, rgba(20,32,26,.82) 0%, rgba(20,32,26,.55) 42%, rgba(20,32,26,.08) 75%),
     linear-gradient(0deg, rgba(20,32,26,.55) 0%, transparent 35%),
-    linear-gradient(180deg, rgba(246,174,45,.18), transparent 40%); }
+    linear-gradient(180deg, rgba(243,123,35,.18), transparent 40%); }
   .hero__in { padding: clamp(56px, 8vw, 96px) 0 clamp(96px, 12vw, 140px); }
   .hero__claim { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 6.2vw, 4.6rem); line-height: 1.02; letter-spacing: -.02em; margin: 0 0 .6rem; max-width: 12ch; text-wrap: balance; }
   .hero h1 { color: #fff; font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 600; margin: 0 0 .9rem; letter-spacing: 0; }
@@ -242,17 +266,40 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .perks li + li { border-left: 1px solid var(--line); }
   .perks :global(svg) { width: 26px; height: 26px; color: var(--forest); flex: none; stroke-width: 1.7; }
 
+  /* SEPARACIÓN DEL BLOQUE INICIAL */
+  .intro { background: #fff; padding-bottom: 1.2rem; border-bottom: 1px solid var(--line); box-shadow: 0 18px 30px -28px rgba(31,74,56,.45); position: relative; z-index: 1; }
+
   /* OFERTAS */
-  .offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1rem; margin-block: 1.6rem 2.6rem; }
-  .offers[hidden] { display: none; }
-  .offer { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto; column-gap: 1rem; align-items: center; padding: 1.1rem 1.3rem; border-radius: var(--radius); background: #fff; box-shadow: 0 0 0 1px rgba(31,74,56,.1), 0 10px 24px -18px rgba(31,74,56,.5); text-decoration: none; color: var(--ink); transition: box-shadow .25s, transform .25s cubic-bezier(.2,.8,.2,1); }
-  .offer:hover { color: var(--ink); transform: translateY(-2px); box-shadow: var(--shadow); }
-  .offer__tag { grid-row: 1 / span 3; align-self: center; background: var(--red); color: #fff; font-weight: 700; font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; padding: .35rem .6rem; border-radius: 8px; }
-  .offer strong { color: var(--forest); font-family: var(--display); font-weight: 700; font-size: 1.1rem; }
-  .offer .offer__text { font-size: .9rem; color: var(--muted); grid-column: 2; }
-  .offer__price { grid-column: 2; justify-self: start; margin-top: .45rem; font-style: normal; font-weight: 700; font-size: .88rem; color: var(--price); }
-  .offer__price[hidden] { display: none; }
-  .offer :global(svg) { grid-row: 1 / span 3; grid-column: 3; width: 20px; color: var(--forest); }
+  .offers-sec { padding-block: clamp(48px, 6vw, 72px); }
+  .offers-sec[hidden] { display: none; }
+  .offers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1.5rem; margin-bottom: 1.4rem; }
+  .offers-head h2 { margin: 0; }
+  .more-link { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--forest); text-decoration: none; }
+  .more-link :global(svg) { width: 16px; height: 16px; transition: transform .2s; }
+  .more-link:hover :global(svg) { transform: translateX(3px); }
+  .offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 1.2rem; }
+  .offer { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1.2rem; padding: 1.6rem 1.6rem 1.5rem 1.7rem; border-radius: var(--radius); color: #fff; text-decoration: none;
+    background: radial-gradient(120% 140% at 100% 0%, rgba(243,123,35,.38) 0%, rgba(243,123,35,0) 48%), linear-gradient(135deg, var(--forest) 0%, #173528 100%);
+    box-shadow: 0 18px 40px -22px rgba(23,53,40,.8); transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
+  .offer::before { content: ''; position: absolute; z-index: -1; right: -60px; bottom: -70px; width: 260px; height: 260px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.12); }
+  .offer:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 26px 50px -24px rgba(23,53,40,.9); }
+  .offer__body { display: grid; gap: .45rem; justify-items: start; }
+  .offer__tag { display: inline-flex; align-items: center; gap: .35rem; background: var(--terra); color: #fff; font-weight: 800; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: .38rem .7rem; border-radius: 999px; text-shadow: 0 1px 1px rgba(0,0,0,.2); }
+  .offer__tag :global(svg) { width: 12px; height: 12px; }
+  .offer__title { font-family: var(--display); font-weight: 700; font-size: clamp(1.25rem, 2.2vw, 1.5rem); line-height: 1.15; color: #fff; }
+  .offer__text { font-size: .93rem; color: #d4e3da; max-width: 42ch; }
+  .offer__until { font-size: .8rem; font-weight: 600; color: var(--sub); }
+  .offer__cta { display: inline-flex; align-items: center; gap: .4rem; margin-top: .35rem; font-weight: 700; font-size: .92rem; color: #fff; border-bottom: 2px solid var(--terra); padding-bottom: .1rem; }
+  .offer__cta :global(svg) { width: 16px; height: 16px; transition: transform .2s; }
+  .offer:hover .offer__cta :global(svg) { transform: translateX(4px); }
+  .offer__stamp { display: grid; justify-items: center; align-content: center; width: 138px; height: 138px; border-radius: 50%; background: #fff; color: var(--price); text-align: center; line-height: 1; transform: rotate(-7deg); box-shadow: 0 0 0 5px rgba(255,255,255,.18), 0 14px 28px -12px rgba(0,0,0,.55); position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+  .offer:hover .offer__stamp { transform: rotate(0deg) scale(1.04); }
+  .offer__stamp::after { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px dashed rgba(194,86,15,.45); }
+  .offer__stamp b { font-family: var(--display); font-weight: 800; font-size: 2.6rem; letter-spacing: -.03em; color: var(--price); }
+  .offer__from, .offer__stamp > small:last-child { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .offer__from { margin-top: .15rem; }
+  .offer__veh { font-size: .68rem; font-weight: 700; color: var(--forest); max-width: 100px; line-height: 1.15; margin-bottom: .15rem; }
+  .offer [hidden], .offer__stamp:has([data-f=amount][hidden]) { display: none; }
 
   /* BANNER DIAGONAL */
   .ritmo { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); background: var(--forest); color: #fff; min-height: 340px; overflow: hidden; }
@@ -316,10 +363,13 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 520px) {
-    .offer { grid-template-columns: minmax(0, 1fr) auto; row-gap: .3rem; }
-    .offer__tag { grid-row: auto; grid-column: 1; justify-self: start; }
-    .offer strong, .offer .offer__text, .offer__price { grid-column: 1; }
-    .offer :global(svg) { grid-row: 1 / span 4; grid-column: 2; }
+    .offer { grid-template-columns: minmax(0, 1fr); padding: 1.4rem 1.3rem; }
+    .offer__stamp { position: absolute; top: .9rem; right: .9rem; width: 98px; height: 98px; }
+    .offer__stamp b { font-size: 1.75rem; }
+    .offer__veh { font-size: .56rem; max-width: 70px; }
+    .offer__from, .offer__stamp > small:last-child { font-size: .62rem; }
+    .offer__tag, .offer__title { margin-right: 100px; }
+    .offer__text { margin-top: .4rem; }
     .hero__claim { font-size: 2.4rem; }
     .search { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
     .perks { grid-template-columns: minmax(0, 1fr); }

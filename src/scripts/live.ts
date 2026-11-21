@@ -69,7 +69,11 @@ export function apply(d: LiveData) {
     document.querySelectorAll<HTMLElement>('[data-offers]').forEach((box) => {
       const tpl = box.querySelector('template'); if (!tpl) return;
       box.querySelectorAll(':scope > :not(template)').forEach((n) => n.remove());
-      active.forEach((o) => box.append(fill(tpl, { title: o.title, text: o.text, price: offerPriceLabel(o) })));
+      active.forEach((o) => box.append(fill(tpl, {
+        title: o.title, text: o.text, price: offerPriceLabel(o),
+        vehicle: o.vehicle || '', amount: o.price ? String(o.price) : '',
+        until: o.until && o.until < '2999' ? `Válida hasta el ${new Date(o.until + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}` : '',
+      })));
       const wrap = box.closest<HTMLElement>('[data-offers-wrap]') ?? box;
       wrap.hidden = active.length === 0;
     });

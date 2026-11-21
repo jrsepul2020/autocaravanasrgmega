@@ -86,7 +86,7 @@ export const seasons: Record<SeasonKey, { label: string; when: string; color: st
   especial: {
     label: 'Temporada especial',
     when: 'Navidad, Semana Santa, Feria de Sevilla, Romería de El Rocío, Gran Premio de Jerez, puentes y festivos',
-    color: '#F6AE2D',
+    color: '#F37B23',
   },
 };
 
