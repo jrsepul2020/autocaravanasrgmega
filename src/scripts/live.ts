@@ -69,13 +69,32 @@ export function apply(d: LiveData) {
     document.querySelectorAll<HTMLElement>('[data-offers]').forEach((box) => {
       const tpl = box.querySelector('template'); if (!tpl) return;
       box.querySelectorAll(':scope > :not(template)').forEach((n) => n.remove());
-      active.forEach((o) => box.append(fill(tpl, {
-        title: o.title, text: o.text, price: offerPriceLabel(o),
-        vehicle: o.vehicle || '', amount: o.price ? String(o.price) : '',
-        until: o.until && o.until < '2999' ? `Válida hasta el ${new Date(o.until + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}` : '',
-      })));
+      active.forEach((o) => {
+        const frag = fill(tpl, {
+          title: o.title, text: o.text, price: offerPriceLabel(o),
+          vehicle: o.vehicle || '', amount: o.price ? String(o.price) : '',
+          until: o.until && o.until < '2999' ? `Válida hasta el ${new Date(o.until + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}` : '',
+        });
+        const card = frag.querySelector('.offer') as HTMLElement | null;
+        if (card) card.dataset.vehicle = /mileo/i.test(o.vehicle || '') ? 'mileo' : 'camper';
+        box.append(frag);
+      });
       const wrap = box.closest<HTMLElement>('[data-offers-wrap]') ?? box;
       wrap.hidden = active.length === 0;
+    });
+    document.querySelectorAll<HTMLElement>('[data-offers-marquee]').forEach((box) => {
+      const track = box.querySelector('.marquee__track'); if (!track) return;
+      const sample = track.querySelector('.marquee__item'); if (!sample) return;
+      const labels = active.length
+        ? active.map((o) => (o.price ? `${o.title} · desde ${o.price} €/día` : o.title))
+        : ['Consulta nuestras ofertas especiales de alquiler'];
+      const items = [...labels, ...labels].map((label) => {
+        const node = sample.cloneNode(true) as HTMLElement;
+        const text = node.querySelector('span');
+        if (text) text.textContent = label;
+        return node;
+      });
+      track.replaceChildren(...items);
     });
   }
   if (d.special) {

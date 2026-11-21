@@ -4,13 +4,13 @@ import { site, waLink } from '../data/site';
 interface Props { title?: string; text?: string; wa?: string }
 const {
   title = '¿Preparamos tu próxima aventura?',
-  text = 'Consúltanos fechas, disponibilidad o cualquier duda. Te respondemos en minutos.',
+  text = 'Consúltanos fechas, disponibilidad o cualquier duda. Te ayudamos encantados.',
   wa = 'Hola, quiero saber si tenéis disponibilidad para estas fechas: ',
 } = Astro.props;
 ---
 <section class="cta">
   <div class="container cta__in">
-    <div>
+    <div class="cta__copy">
       <p class="cta__t">{title}</p>
       <p class="cta__p">{text}</p>
     </div>
@@ -22,17 +22,26 @@ const {
   </div>
 </section>
 <style>
-  .cta { background: var(--forest); color: #fff; padding: 2.6rem 0; }
-  .cta__in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem 2.5rem; }
-  .cta__t { font-family: var(--display); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin: 0 0 .25rem; color: #fff; line-height: 1.15; }
-  .cta__p { margin: 0; color: var(--on-dark); }
-  .cta__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; }
+  .cta { background: var(--forest); color: #fff; padding: 2.8rem 0; }
+  .cta__in {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem 2.5rem;
+  }
+  .cta__copy { min-width: 0; flex: 1 1 280px; }
+  .cta__t { font-family: var(--display); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin: 0 0 .35rem; color: #fff; line-height: 1.15; }
+  .cta__p { margin: 0; color: var(--on-dark); max-width: 46ch; }
+  .cta__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
   .cta__wa { background: #fff; color: var(--forest); }
   .cta__wa:hover { background: var(--sand); color: var(--forest); }
   .cta__wa :global(svg) { color: var(--wa); }
-  .cta__sep { width: 1px; height: 44px; background: rgba(255,255,255,.3); }
+  .cta__sep { width: 1px; height: 44px; background: rgba(255,255,255,.35); flex: none; }
   .cta__tel { display: inline-flex; align-items: center; gap: .55rem; color: #fff; text-decoration: none; font-family: var(--display); font-weight: 700; font-size: 1.6rem; white-space: nowrap; }
   .cta__tel:hover { color: var(--sub); }
   .cta__tel :global(svg) { width: 26px; height: 26px; color: var(--sub); }
-  @media (max-width: 560px) { .cta__sep { display: none; } }
+  @media (max-width: 560px) {
+    .cta__sep { display: none; }
+  }
 </style>

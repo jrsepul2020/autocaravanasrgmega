@@ -142,8 +142,8 @@ export const offers: { title: string; text: string; until: string; vehicle?: str
     title: 'Invierno a precio de temporada baja',
     text: 'De enero a marzo, en estancias de más de 14 días. La Mileo 268, desde 140 €/día.',
     until: '2027-03-31',
-    vehicle: 'Camper 120 UP',
-    price: 110,
+    vehicle: 'Mileo 268',
+    price: 140,
   },
 ];
 
