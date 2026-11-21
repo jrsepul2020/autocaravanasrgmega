@@ -38,10 +38,10 @@ const { title = 'Recogida y entrega en Sevilla (Salteras)' } = Astro.props;
   .loc__list { list-style: none; padding: 0; margin: 0 0 1.6rem; display: grid; gap: .8rem; }
   .loc__list li { display: flex; gap: .7rem; }
   .loc__list :global(svg) { width: 22px; height: 22px; color: var(--terra-ink); flex: none; margin-top: .15rem; }
-  .loc__map { aspect-ratio: 4/3; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: #dfe8e3; }
+  .loc__map { aspect-ratio: 4/3; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: var(--on-dark); }
   .loc__map :global(iframe) { width: 100%; height: 100%; border: 0; }
   .loc__load { width: 100%; height: 100%; border: 0; cursor: pointer; display: grid; place-content: center; justify-items: center; gap: .6rem; font: inherit; color: var(--pine);
-    background: radial-gradient(circle at 50% 45%, #fff 0 12%, transparent 13%), repeating-linear-gradient(45deg, #dce7e1 0 18px, #e6eee9 18px 36px); }
+    background: radial-gradient(circle at 50% 45%, #fff 0 12%, transparent 13%), repeating-linear-gradient(45deg, var(--on-dark) 0 18px, var(--on-dark) 18px 36px); }
   .loc__load :global(svg) { width: 44px; height: 44px; color: var(--terra-ink); }
   .loc__load span { display: grid; text-align: center; }
   .loc__load small { color: var(--muted); }

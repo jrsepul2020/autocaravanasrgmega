@@ -2,31 +2,35 @@
 @import '@fontsource-variable/jost';
 
 :root {
-  --pine: #3C5F4D;
-  --pine-dark: #22392E;
-  --pine-2: #4F7A64;
-  --pine-3: #E6EFEA;
-  --sand: #FFFCF6;   /* crema muy claro: fondos pastel */
-  --sand-2: #F6ECD8; /* crema más intenso: fichas, avatares y separadores */
-  --forest: #1F4A38; /* verde bosque: botones principales */
-  --forest-2: #163A2B;
-  --price: #C2560F;  /* naranja oscuro: precios (4,5:1 sobre blanco) */
-  --terra: #FAB02C;
-  --terra-ink: #B84F0C; /* naranja oscuro para textos sobre fondo claro (contraste AA) */
-  --terra-2: #E39A14;
-  --sub: #FAB02C;     /* subtítulos (eyebrow) */
-  --red: #D62828;     /* rojo oferta: precios y botones de reservar (5:1 con blanco) */
-  --red-2: #B01E1E;
+  /* ===== PALETA (mínima) =====
+     Verde corporativo #3C5F4D · Verde bosque #1F4A38 · Naranja #FAB02C
+     Crema #FFFCF6 · Tinta #1b2420 · Gris #5d6b65 · Blanco
+     (+ verde WhatsApp y rojo/verde del calendario, que son semánticos) */
+  --pine: #3C5F4D;    /* verde corporativo: títulos, precios, enlaces */
+  --forest: #1F4A38;  /* verde bosque: botones, bandas oscuras, pie */
+  --terra: #FAB02C;   /* naranja: subtítulos, líneas, iconos, etiquetas */
+  --sand: #FFFCF6;    /* crema: fondos pastel */
   --ink: #1b2420;
   --muted: #5d6b65;
-  --line: #e2ddd3;
   --white: #fff;
   --wa: #25d366;
+  /* Derivados (no son colores nuevos, son mezclas de los anteriores) */
+  --sand-2: #F6ECD8;  /* crema más intenso: fichas, avatares, viñetas */
+  --line: #ECE3D1;    /* líneas y bordes */
+  --on-dark: rgba(255,255,255,.9); /* texto sobre fondo verde */
+  /* Alias para compatibilidad: apuntan a la paleta de arriba */
+  --pine-dark: var(--forest);
+  --pine-2: var(--pine);
+  --pine-3: var(--sand-2);
+  --forest-2: #163A2B; /* hover de botones */
+  --price: var(--pine);
+  --terra-ink: var(--pine);
+  --terra-2: var(--terra);
+  --sub: var(--terra);
   --radius: 14px;
   --radius-sm: 10px;
-  --shadow: 0 1px 2px rgba(34,57,46,.08), 0 12px 32px -12px rgba(34,57,46,.28);
-  --shadow-lg: 0 2px 4px rgba(34,57,46,.08), 0 24px 48px -16px rgba(34,57,46,.38);
-  --glow-sun: radial-gradient(circle at 100% 0%, rgba(250,176,44,.22), transparent 42%), radial-gradient(circle at 0% 100%, rgba(79,122,100,.55), transparent 50%);
+  --shadow: 0 1px 2px rgba(31,74,56,.08), 0 12px 32px -12px rgba(31,74,56,.28);
+  --shadow-lg: 0 2px 4px rgba(31,74,56,.08), 0 24px 48px -16px rgba(31,74,56,.38);
   --max: 1200px;
   --font: 'Inter Variable', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   --display: 'Jost Variable', 'Inter Variable', system-ui, sans-serif;
@@ -42,8 +46,8 @@ body {
 img { max-width: 100%; height: auto; display: block; }
 ::selection { background: var(--terra); color: #fff; }
 html { scrollbar-color: var(--pine-2) var(--sand); accent-color: var(--pine); caret-color: var(--pine); }
-a { color: var(--pine-2); text-underline-offset: 3px; }
-a:hover { color: var(--pine); }
+a { color: var(--pine); text-underline-offset: 3px; }
+a:hover { color: var(--forest); }
 h1, h2, h3, h4 { font-family: var(--display); line-height: 1.12; color: var(--pine); margin: 0 0 .5em; letter-spacing: -.01em; }
 h1 { font-size: clamp(2.2rem, 5.4vw, 3.8rem); font-weight: 700; }
 h2 { font-size: clamp(1.75rem, 3.7vw, 2.6rem); font-weight: 700; }
@@ -54,9 +58,9 @@ ul { padding-left: 1.2em; }
 .container { width: min(100% - 32px, var(--max)); margin-inline: auto; }
 .narrow { width: min(100% - 32px, 820px); margin-inline: auto; }
 .section { padding: clamp(56px, 8vw, 100px) 0; }
-.section--sand { background: var(--sand); border-block: 1px solid #F2E8D5; }
-.section--pine { background: var(--forest); color: #e8efeb; }
-.section--pine .lead { color: #c4d3cb; }
+.section--sand { background: var(--sand); border-block: 1px solid var(--line); }
+.section--pine { background: var(--forest); color: var(--on-dark); }
+.section--pine .lead { color: var(--on-dark); }
 .section--pine h2, .section--pine h3 { color: #fff; }
 /* Subtítulo: naranja #FAB02C sobre pastilla verde oscuro (sobre blanco solo daría 1,9:1) */
 .eyebrow {
@@ -75,7 +79,7 @@ ul { padding-left: 1.2em; }
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .55em;
-  padding: .9em 1.4em; border-radius: 999px; font-weight: 650; font-size: 1rem; text-decoration: none;
+  padding: .85em 1.35em; border-radius: var(--radius-sm); font-weight: 650; font-size: 1rem; text-decoration: none;
   border: 2px solid transparent; cursor: pointer; transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
   line-height: 1.1; white-space: nowrap; font-family: var(--font);
 }
@@ -113,7 +117,7 @@ ul { padding-left: 1.2em; }
 .price-hot { color: var(--price); }
 .price-badge { display: inline-block; white-space: nowrap; background: var(--price); color: #fff; padding: .05em .45em; border-radius: 8px; }
 .pill.pill--hot { background: var(--price); color: #fff; }
-.card--dark { background: var(--pine-dark); color: #e8efeb; border-color: var(--pine-dark); }
+.card--dark { background: var(--pine-dark); color: var(--on-dark); border-color: var(--pine-dark); }
 .card--dark h2, .card--dark h3 { color: #fff; }
 .pill { display: inline-flex; align-items: center; gap: .4em; padding: .3em .8em; border-radius: 999px; background: var(--pine-3); color: var(--pine); font-size: .85rem; font-weight: 600; }
 .prose { max-width: 72ch; }
