@@ -1,0 +1,45 @@
+---
+import Icon from './Icon.astro';
+import { site, waLink } from '../data/site';
+---
+<!-- Barra fija de contacto en móvil (70 % de los clics llegan desde móvil) -->
+<div class="mbar" role="navigation" aria-label="Contacto rápido">
+  <a href={`tel:${site.phone}`} class="mbar__call"><Icon name="phone" /><span>Llamar</span></a>
+  <a href={waLink()} class="mbar__wa" target="_blank" rel="noopener"><Icon name="whatsapp" /><span>WhatsApp</span></a>
+  <a href="/calendario-disponibilidad/" class="mbar__cal"><Icon name="calendar" /><span>Fechas</span></a>
+</div>
+
+<!-- Botón flotante de WhatsApp en escritorio -->
+<a href={waLink()} class="wa-float" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <Icon name="whatsapp" />
+  <span class="wa-float__tip">¿Dudas? Escríbenos</span>
+</a>
+
+<style>
+  .mbar { display: none; }
+  @media (max-width: 760px) {
+    .mbar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: 1fr 1.25fr 1fr;
+      gap: 6px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--line);
+      box-shadow: 0 -6px 20px rgba(0,0,0,.06);
+    }
+    .mbar a { display: flex; align-items: center; justify-content: center; gap: .4rem; padding: .75rem .4rem; border-radius: 12px; font-weight: 650; text-decoration: none; font-size: .95rem; }
+    .mbar :global(svg) { width: 20px; height: 20px; }
+    .mbar__call { background: var(--pine-3); color: var(--pine); }
+    .mbar__wa { background: var(--wa); color: #fff; }
+    .mbar__cal { background: var(--terra); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.22); }
+    .wa-float { display: none !important; }
+  }
+  .wa-float {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 60px; height: 60px; border-radius: 50%;
+    background: var(--wa); color: #fff; display: grid; place-items: center; box-shadow: 0 10px 30px rgba(37,211,102,.4);
+    transition: transform .2s ease;
+  }
+  .wa-float:hover { transform: scale(1.07); color: #fff; }
+  .wa-float :global(svg) { width: 32px; height: 32px; }
+  .wa-float__tip {
+    position: absolute; right: 72px; white-space: nowrap; background: var(--pine); color: #fff; padding: .45rem .8rem; border-radius: 10px;
+    font-size: .88rem; font-weight: 600; opacity: 0; transform: translateX(6px); transition: .2s; pointer-events: none;
+  }
+  .wa-float:hover .wa-float__tip { opacity: 1; transform: none; }
+</style>

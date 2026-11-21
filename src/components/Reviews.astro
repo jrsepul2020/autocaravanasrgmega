@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+// Opiniones reales de clientes (de la web anterior). Añade aquí nuevas reseñas de Google.
+const reviews = [
+  { name: 'Juan Antonio', model: 'Mileo 268', text: 'Nuestra primera experiencia en autocaravana y todo fue facilísimo. Nos lo explicaron todo con paciencia, la recogimos un domingo sin problema y recorrimos Andalucía encantados.' },
+  { name: 'Pedro', model: 'Camper 120 UP', text: 'Fin de semana largo perfecto. Con la placa solar no nos hizo falta enchufe, viajamos con nuestro perro sin coste extra y saber que había asistencia 24 h nos dio mucha tranquilidad.' },
+  { name: 'Francisco Montes', model: 'Mileo 268', text: 'Dejamos el coche en su parking gratis y nos recomendaron apps para pernoctar. Hicimos la ruta por la costa de Cádiz y repetiremos seguro.' },
+  { name: 'Rosa', model: 'Mileo 268', text: 'Atención de diez desde el primer mensaje: nos ayudaron a elegir el vehículo para nuestra ruta por Cádiz. La autocaravana estaba impecable y muy limpia.' },
+];
+---
+<div class="rv">
+  <div class="rv__grid">
+    {reviews.map((r) => (
+      <figure class="rv__card">
+        <div class="rv__stars" aria-label="5 de 5 estrellas">{[1,2,3,4,5].map(() => <Icon name="star" />)}</div>
+        <blockquote>“{r.text}”</blockquote>
+        <figcaption><strong>{r.name}</strong> · alquiló la {r.model}</figcaption>
+      </figure>
+    ))}
+  </div>
+  <div class="rv__gbp">
+    <Icon name="google" class="rv__g" />
+    <p><strong>¿Ya viajaste con nosotros?</strong> Tu opinión en Google ayuda a otros viajeros a decidirse.</p>
+    <a class="btn btn--ghost btn--sm" href={site.gbpReviewUrl} target="_blank" rel="noopener">Dejar reseña en Google</a>
+  </div>
+</div>
+<style>
+  .rv__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.2rem; }
+  .rv__card { margin: 0; background: #fff; border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--line); display: flex; flex-direction: column; gap: .8rem; }
+  .rv__stars { display: flex; gap: 2px; color: #f4b400; }
+  .rv__stars :global(svg) { width: 18px; height: 18px; }
+  blockquote { margin: 0; font-size: .98rem; color: #33403b; flex: 1; }
+  figcaption { font-size: .88rem; color: var(--muted); }
+  figcaption strong { color: var(--pine); }
+  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem 1.3rem; background: #fff; border: 1px dashed var(--line); border-radius: 14px; }
+  .rv__gbp p { margin: 0; flex: 1; min-width: 220px; }
+  :global(.rv__g) { width: 30px; height: 30px; }
+</style>

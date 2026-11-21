@@ -1,0 +1,8 @@
+# Netlify / Cloudflare Pages: redirecciones 301 de la web anterior
+/inicio/                                   /                            301
+/inicio-3/                                 /                            301
+/calendarios/                              /calendario-disponibilidad/  301
+/calendario/                               /calendario-disponibilidad/  301
+/modelos-de-autocaravanas-en-alquiler/     /#autocaravanas              301
+/tarifa-alquilar-autocaravana-mileo-268/   /tarifas/                    301
+/autocaravanas/benimar-t463-up-ford-165cv/ /                            301

@@ -1,0 +1,50 @@
+---
+/**
+ * Feed de Instagram con LightWidget. Se carga solo cuando el usuario llega a la sección
+ * (no penaliza la velocidad). El ID se configura en src/data/site.ts → lightwidgetId.
+ */
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+<section class="section ig" aria-labelledby="ig-title">
+  <div class="container">
+    <div class="ig__head">
+      <div>
+        <span class="eyebrow">Síguenos</span>
+        <h2 id="ig-title">Viajes reales de nuestros clientes</h2>
+        <p class="lead">Rutas, pernoctas y rincones de Andalucía en {site.instagramHandle}.</p>
+      </div>
+      <a class="btn btn--ghost" href={site.social.instagram} target="_blank" rel="noopener"><Icon name="instagram" /> Ver Instagram</a>
+    </div>
+    {site.lightwidgetId ? (
+      <div class="ig__feed" data-lw={site.lightwidgetId}><p class="ig__ph">Cargando publicaciones…</p></div>
+    ) : (
+      <a class="ig__empty" href={site.social.instagram} target="_blank" rel="noopener">
+        <Icon name="instagram" /> <span>Descubre nuestras últimas publicaciones en Instagram</span>
+      </a>
+    )}
+  </div>
+</section>
+<script>
+  const el = document.querySelector<HTMLElement>('.ig__feed');
+  if (el) {
+    const io = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      io.disconnect();
+      const s = document.createElement('script');
+      s.src = 'https://cdn.lightwidget.com/widgets/lightwidget.js';
+      document.body.appendChild(s);
+      el.innerHTML = `<iframe src="https://cdn.lightwidget.com/widgets/${el.dataset.lw}.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" title="Publicaciones de Instagram" style="width:100%;border:0;overflow:hidden;"></iframe>`;
+    }, { rootMargin: '400px' });
+    io.observe(el);
+  }
+</script>
+<style>
+  .ig__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 2rem; }
+  .ig__head .lead { margin: 0; }
+  .ig__feed { min-height: 300px; }
+  .ig__ph { color: var(--muted); }
+  .ig__empty { display: flex; align-items: center; justify-content: center; gap: .7rem; padding: 3rem 1rem; border-radius: var(--radius); text-decoration: none; font-weight: 650; color: #fff; background: linear-gradient(120deg, #feda75, #fa7e1e 30%, #d62976 60%, #962fbf 85%, #4f5bd5); }
+  .ig__empty :global(svg) { width: 28px; height: 28px; }
+  .ig__empty:hover { color: #fff; filter: brightness(1.05); }
+</style>

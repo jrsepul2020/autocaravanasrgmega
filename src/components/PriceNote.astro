@@ -1,0 +1,18 @@
+---
+import { priceDisclaimer, waLink } from '../data/site';
+interface Props { tone?: 'light' | 'dark'; compact?: boolean }
+const { tone = 'light', compact = false } = Astro.props;
+---
+<p class:list={['pn', `pn--${tone}`, { 'pn--compact': compact }]}>
+  <span aria-hidden="true">ⓘ</span>
+  <span>{priceDisclaimer}{!compact && <> <a href={waLink('Hola, ¿qué ofertas o promociones tenéis ahora mismo?')} target="_blank" rel="noopener">Pregúntanos por WhatsApp</a>.</>}</span>
+</p>
+<style>
+  .pn { display: flex; gap: .45rem; align-items: flex-start; margin: .8rem 0 0; font-size: .88rem; line-height: 1.45; color: var(--muted); }
+  .pn > span:first-child { color: var(--red); font-weight: 700; }
+  .pn a { color: var(--pine); font-weight: 600; }
+  .pn--compact { font-size: .78rem; margin-top: .4rem; }
+  .pn--dark { color: #e3ece7; }
+  .pn--dark > span:first-child { color: var(--terra); }
+  .pn--dark a { color: #fff; }
+</style>

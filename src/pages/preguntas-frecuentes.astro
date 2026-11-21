@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { faqs } from '../data/faqs';
+---
+<Base
+  title="Preguntas Frecuentes sobre el Alquiler de Autocaravanas | RG MEGA Sevilla"
+  description="Resolvemos tus dudas sobre alquilar una autocaravana en Sevilla: precio, carnet necesario, kilómetros, mascotas, depósitos, dónde dormir, recogida, pagos y cancelación."
+  breadcrumbs={[{ name: 'Preguntas frecuentes', url: '/preguntas-frecuentes/' }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="narrow">
+      <span class="eyebrow">Resolvemos tus dudas</span>
+      <h1>Preguntas frecuentes sobre el alquiler de autocaravanas</h1>
+      <p class="lead">¿Es tu primera vez en autocaravana? Aquí tienes todo lo que necesitas saber. Si te queda alguna duda, escríbenos por WhatsApp.</p>
+      <FaqList items={faqs} />
+    </div>
+  </section>
+  <CtaBand title="¿No encuentras tu respuesta?" text="Pregúntanos lo que quieras: te contestamos enseguida." />
+</Base>

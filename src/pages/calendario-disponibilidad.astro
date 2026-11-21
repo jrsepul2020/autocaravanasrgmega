@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import AvailabilityCalendar from '../components/AvailabilityCalendar.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
+import { vehicles, fromPrice } from '../data/vehicles';
+import PriceNote from '../components/PriceNote.astro';
+---
+<Base
+  title="Disponibilidad Autocaravanas de Alquiler en Sevilla · Calendario | RG MEGA"
+  description="Consulta en tiempo real las fechas libres de nuestras autocaravanas de alquiler en Sevilla: Benimar Mileo 268 y Camper 120 UP. Selecciona tus días y pide precio al momento."
+  breadcrumbs={[{ name: 'Disponibilidad', url: '/calendario-disponibilidad/' }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Calendario actualizado</span>
+        <h1>Disponibilidad de autocaravanas en Sevilla</h1>
+        <p class="lead">Los días en verde están libres. Pulsa el día de recogida y el de devolución en el calendario del vehículo que prefieras y te calculamos el precio.</p>
+      </div>
+      <div class="cal-grid">
+        {vehicles.map((v) => (
+          <div>
+            <div class="cal-head">
+              <h2><a href={v.slug}>{v.name}</a></h2>
+              <span class="pill pill--hot">desde <span data-from={v.id}>{fromPrice(v)}</span> €/día</span>
+            </div>
+            <PriceNote compact />
+            <AvailabilityCalendar vehicle={v} months={1} />
+          </div>
+        ))}
+      </div>
+      <p class="cal-note"><Icon name="calendar" /> El calendario se actualiza a diario. Si una fecha aparece libre pero tienes prisa, confírmala por WhatsApp: respondemos en minutos.</p>
+    </div>
+  </section>
+  <section class="section section--sand">
+    <div class="narrow"><QuoteForm title="Pide precio para tus fechas" /></div>
+  </section>
+  <CtaBand />
+</Base>
+<style>
+  .cal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2rem; }
+  .cal-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
+  .cal-head h2 { margin: 0; font-size: 1.5rem; }
+  .cal-head a { color: inherit; text-decoration: none; }
+  .cal-note { display: flex; gap: .6rem; align-items: flex-start; margin-top: 1.5rem; color: var(--muted); }
+  .cal-note :global(svg) { width: 20px; height: 20px; flex: none; margin-top: .2rem; color: var(--terra-ink); }
+</style>

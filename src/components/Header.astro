@@ -1,0 +1,132 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import logo from '../assets/img/logo-rgmega.png';
+import { site, waLink } from '../data/site';
+
+const nav = [
+  {
+    label: 'Autocaravanas', href: '/#autocaravanas',
+    children: [
+      { label: 'Benimar Mileo 268', href: '/alquilar-benimar-mileo-268/', note: 'Perfilada · 4 plazas' },
+      { label: 'Camper 120 UP', href: '/alquilar-camper-120-up/', note: 'Furgoneta camper · 6 m' },
+    ],
+  },
+  { label: 'Tarifas', href: '/tarifas/' },
+  { label: 'Disponibilidad', href: '/calendario-disponibilidad/' },
+  {
+    label: 'Escapadas', href: '/alquiler-autocaravana-fin-de-semana-sevilla/',
+    children: [
+      { label: 'Fin de semana', href: '/alquiler-autocaravana-fin-de-semana-sevilla/', note: 'Desde 3 días' },
+      { label: 'Puentes y festivos', href: '/alquiler-autocaravana-puente-sevilla/', note: 'Diciembre, Semana Santa, mayo…' },
+      { label: 'Fútbol y eventos', href: '/alquiler-autocaravana-eventos-futbol-sevilla/', note: 'Sevilla, Betis, Bernabéu…' },
+      { label: 'Alquiler camper Sevilla', href: '/alquiler-camper-sevilla/', note: 'Compacta y fácil' },
+      { label: 'Ofertas y precios baratos', href: '/ofertas-alquiler-autocaravana-sevilla/', note: 'Temporada baja' },
+      { label: 'Rutas desde Sevilla', href: '/rutas/', note: 'Cádiz, Huelva, Portugal…' },
+    ],
+  },
+  { label: 'FAQ', href: '/preguntas-frecuentes/' },
+  { label: 'Contacto', href: '/contacto/' },
+];
+const path = Astro.url.pathname;
+---
+<header class="hdr">
+  <div class="container hdr__in">
+    <a href="/" class="brand" aria-label="RG MEGA Autocaravanas, inicio">
+      <Image src={logo} alt="" width={48} height={48} loading="eager" />
+      <span><strong>RG MEGA</strong><small>Alquiler de autocaravanas · Sevilla</small></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Principal">
+      <ul>
+        {nav.map((item) => (
+          <li class={item.children ? 'has-sub' : ''}>
+            <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>{item.label}</a>
+            {item.children && (
+              <ul class="sub">
+                {item.children.map((c) => (
+                  <li><a href={c.href}><span>{c.label}</span><small>{c.note}</small></a></li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div class="nav__mobile-cta">
+        <a class="btn btn--wa" href={waLink()} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
+        <a class="btn btn--ghost" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
+      </div>
+    </nav>
+
+    <div class="hdr__cta">
+      <a class="hdr__phone" href={`tel:${site.phone}`}><Icon name="phone" /> <span>{site.phoneDisplay}</span></a>
+      <a class="btn btn--primary btn--sm" href="/contacto/#presupuesto">Pedir presupuesto</a>
+      <button class="burger" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú">
+        <Icon name="menu" class="i-open" /><Icon name="close" class="i-close" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.burger');
+  const nav = document.getElementById('nav');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('is-open', !open);
+    document.body.style.overflow = open ? '' : 'hidden';
+  });
+  nav?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => {
+    btn?.setAttribute('aria-expanded', 'false'); nav.classList.remove('is-open'); document.body.style.overflow = '';
+  }));
+</script>
+
+<style>
+  .hdr { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.94); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); }
+  .hdr__in { display: flex; align-items: center; gap: 1.2rem; min-height: 72px; }
+  .brand { display: flex; align-items: center; gap: .65rem; text-decoration: none; color: var(--pine); flex: none; }
+  .brand img { width: 48px; height: 48px; border-radius: 50%; }
+  .brand span { display: grid; line-height: 1.15; }
+  .brand strong { font-family: var(--display); font-size: 1.2rem; letter-spacing: .02em; }
+  .brand small { font-size: .72rem; color: var(--muted); }
+  .nav { margin-left: auto; }
+  .nav > ul { list-style: none; display: flex; gap: .2rem; margin: 0; padding: 0; }
+  .nav > ul > li { position: relative; }
+  .nav > ul > li > a { display: block; padding: .6rem .75rem; text-decoration: none; color: var(--ink); font-weight: 560; font-size: .95rem; border-radius: 8px; white-space: nowrap; }
+  .nav > ul > li > a:hover, .nav a[aria-current] { color: var(--terra-ink); }
+  .has-sub > a::after { content: ''; display: inline-block; width: .4em; height: .4em; border-right: 2px solid; border-bottom: 2px solid; transform: rotate(45deg) translateY(-3px); margin-left: .45em; opacity: .55; }
+  .sub { list-style: none; margin: 0; padding: .5rem; position: absolute; top: 100%; left: -.5rem; min-width: 280px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); opacity: 0; visibility: hidden; transform: translateY(6px); transition: .18s ease; }
+  .has-sub:hover .sub, .has-sub:focus-within .sub { opacity: 1; visibility: visible; transform: none; }
+  .sub a { display: grid; padding: .6rem .8rem; border-radius: 10px; text-decoration: none; color: var(--ink); }
+  .sub a:hover { background: var(--sand); }
+  .sub span { font-weight: 600; }
+  .sub small { color: var(--muted); font-size: .8rem; }
+  .hdr__cta { display: flex; align-items: center; gap: .8rem; }
+  .hdr__phone { display: inline-flex; align-items: center; gap: .4rem; font-weight: 650; text-decoration: none; color: var(--pine); white-space: nowrap; }
+  .hdr__phone :global(svg) { width: 18px; height: 18px; }
+  .burger { display: none; background: none; border: 0; padding: .5rem; cursor: pointer; color: var(--pine); }
+  .burger :global(svg) { width: 28px; height: 28px; }
+  .burger :global(.i-close) { display: none; }
+  .burger[aria-expanded='true'] :global(.i-open) { display: none; }
+  .burger[aria-expanded='true'] :global(.i-close) { display: block; }
+  .nav__mobile-cta { display: none; }
+
+  @media (max-width: 1240px) { .hdr__phone span { display: none; } }
+  @media (max-width: 1100px) {
+    .hdr { backdrop-filter: none; background: #fff; }
+    .burger { display: block; }
+    .hdr__cta .btn { display: none; }
+    .hdr__phone { display: none; }
+    .nav { position: fixed; inset: 72px 0 0; background: #fff; padding: 1rem 16px 6rem; overflow-y: auto; display: none; margin: 0; }
+    .nav.is-open { display: block; animation: navIn .2s ease; }
+    @keyframes navIn { from { opacity: 0; transform: translateY(-8px); } }
+    .nav > ul { flex-direction: column; gap: 0; }
+    .nav > ul > li > a { font-size: 1.15rem; padding: .9rem .25rem; border-bottom: 1px solid var(--line); border-radius: 0; }
+    .has-sub > a::after { display: none; }
+    .sub { position: static; opacity: 1; visibility: inherit; transform: none; box-shadow: none; border: 0; padding: .3rem 0 .6rem .6rem; min-width: 0; }
+    .nav__mobile-cta { display: grid; gap: .7rem; margin-top: 1.5rem; }
+    .hdr__cta { margin-left: auto; }
+  }
+  @media (max-width: 420px) { .brand small { display: none; } }
+</style>

@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { waLink } from '../data/site';
+---
+<Base title="Página no encontrada | RG MEGA Autocaravanas" description="La página que buscas no existe." noindex>
+  <section class="section">
+    <div class="narrow" style="text-align:center">
+      <h1>Ups, esta ruta no lleva a ninguna parte</h1>
+      <p class="lead" style="margin-inline:auto">La página que buscas no existe o ha cambiado de dirección.</p>
+      <div class="btn-row" style="justify-content:center">
+        <a class="btn btn--dark" href="/">Ir al inicio</a>
+        <a class="btn btn--ghost" href="/calendario-disponibilidad/">Ver disponibilidad</a>
+        <a class="btn btn--wa" href={waLink()} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</Base>

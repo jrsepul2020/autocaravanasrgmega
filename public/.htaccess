@@ -1,0 +1,31 @@
+# Servidor Apache: redirecciones 301 de las URLs del WordPress anterior
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+Redirect 301 /inicio/ /
+Redirect 301 /inicio-3/ /
+Redirect 301 /calendarios/ /calendario-disponibilidad/
+Redirect 301 /calendario/ /calendario-disponibilidad/
+Redirect 301 /modelos-de-autocaravanas-en-alquiler/ /#autocaravanas
+Redirect 301 /tarifa-alquilar-autocaravana-mileo-268/ /tarifas/
+Redirect 301 /autocaravanas/benimar-t463-up-ford-165cv/ /
+RedirectMatch 301 ^/wp-content/uploads/(.*)$ /
+RedirectMatch 410 ^/(wp-admin|wp-login\.php|xmlrpc\.php|feed)(/.*)?$
+
+ErrorDocument 404 /404.html
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

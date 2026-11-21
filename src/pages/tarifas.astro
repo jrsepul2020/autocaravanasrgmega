@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+import PriceTable from '../components/PriceTable.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { faqsBy } from '../data/faqs';
+import { specialDates } from '../data/site';
+import { px } from '../data/vehicles';
+const today = new Date().toISOString().slice(0, 10);
+const fmt = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<Base
+  title="Precios Alquiler Autocaravanas en Sevilla 2026-2027 · Tarifas | RG MEGA"
+  description="Precios del alquiler de autocaravanas en Sevilla: Camper 120 UP desde {camper.desde} €/día y Benimar Mileo 268 desde {mileo.desde} €/día. Tarifas por temporada, kilometraje, pagos y cancelación. Calcula tu precio."
+  breadcrumbs={[{ name: 'Tarifas', url: '/tarifas/' }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Tarifas 2026 – 2027</span>
+        <h1>Precios del alquiler de autocaravanas en Sevilla</h1>
+        <p class="lead">Precio por día con IVA, seguro, asistencia 24 h, equipamiento completo y parking para tu coche incluidos. Alquiler mínimo de 3 días.</p>
+      </div>
+      <PriceTable />
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container tf">
+      <div class="prose">
+        <h2>Calcula el precio de tu alquiler</h2>
+        <p>Elige modelo y fechas en el formulario y verás al momento un <strong>precio orientativo</strong> calculado día a día según la temporada. Te confirmamos el precio final y la disponibilidad en menos de 24 horas.</p>
+        <h3>Ejemplos de precio</h3>
+        <ul>
+          <li>Fin de semana (3 días) en Camper 120 UP, temporada baja: <strong>{px('{camper.baja.x3}')} €</strong>.</li>
+          <li>Una semana (7 días) en Camper 120 UP, temporada media: <strong>{px('{camper.media.x7}')} €</strong>.</li>
+          <li>Una semana (7 días) en Mileo 268, temporada media: <strong>{px('{mileo.media.x7}')} €</strong>.</li>
+          <li>Dos semanas (15 días) en Mileo 268, temporada alta, km ilimitados: <strong>{px('{mileo.alta.long.x15}')} €</strong>.</li>
+        </ul>
+        <p><em>Todos los precios son orientativos. Consulta siempre nuestras ofertas especiales y promociones: a menudo hay descuentos en fechas concretas.</em></p>
+        <h3>Fechas de temporada especial</h3>
+        <ul data-special>
+          <template><li><span data-f="name"></span>: <span data-f="from"></span> – <span data-f="to"></span></li></template>
+          {specialDates.filter((d) => d.to >= today).map((d) => <li>{d.name}: {fmt(d.from)} – {fmt(d.to)}</li>)}
+        </ul>
+        <h3>¿Qué incluye el precio?</h3>
+        <p>Seguro del vehículo, asistencia en carretera 24 h, menaje de cocina y cubertería, mesa y sillas de camping, bombona de gas, manguera y alargadera, pastillas químicas para el WC, kit de limpieza, mascotas sin coste y parking cerrado para tu coche. Solo tienes que traer ropa de cama y toallas.</p>
+        <p>Consulta los <a href="/requisitos-condiciones-de-uso-y-terminos/">requisitos y condiciones de alquiler</a>.</p>
+      </div>
+      <div class="tf__form"><QuoteForm /></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="narrow">
+      <h2>Preguntas sobre precios</h2>
+      <FaqList items={faqsBy('precio', 8)} />
+    </div>
+  </section>
+  <CtaBand title="¿Quieres un precio cerrado?" />
+</Base>
+<style>
+  .tf { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 3rem; align-items: start; }
+  .tf__form { position: sticky; top: 92px; }
+  @media (max-width: 1100px) { .tf { grid-template-columns: minmax(0, 1fr); } .tf__form { position: static; } }
+</style>

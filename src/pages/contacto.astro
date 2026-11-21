@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import Location from '../components/Location.astro';
+import Icon from '../components/Icon.astro';
+import { site, waLink } from '../data/site';
+const channels = [
+  { icon: 'whatsapp', t: 'WhatsApp', d: 'La forma más rápida. Respondemos en minutos.', href: waLink(), cta: 'Abrir WhatsApp', cls: 'wa', ext: true },
+  { icon: 'phone', t: 'Teléfono', d: `${site.phoneDisplay} · ${site.hours}`, href: `tel:${site.phone}`, cta: 'Llamar ahora', cls: 'call' },
+  { icon: 'mail', t: 'Email', d: site.email, href: `mailto:${site.email}?subject=Consulta alquiler autocaravana`, cta: 'Enviar email', cls: 'mail' },
+  { icon: 'pin', t: 'Visítanos', d: `${site.address.city} (Sevilla) · con cita previa`, href: site.mapsUrl, cta: 'Cómo llegar', cls: 'map', ext: true },
+];
+---
+<Base
+  title="Contacto · Alquiler de Autocaravanas en Sevilla | RG MEGA"
+  description="Contacta con RG MEGA Autocaravanas en Sevilla por WhatsApp, teléfono (663 63 88 10), email o formulario. Te respondemos en menos de 24 h con disponibilidad y precio."
+  breadcrumbs={[{ name: 'Contacto', url: '/contacto/' }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="container ct">
+      <div>
+        <span class="eyebrow">Hablemos</span>
+        <h1>Contacto y reservas</h1>
+        <p class="lead">Elige cómo prefieres hablar con nosotros. Siempre te atiende el equipo de RG MEGA, sin centralitas.</p>
+        <div class="ch">
+          {channels.map((c) => (
+            <a class={`ch__item ch__item--${c.cls}`} href={c.href} target={c.ext ? '_blank' : undefined} rel={c.ext ? 'noopener' : undefined}>
+              <span class="ch__i"><Icon name={c.icon} /></span>
+              <span class="ch__txt"><strong>{c.t}</strong><small>{c.d}</small></span>
+              <span class="ch__cta">{c.cta} →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div><QuoteForm /></div>
+    </div>
+  </section>
+  <Location />
+</Base>
+<style>
+  .ct { display: grid; grid-template-columns: 1fr 460px; gap: 3rem; align-items: start; }
+  .ch { display: grid; gap: .8rem; margin-top: 1.5rem; }
+  .ch__item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 16px; text-decoration: none; color: var(--ink); transition: .2s; }
+  .ch__item:hover { border-color: var(--pine-2); box-shadow: var(--shadow); color: var(--ink); }
+  .ch__i { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--pine-3); color: var(--pine); }
+  .ch__item--wa .ch__i { background: var(--wa); color: #fff; }
+  .ch__i :global(svg) { width: 24px; height: 24px; }
+  .ch__txt { display: grid; }
+  .ch__txt strong { color: var(--pine); }
+  .ch__txt small { color: var(--muted); font-size: .9rem; word-break: break-word; }
+  .ch__cta { font-weight: 650; color: var(--terra-ink); font-size: .9rem; white-space: nowrap; }
+  @media (max-width: 1060px) { .ct { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 480px) { .ch__cta { display: none; } }
+</style>

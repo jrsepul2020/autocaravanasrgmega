@@ -1,0 +1,18 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { site } from '../data/site';
+---
+<LegalPage title="Aviso legal" h1="Aviso legal" url="/aviso-legal/">
+  <!-- COMPLETAR con los datos fiscales del titular -->
+  <p>En cumplimiento de la Ley 34/2002 de Servicios de la Sociedad de la Información (LSSI-CE), se informa de los datos del titular de este sitio web:</p>
+  <ul>
+    <li>Titular: <strong>[NOMBRE O RAZÓN SOCIAL]</strong></li>
+    <li>NIF/CIF: <strong>[NIF]</strong></li>
+    <li>Domicilio: {site.address.street}, {site.address.postalCode} {site.address.city} ({site.address.region})</li>
+    <li>Teléfono: {site.phoneDisplay} · Email: {site.email}</li>
+  </ul>
+  <h2>Condiciones de uso</h2>
+  <p>El acceso a esta web atribuye la condición de usuario e implica la aceptación de estas condiciones. Los contenidos, imágenes y marcas son propiedad del titular o se utilizan con autorización, y no pueden reproducirse sin permiso.</p>
+  <h2>Responsabilidad</h2>
+  <p>Los precios y la disponibilidad mostrados son orientativos hasta su confirmación expresa. El titular no se hace responsable del uso indebido de la información publicada.</p>
+</LegalPage>

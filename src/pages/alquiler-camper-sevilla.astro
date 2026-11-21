@@ -1,0 +1,37 @@
+---
+import LandingPage from '../components/LandingPage.astro';
+import img from '../assets/img/camper-120-up-exterior.jpg';
+import { faqsBy } from '../data/faqs';
+const faqs = [
+  { q: '¿Cuánto cuesta alquilar una camper en Sevilla?', a: 'Nuestra Camper 120 UP cuesta desde {camper.desde} €/día en temporada baja para alquileres largos y entre {camper.min} y {camper.max} €/día para alquileres de 3 a 14 días. Incluye seguro, asistencia 24 h, equipamiento completo y parking para tu coche.', tags: [] },
+  { q: '¿Qué diferencia hay entre una camper y una autocaravana?', a: 'La camper es una furgoneta camperizada (unos 6 m), más ágil y fácil de aparcar. La autocaravana perfilada como la Mileo 268 es más ancha, con más espacio interior, camas fijas más grandes y garaje. Ambas tienen baño, ducha y cocina.', tags: [] },
+  ...faqsBy('camper', 4),
+];
+---
+<LandingPage
+  title="Alquiler de Camper en Sevilla desde {camper.desde} €/día | Furgoneta camper RG MEGA"
+  description="Alquiler de furgonetas camper en Sevilla con baño, ducha, cocina y placa solar. Camper Benimar 120 UP desde {camper.desde} €/día, mascotas gratis y recogida en Salteras. Fines de semana y vacaciones."
+  h1="Alquiler de camper en Sevilla"
+  eyebrow="Furgoneta camper · Sevilla"
+  lead="Una camper compacta, nueva y totalmente equipada para recorrer Andalucía a tu ritmo. Recógela en Sevilla y empieza la aventura el mismo día."
+  image={img}
+  imageAlt="Furgoneta camper Benimar 120 UP de alquiler en Sevilla"
+  crumb="Alquiler camper Sevilla"
+  focus="camper"
+  faqs={faqs}
+  waText="Hola, me interesa alquilar la camper en Sevilla. ¿Tenéis disponibilidad para…?"
+  bullets={['Camper Benimar 120 UP de 6 m, fácil de conducir', 'Baño con ducha, cocina y nevera de 138 L', 'Placa solar: días de autonomía sin enchufe', 'Mascotas gratis y parking para tu coche']}
+>
+  <h2>Tu furgoneta camper de alquiler con salida desde Sevilla</h2>
+  <p>Si estás buscando <strong>alquilar una camper en Sevilla</strong>, en RG MEGA tienes la <a href="/alquilar-camper-120-up/">Benimar Camper 120 UP</a>: una furgoneta camper de nueva generación que se conduce como un turismo grande y cabe en cualquier aparcamiento largo. Es la opción preferida por parejas y familias pequeñas que quieren moverse con libertad por pueblos, calas y ciudades.</p>
+  <p>A diferencia de las grandes plataformas, aquí no hay sorpresas: te entregamos la camper personalmente en nuestras instalaciones de Salteras, a 15 minutos del centro de Sevilla, te explicamos el funcionamiento de agua, gas, electricidad y calefacción, y estamos al teléfono durante todo el viaje.</p>
+  <h3>¿Qué incluye el alquiler de la camper?</h3>
+  <ul>
+    <li>Seguro del vehículo y asistencia en carretera 24 h.</li>
+    <li>Menaje de cocina, cubertería, mesa y sillas de camping.</li>
+    <li>Bombona de gas, manguera, alargadera y pastillas para el WC.</li>
+    <li>250 km/día en alquileres cortos y <strong>kilómetros ilimitados a partir de 8 días</strong>.</li>
+  </ul>
+  <h3>Rutas en camper desde Sevilla</h3>
+  <p>En menos de dos horas puedes estar en la costa de Cádiz, en Doñana o en la Sierra de Aracena. Echa un vistazo a nuestras <a href="/rutas/">rutas en camper desde Sevilla</a> para inspirarte. ¿Viajáis 4 adultos? Entonces te encajará mejor la <a href="/alquilar-benimar-mileo-268/">autocaravana Mileo 268</a>.</p>
+</LandingPage>

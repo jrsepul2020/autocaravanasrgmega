@@ -1,0 +1,49 @@
+---
+import LandingPage from '../components/LandingPage.astro';
+import img from '../assets/img/mileo-268-salon-comedor.jpg';
+import { specialDates } from '../data/site';
+import { faqsBy } from '../data/faqs';
+const today = new Date().toISOString().slice(0, 10);
+const upcoming = specialDates.filter((d) => d.to >= today).slice(0, 8);
+const fmt = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+const faqs = [
+  { q: '¿Con cuánta antelación debo reservar para un puente?', a: 'Para puentes como el de diciembre, Semana Santa, Feria o El Rocío recomendamos reservar con 1-2 meses de antelación: solo tenemos dos vehículos y son las primeras fechas en ocuparse.', tags: [] },
+  { q: '¿Qué precio tiene el alquiler en puentes y festivos?', a: 'En puentes y festivos se aplica la temporada especial: {camper.especial.short} €/día la Camper 120 UP y {mileo.especial.short} €/día la Mileo 268 (3-14 días). Si sumas días antes o después del puente se aplica la tarifa normal a esos días.', tags: [] },
+  ...faqsBy('puente', 5),
+];
+---
+<LandingPage
+  title="Alquiler de Autocaravana para Puentes y Festivos en Sevilla | RG MEGA"
+  description="Alquila una autocaravana en Sevilla para el puente de diciembre, Andalucía, Semana Santa, Feria, mayo o El Rocío. Mínimo 3 días, seguro incluido. Reserva con antelación."
+  h1="Alquiler de autocaravana para puentes en Sevilla"
+  eyebrow="Puentes y festivos"
+  lead="Los puentes son el momento perfecto para una escapada en autocaravana… y los primeros días en reservarse. Asegura tu fecha."
+  image={img}
+  imageAlt="Interior de la autocaravana Mileo 268 lista para un puente"
+  crumb="Puentes y festivos"
+  faqs={faqs}
+  waText="Hola, quiero alquilar una autocaravana para el puente de…"
+  bullets={['Puente de diciembre, Andalucía, Semana Santa, mayo…', 'Mínimo 3 días: encaja en cualquier puente', 'Recogida flexible en vísperas y festivos', 'Solo 2 vehículos: reserva con antelación']}
+>
+  <h2>Próximos puentes y festivos</h2>
+  <div class="bridges">
+    {upcoming.map((d) => (
+      <a class="bridge" href={`/contacto/?salida=${d.from}&llegada=${d.to}#presupuesto`}>
+        <strong>{d.name}</strong><span>{fmt(d.from)} – {fmt(d.to)}</span><em>Consultar →</em>
+      </a>
+    ))}
+  </div>
+  <p><small>Fechas orientativas. Puedes ajustar recogida y devolución a tu gusto (mínimo 3 días).</small></p>
+  <h2>Un puente en autocaravana desde Sevilla</h2>
+  <p>El <strong>puente de la Constitución y la Inmaculada</strong> es ideal para la Sierra de Aracena o Sierra Nevada; el <strong>puente de Andalucía</strong> (28 de febrero) para la costa de Cádiz sin aglomeraciones; y <strong>Semana Santa</strong> o el <strong>puente de mayo</strong> para recorrer el Algarve o los pueblos blancos con la primavera en pleno apogeo.</p>
+  <p>Durante la <strong>Feria de Abril</strong> y la <strong>Romería de El Rocío</strong> muchos sevillanos aprovechan para salir de la ciudad… o para tener su propio "alojamiento" sobre ruedas cerca de la aldea. Estas fechas se aplican con la <a href="/tarifas/">tarifa de temporada especial</a>.</p>
+  <p>Escríbenos por WhatsApp con las fechas de tu puente y te confirmamos disponibilidad al momento, o <a href="/calendario-disponibilidad/">mira el calendario</a> de cada vehículo.</p>
+</LandingPage>
+<style>
+  .bridges { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: .7rem; margin: 1rem 0; }
+  .bridge { display: grid; gap: .15rem; padding: .9rem 1rem; border-radius: 14px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); background: #fff; }
+  .bridge:hover { border-color: var(--terra-ink); color: var(--ink); }
+  .bridge strong { color: var(--pine); }
+  .bridge span { font-size: .9rem; color: var(--muted); }
+  .bridge em { font-style: normal; color: var(--terra-ink); font-weight: 650; font-size: .9rem; }
+</style>

@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { pricing } from '../data/site';
+---
+<Base
+  title="Requisitos y Condiciones de Alquiler de Autocaravanas | RG MEGA Sevilla"
+  description="Requisitos para alquilar una autocaravana en RG MEGA Sevilla: edad mínima 25 años, 5 años de carnet B, kilometraje, forma de pago, cancelación y normas de uso."
+  breadcrumbs={[{ name: 'Requisitos y condiciones', url: '/requisitos-condiciones-de-uso-y-terminos/' }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="narrow prose">
+      <span class="eyebrow">Antes de reservar</span>
+      <h1>Requisitos y condiciones de alquiler</h1>
+      <h2>Requisitos del conductor</h2>
+      <ul>
+        <li>Edad mínima: <strong>25 años</strong>.</li>
+        <li>Carnet de conducir <strong>tipo B</strong> con al menos <strong>5 años de antigüedad</strong>.</li>
+        <li>Solo pueden conducir las personas que figuren en el contrato y cumplan estos requisitos.</li>
+      </ul>
+      <h2>Duración y kilometraje</h2>
+      <ul>
+        <li>Alquiler mínimo: {pricing.minDays} días (para eventos especiales, <a href="/alquiler-autocaravana-eventos-futbol-sevilla/">consúltanos</a>).</li>
+        <li>{pricing.km.shortStay}. {pricing.km.longStay}.</li>
+        <li>Exceso de kilometraje: {pricing.km.excess}.</li>
+      </ul>
+      <h2>Pago de la reserva</h2>
+      <ul>{pricing.payment.map((p) => <li>{p}</li>)}</ul>
+      <h2>Cancelaciones</h2>
+      <ul>{pricing.cancellation.map((p) => <li>{p}</li>)}</ul>
+      <h2>Normas de uso</h2>
+      <ul>
+        <li>Está prohibido fumar en el interior del vehículo.</li>
+        <li>Se admiten mascotas sin coste; los posibles desperfectos corren a cargo del arrendatario.</li>
+        <li>Respeta las normas de estacionamiento y acampada de cada municipio.</li>
+      </ul>
+      <h2>Qué traer</h2>
+      <p>Ropa de cama (sábanas, fundas de almohada, mantas o sacos) y toallas. Todo lo demás está incluido.</p>
+      <p><a href="/tarifas/">Ver tarifas</a> · <a href="/preguntas-frecuentes/">Preguntas frecuentes</a></p>
+    </div>
+  </section>
+  <CtaBand />
+</Base>

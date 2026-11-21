@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site, waLink } from '../data/site';
+---
+<Base title="¡Gracias! Hemos recibido tu consulta | RG MEGA" description="Hemos recibido tu consulta de alquiler de autocaravana." noindex>
+  <section class="section">
+    <div class="narrow" style="text-align:center">
+      <h1>¡Gracias! Hemos recibido tu consulta</h1>
+      <p class="lead" style="margin-inline:auto">Te responderemos en menos de 24 horas con la disponibilidad y el precio. Si tienes prisa, escríbenos por WhatsApp.</p>
+      <div class="btn-row" style="justify-content:center">
+        <a class="btn btn--wa" href={waLink('Hola, acabo de enviar una consulta desde la web')} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
+        <a class="btn btn--ghost" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
+        <a class="btn btn--ghost" href="/rutas/">Inspírate con nuestras rutas</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,134 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import logoNeg from '../assets/img/logo-rgmega-negativo.png';
+import { site, waLink } from '../data/site';
+const year = new Date().getFullYear();
+
+const flota = [
+  { href: '/alquilar-benimar-mileo-268/', t: 'Alquiler Benimar Mileo 268' },
+  { href: '/alquilar-camper-120-up/', t: 'Alquiler Camper 120 UP' },
+  { href: '/tarifas/', t: 'Precios y tarifas' },
+  { href: '/calendario-disponibilidad/', t: 'Calendario de disponibilidad' },
+  { href: '/requisitos-condiciones-de-uso-y-terminos/', t: 'Requisitos y condiciones' },
+];
+const escapadas = [
+  { href: '/alquiler-autocaravana-fin-de-semana-sevilla/', t: 'Autocaravana fin de semana' },
+  { href: '/alquiler-autocaravana-puente-sevilla/', t: 'Autocaravana para puentes' },
+  { href: '/alquiler-autocaravana-eventos-futbol-sevilla/', t: 'Autocaravana para fútbol y eventos' },
+  { href: '/alquiler-camper-sevilla/', t: 'Alquiler camper Sevilla' },
+  { href: '/ofertas-alquiler-autocaravana-sevilla/', t: 'Ofertas autocaravanas baratas' },
+  { href: '/rutas/', t: 'Rutas en autocaravana' },
+  { href: '/preguntas-frecuentes/', t: 'Preguntas frecuentes' },
+];
+---
+<footer class="ftr">
+  <div class="container ftr__grid">
+    <div class="ftr__brand">
+      <a href="/" class="ftr__logo" aria-label="RG MEGA Autocaravanas, inicio">
+        <Image src={logoNeg} alt="Logo RG MEGA Autocaravanas" width={110} height={110} />
+      </a>
+      <p>Alquiler de autocaravanas y campers en Sevilla. Recogida y entrega en Salteras, a {site.distanceToSevilla}.</p>
+      <ul class="ftr__usp">
+        <li><Icon name="shield" /> Seguro y asistencia 24 h</li>
+        <li><Icon name="paw" /> Mascotas gratis</li>
+        <li><Icon name="parking" /> Parking gratis</li>
+      </ul>
+      <div class="ftr__social">
+        <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram" /></a>
+        <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook"><Icon name="facebook" /></a>
+        <a href={site.social.tiktok} target="_blank" rel="noopener" aria-label="TikTok"><Icon name="tiktok" /></a>
+      </div>
+    </div>
+    <div>
+      <p class="ftr__h"><Icon name="key" /> Autocaravanas</p>
+      <ul class="ftr__links">
+        {flota.map((l) => <li><a href={l.href}><Icon name="arrow" /><span>{l.t}</span></a></li>)}
+      </ul>
+    </div>
+    <div>
+      <p class="ftr__h"><Icon name="route" /> Escapadas desde Sevilla</p>
+      <ul class="ftr__links">
+        {escapadas.map((l) => <li><a href={l.href}><Icon name="arrow" /><span>{l.t}</span></a></li>)}
+      </ul>
+    </div>
+    <div class="ftr__contact">
+      <p class="ftr__h"><Icon name="headset" /> Contacto</p>
+      <ul>
+        <li><a href={`tel:${site.phone}`}><span class="ftr__ic"><Icon name="phone" /></span> {site.phoneDisplay}</a></li>
+        <li><a href={waLink()} target="_blank" rel="noopener"><span class="ftr__ic ftr__ic--wa"><Icon name="whatsapp" /></span> WhatsApp</a></li>
+        <li><a href={`mailto:${site.email}`}><span class="ftr__ic"><Icon name="mail" /></span> <span class="ftr__break">{site.email}</span></a></li>
+        <li><a href={site.mapsUrl} target="_blank" rel="noopener"><span class="ftr__ic"><Icon name="pin" /></span> {site.address.street}, {site.address.postalCode} {site.address.city} ({site.address.region})</a></li>
+        <li><span><span class="ftr__ic"><Icon name="clock" /></span> {site.hours}</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container ftr__legal">
+    <p>© {year} RG MEGA Autocaravanas · Alquiler de autocaravanas en Sevilla</p>
+    <nav aria-label="Legal">
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/politica-de-privacidad/">Privacidad</a>
+      <a href="/politica-de-cookies/">Cookies</a>
+    </nav>
+  </div>
+</footer>
+<style>
+  .ftr { background: var(--pine-dark); color: #c4d3cb; font-size: .95rem; border-top: 5px solid var(--terra); }
+  .ftr a { color: #e3ece7; text-decoration: none; }
+  .ftr a:hover { color: #fff; }
+  .ftr :global(svg) { flex: none; }
+
+  .ftr__grid { display: grid; grid-template-columns: 1.2fr 1fr 1.1fr 1.3fr; gap: 0; padding: 4rem 0 0; }
+  .ftr__grid > div { padding: 0 1.8rem; border-left: 1px solid rgba(255,255,255,.12); }
+  .ftr__grid > div:first-child { padding-left: 0; border-left: 0; }
+  .ftr__grid > div:last-child { padding-right: 0; }
+
+  .ftr__logo { display: inline-block; margin-bottom: 1rem; }
+  .ftr__logo :global(img) { width: 110px; height: auto; }
+  .ftr__usp { list-style: none; padding: 0; margin: 0 0 1.2rem; display: grid; gap: .4rem; font-size: .9rem; }
+  .ftr__usp li { display: flex; align-items: center; gap: .5rem; }
+  .ftr__usp :global(svg) { width: 17px; height: 17px; color: var(--terra); }
+
+  .ftr__h { display: flex; align-items: center; gap: .5rem; color: #fff; font-family: var(--display); font-weight: 700; font-size: 1.1rem; margin-bottom: .9rem; padding-bottom: .7rem; position: relative; }
+  .ftr__h::after { content: ''; position: absolute; left: 0; bottom: 0; width: 40px; height: 3px; border-radius: 3px; background: var(--terra); }
+  .ftr__h :global(svg) { width: 20px; height: 20px; color: var(--terra); }
+
+  .ftr ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .1rem; }
+  .ftr__links a { display: flex; align-items: flex-start; gap: .45rem; padding: .35rem 0; border-bottom: 1px dashed rgba(255,255,255,.1); transition: color .15s, padding-left .15s; }
+  .ftr__links li:last-child a { border-bottom: 0; }
+  .ftr__links :global(svg) { width: 15px; height: 15px; margin-top: .25rem; color: var(--terra); transition: transform .15s; }
+  .ftr__links a:hover { padding-left: .2rem; }
+  .ftr__links a:hover :global(svg) { transform: translateX(3px); }
+
+  .ftr__contact ul { gap: .55rem; }
+  .ftr__contact a, .ftr__contact li > span { display: flex; gap: .65rem; align-items: center; }
+  .ftr__ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--terra); color: #fff; flex: none; }
+  .ftr__ic--wa { background: var(--wa); color: #fff; }
+  .ftr__ic :global(svg) { width: 17px; height: 17px; }
+  .ftr__break { overflow-wrap: anywhere; }
+
+  .ftr__social { display: flex; gap: .6rem; }
+  .ftr__social a { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); }
+  .ftr__social a:hover { background: var(--terra); color: #fff; border-color: var(--terra); }
+  .ftr__social :global(svg) { width: 20px; height: 20px; }
+
+  .ftr__legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding: 1.4rem 0 1.6rem; border-top: 1px solid rgba(255,255,255,.14); font-size: .85rem; }
+  .ftr__legal p { margin: 0; }
+  .ftr__legal nav { display: flex; gap: 0; }
+  .ftr__legal nav a + a { border-left: 1px solid rgba(255,255,255,.25); }
+  .ftr__legal nav a { padding: 0 .9rem; }
+  .ftr__legal nav a:first-child { padding-left: 0; }
+  .ftr__legal a:hover { color: var(--terra); }
+
+  @media (max-width: 1000px) {
+    .ftr__grid { grid-template-columns: 1fr 1fr; row-gap: 2.5rem; }
+    .ftr__grid > div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .ftr__grid > div:nth-child(2) { padding-right: 0; }
+  }
+  @media (max-width: 600px) {
+    .ftr__grid { grid-template-columns: minmax(0, 1fr); }
+    .ftr__grid > div { padding: 0 !important; border-left: 0 !important; }
+    .ftr__grid > div + div { padding-top: 2rem !important; border-top: 1px solid rgba(255,255,255,.12); }
+  }
+</style>

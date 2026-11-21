@@ -1,0 +1,185 @@
+---
+/**
+ * Formulario de "Pedir presupuesto / disponibilidad".
+ * - Calcula un precio orientativo en vivo según fechas y modelo.
+ * - Envía por email (Web3Forms, si hay clave en site.ts) y siempre ofrece enviarlo por WhatsApp.
+ */
+import Icon from './Icon.astro';
+import { site, seasons, priceDisclaimer, specialDates } from '../data/site';
+import { vehicles } from '../data/vehicles';
+
+interface Props { preselect?: 'mileo' | 'camper'; title?: string; compact?: boolean; id?: string }
+const { preselect, title = 'Consulta disponibilidad y precio', compact = false, id = 'presupuesto' } = Astro.props;
+const vehicleData = vehicles.map((v) => ({ id: v.id, name: v.name, prices: v.prices }));
+---
+<form class:list={['qf', { 'qf--compact': compact }]} id={id} data-key={site.web3formsKey} data-wa={site.whatsapp} novalidate>
+  <div class="qf__head">
+    <p class="qf__title">{title}</p>
+    <p class="qf__sub">Respuesta en menos de 24 h · Sin compromiso</p>
+  </div>
+
+  <fieldset class="qf__models">
+    <legend class="visually-hidden">Modelo</legend>
+    {vehicles.map((v) => (
+      <label class="qf__model">
+        <input type="radio" name="modelo" value={v.id} checked={preselect ? preselect === v.id : v.id === 'mileo'} />
+        <span><strong>{v.short}</strong><small>{v.type}</small></span>
+      </label>
+    ))}
+  </fieldset>
+
+  <div class="qf__row">
+    <div class="field"><label for={`${id}-from`}>Recogida</label><input id={`${id}-from`} type="date" name="salida" required /></div>
+    <div class="field"><label for={`${id}-to`}>Devolución</label><input id={`${id}-to`} type="date" name="llegada" required /></div>
+  </div>
+
+  <div class="qf__estimate" aria-live="polite" hidden>
+    <div class="qf__est-main"><span>Precio orientativo</span><strong data-total>—</strong></div>
+    <p class="qf__est-detail" data-detail></p>
+    <p class="qf__est-note">{priceDisclaimer}</p>
+  </div>
+
+  <div class="qf__row">
+    <div class="field"><label for={`${id}-name`}>Nombre</label><input id={`${id}-name`} name="nombre" autocomplete="name" required /></div>
+    <div class="field"><label for={`${id}-tel`}>Teléfono</label><input id={`${id}-tel`} name="telefono" type="tel" autocomplete="tel" inputmode="tel" required /></div>
+  </div>
+  {!compact && (
+    <>
+      <div class="field"><label for={`${id}-email`}>Email</label><input id={`${id}-email`} name="email" type="email" autocomplete="email" /></div>
+      <div class="field"><label for={`${id}-msg`}>¿Algo más? (personas, mascota, dudas…)</label><textarea id={`${id}-msg`} name="mensaje" rows="3"></textarea></div>
+    </>
+  )}
+  <input type="checkbox" name="botcheck" class="visually-hidden" tabindex="-1" autocomplete="off" />
+  <label class="qf__legal"><input type="checkbox" name="privacidad" required /> <span>Acepto la <a href="/politica-de-privacidad/" target="_blank">política de privacidad</a></span></label>
+
+  <div class="qf__actions">
+    <button type="submit" class="btn btn--primary" data-mode="email"><Icon name="mail" /> Enviar consulta</button>
+    <button type="button" class="btn btn--wa" data-mode="wa"><Icon name="whatsapp" /> Enviar por WhatsApp</button>
+  </div>
+  <p class="qf__msg" role="status"></p>
+</form>
+
+<script is:inline type="application/json" id="qf-data" set:html={JSON.stringify({ vehicles: vehicleData, seasons, special: specialDates })}></script>
+
+<script>
+  import { estimate, parseDate, setSpecialDates } from '../scripts/pricing';
+  const data = JSON.parse(document.getElementById('qf-data')!.textContent!);
+  setSpecialDates(data.special);
+  // Precios en vivo desde Google Sheets (scripts/live.ts)
+  const applyLive = (d: any) => {
+    if (!d) return;
+    for (const v of data.vehicles) if (d.prices?.[v.id]) Object.assign(v.prices, d.prices[v.id]);
+    setSpecialDates(d.special);
+  };
+  applyLive((window as any).__rgLive);
+  const eur = (n: number) => n.toLocaleString('es-ES') + ' €';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const isoToday = today.toISOString().slice(0, 10);
+
+  document.querySelectorAll<HTMLFormElement>('form.qf').forEach((form) => {
+    const from = form.querySelector<HTMLInputElement>('[name=salida]')!;
+    const to = form.querySelector<HTMLInputElement>('[name=llegada]')!;
+    const est = form.querySelector<HTMLElement>('.qf__estimate')!;
+    const msg = form.querySelector<HTMLElement>('.qf__msg')!;
+    from.min = isoToday; to.min = isoToday;
+
+    // Prefill desde URL (?modelo=camper&salida=2026-12-04&llegada=2026-12-08)
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('modelo')) { const r = form.querySelector<HTMLInputElement>(`[name=modelo][value=${qs.get('modelo')}]`); if (r) r.checked = true; }
+    if (qs.get('salida')) from.value = qs.get('salida')!;
+    if (qs.get('llegada')) to.value = qs.get('llegada')!;
+
+    const model = () => form.querySelector<HTMLInputElement>('[name=modelo]:checked')?.value ?? 'mileo';
+    let lastText = '';
+
+    function update() {
+      if (from.value) to.min = from.value;
+      const a = parseDate(from.value), b = parseDate(to.value);
+      if (!a || !b || b < a) { est.hidden = true; lastText = ''; return; }
+      const v = data.vehicles.find((x: any) => x.id === model());
+      const r = estimate(v.prices, a, b);
+      if (!r) return;
+      est.hidden = false;
+      const parts = Object.entries(r.breakdown).map(([k, x]: any) => `${x.days} d × ${x.rate} €/día (${data.seasons[k].label.replace('Temporada ', '')})`);
+      est.querySelector('[data-total]')!.textContent = eur(r.total);
+      est.querySelector('[data-detail]')!.textContent =
+        `${r.days} días · ${parts.join(' + ')} · ${r.unlimitedKm ? 'Km ilimitados' : '250 km/día incluidos'}` +
+        (r.belowMin ? ' · El mínimo general es de 3 días; para eventos especiales, consúltanos' : '');
+      lastText = `Precio orientativo: ${eur(r.total)} (${r.days} días)`;
+    }
+    form.addEventListener('input', update);
+    window.addEventListener('rg:live', (e: any) => { applyLive(e.detail); update(); });
+    update();
+
+    function summary() {
+      const fd = new FormData(form);
+      const v = data.vehicles.find((x: any) => x.id === model());
+      const fmt = (s: string) => s ? s.split('-').reverse().join('/') : '¿?';
+      return [
+        `Hola, quiero consultar disponibilidad:`,
+        `🚐 Modelo: ${v.name}`,
+        `📅 Del ${fmt(String(fd.get('salida') || ''))} al ${fmt(String(fd.get('llegada') || ''))}`,
+        lastText && `💶 ${lastText}`,
+        fd.get('nombre') && `👤 ${fd.get('nombre')}`,
+        fd.get('telefono') && `📞 ${fd.get('telefono')}`,
+        fd.get('mensaje') && `📝 ${fd.get('mensaje')}`,
+      ].filter(Boolean).join('\n');
+    }
+
+    const sendWa = () => {
+      window.open(`https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(summary())}`, '_blank', 'noopener');
+      (window as any).dataLayer?.push({ event: 'lead_whatsapp', modelo: model() });
+    };
+    form.querySelector('[data-mode=wa]')!.addEventListener('click', sendWa);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const key = form.dataset.key;
+      if (!key) { sendWa(); return; }
+      msg.textContent = 'Enviando…';
+      const fd = new FormData(form);
+      fd.append('access_key', key);
+      fd.append('subject', `Nueva consulta web – ${data.vehicles.find((x: any) => x.id === model()).name}`);
+      fd.append('from_name', 'Web RG MEGA');
+      fd.append('resumen', summary());
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
+        const j = await res.json();
+        if (j.success) { (window as any).dataLayer?.push({ event: 'lead_form', modelo: model() }); location.href = import.meta.env.BASE_URL + 'gracias/'; }
+        else throw new Error();
+      } catch {
+        msg.innerHTML = 'No se pudo enviar. Escríbenos por WhatsApp o llámanos al <a href="tel:+34663638810">663 63 88 10</a>.';
+      }
+    });
+  });
+</script>
+
+<style>
+  .qf { background: #fff; border-radius: var(--radius); padding: clamp(1.2rem, 3vw, 2rem); box-shadow: 0 20px 60px rgba(60,95,77,.16); display: grid; gap: 1rem; color: var(--ink); border: 1px solid var(--line); }
+  .qf__title { font-family: var(--display); font-size: 1.45rem; font-weight: 720; color: var(--pine); margin: 0; line-height: 1.2; }
+  .qf__sub { margin: .2rem 0 0; color: var(--muted); font-size: .9rem; }
+  .qf__models { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .qf__model { position: relative; cursor: pointer; }
+  .qf__model input { position: absolute; opacity: 0; }
+  .qf__model span { display: grid; padding: .7rem .9rem; border: 1.5px solid var(--line); border-radius: 12px; transition: .15s; }
+  .qf__model small { color: var(--muted); font-size: .8rem; }
+  .qf__model input:checked + span { border-color: var(--pine-2); background: var(--pine-3); box-shadow: inset 0 0 0 1px var(--pine-2); }
+  .qf__model input:focus-visible + span { outline: 3px solid var(--terra-ink); outline-offset: 2px; }
+  .qf__row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .qf__estimate { background: var(--sand); border-radius: 12px; padding: .8rem 1rem; }
+  .qf__est-main { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .qf__est-main span { font-weight: 600; color: var(--pine); font-size: .9rem; }
+  .qf__est-main strong { font-family: var(--display); font-size: 1.6rem; color: var(--red); }
+  .qf__est-detail { margin: .2rem 0 0; font-size: .82rem; color: var(--muted); }
+  .qf__est-note { margin: .35rem 0 0; font-size: .78rem; color: var(--pine); font-weight: 600; }
+  .qf__legal { display: flex; gap: .5rem; align-items: flex-start; font-size: .85rem; color: var(--muted); }
+  .qf__legal input { margin-top: .25rem; accent-color: var(--pine); }
+  .qf__actions { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .qf__actions .btn { white-space: normal; padding-inline: .8em; }
+  .qf__msg { margin: 0; font-size: .9rem; color: var(--terra-ink); }
+  .qf__msg:empty { display: none; }
+  @media (max-width: 480px) {
+    .qf__row, .qf__actions { grid-template-columns: 1fr; }
+  }
+</style>

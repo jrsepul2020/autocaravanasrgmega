@@ -1,0 +1,69 @@
+---
+import { seasons, pricing, type SeasonKey } from '../data/site';
+import PriceNote from './PriceNote.astro';
+import { vehicles, type Vehicle } from '../data/vehicles';
+interface Props { only?: Vehicle['id']; showConditions?: boolean }
+const { only, showConditions = true } = Astro.props;
+const list = only ? vehicles.filter((v) => v.id === only) : vehicles;
+const order: SeasonKey[] = ['baja', 'media', 'alta', 'especial'];
+---
+<div class="pt">
+  <div class="pt__scroll">
+    <table>
+      <caption class="visually-hidden">Precios por día del alquiler de autocaravanas en Sevilla</caption>
+      <thead>
+        <tr>
+          <th scope="col">Temporada</th>
+          {list.map((v) => <th scope="col" colspan="2">{v.short}</th>)}
+        </tr>
+        <tr class="pt__sub">
+          <th></th>
+          {list.map(() => <><th scope="col">3-14 días</th><th scope="col">+14 días</th></>)}
+        </tr>
+      </thead>
+      <tbody>
+        {order.map((k) => (
+          <tr>
+            <th scope="row">
+              <span class="pt__dot" style={`background:${seasons[k].color}`}></span>
+              <strong>{seasons[k].label}</strong>
+              <small>{seasons[k].when}</small>
+            </th>
+            {list.map((v) => <><td><b><span data-p={`${v.id}.${k}.short`}>{v.prices[k].short}</span> €<small>/día</small></b></td><td><b><span data-p={`${v.id}.${k}.long`}>{v.prices[k].long}</span> €<small>/día</small></b></td></>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="pt__note">Precio por día con IVA incluido · Alquiler mínimo {pricing.minDays} días · Seguro, asistencia 24 h y equipamiento incluidos.</p>
+  <PriceNote />
+  {showConditions && (
+    <div class="pt__cond grid grid-3">
+      <div><p class="pt__h">Kilometraje</p><ul><li>{pricing.km.shortStay}</li><li>{pricing.km.longStay}</li><li>Exceso: {pricing.km.excess}</li></ul></div>
+      <div><p class="pt__h">Pago de la reserva</p><ul>{pricing.payment.map((p) => <li>{p}</li>)}</ul></div>
+      <div><p class="pt__h">Cancelación</p><ul>{pricing.cancellation.map((p) => <li>{p}</li>)}</ul></div>
+    </div>
+  )}
+</div>
+<style>
+  .pt__scroll { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); background: #fff; box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  th, td { padding: .9rem 1rem; text-align: center; border-bottom: 1px solid var(--line); }
+  thead th { background: var(--pine); color: #fff; font-family: var(--display); font-size: 1.05rem; }
+  .pt__sub th { background: var(--pine-2); font-family: var(--font); font-size: .8rem; font-weight: 600; padding: .5rem; }
+  tbody th { text-align: left; font-weight: 400; max-width: 340px; }
+  tbody th strong { display: inline; color: var(--pine); }
+  tbody th small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.4; margin-top: .2rem; }
+  .pt__dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: .45rem; }
+  td b { font-family: var(--display); font-size: 1.3rem; color: var(--red); }
+  td b small { font-size: .62em; font-weight: 500; margin-left: .1em; }
+  tbody tr:last-child > * { border-bottom: 0; }
+  tbody tr:nth-child(even) { background: var(--sand); }
+  .pt__note { font-size: .9rem; color: var(--muted); margin: .9rem 0 0; }
+  .pt__cond { margin-top: 1.5rem; }
+  .pt__cond > div { background: var(--pine-dark); color: #fff; border-radius: 14px; padding: 1.2rem 1.3rem; font-size: .92rem; }
+  .pt__cond > div:last-child { background: var(--terra); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.22); }
+  .pt__cond > div:last-child .pt__h { color: #fff; }
+  .pt__cond ul { margin: 0; padding-left: 1.1em; }
+  .pt__h { font-family: var(--display); font-weight: 600; font-size: 1.1rem; color: #fff; margin-bottom: .5rem; }
+</style>

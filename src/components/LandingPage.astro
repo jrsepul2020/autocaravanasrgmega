@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import QuoteForm from './QuoteForm.astro';
+import VehicleCard from './VehicleCard.astro';
+import PriceTable from './PriceTable.astro';
+import FaqList from './FaqList.astro';
+import Benefits from './Benefits.astro';
+import Reviews from './Reviews.astro';
+import Location from './Location.astro';
+import CtaBand from './CtaBand.astro';
+import PhotoCarousel from './PhotoCarousel.astro';
+import { waLink } from '../data/site';
+import { vehicles, type Vehicle } from '../data/vehicles';
+import { px } from '../data/vehicles';
+import type { Faq } from '../data/faqs';
+
+interface Props {
+  title: string; description: string; h1: string; eyebrow: string; lead: string;
+  image: ImageMetadata; imageAlt: string; crumb: string; faqs: Faq[];
+  bullets: string[]; waText: string; focus?: Vehicle['id'];
+}
+const { title, description, h1, eyebrow, lead, image, imageAlt, crumb, faqs, bullets, waText, focus } = Astro.props;
+const list = focus ? [...vehicles].sort((a) => (a.id === focus ? -1 : 1)) : vehicles;
+---
+<Base title={title} description={description} breadcrumbs={[{ name: crumb, url: Astro.url.pathname }]}>
+  <section class="lp-hero">
+    <div class="container lp-hero__in">
+      <div>
+        <span class="eyebrow">{eyebrow}</span>
+        <h1>{h1}</h1>
+        <p class="lead">{px(lead)}</p>
+        <ul class="check-list lp-bul">{bullets.map((b) => <li>{px(b)}</li>)}</ul>
+        <div class="btn-row">
+          <a class="btn btn--wa" href={waLink(waText)} target="_blank" rel="noopener"><Icon name="whatsapp" /> Preguntar por WhatsApp</a>
+          <a class="btn btn--ghost" href="/calendario-disponibilidad/"><Icon name="calendar" /> Ver disponibilidad</a>
+        </div>
+      </div>
+      <div class="lp-hero__img">
+        <Image src={image} alt={imageAlt} widths={[500, 900, 1200]} sizes="(max-width: 960px) 100vw, 50vw" loading="eager" fetchpriority="high" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container lp-body">
+      <article class="prose"><slot /></article>
+      <aside class="lp-form"><QuoteForm preselect={focus} /></aside>
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Vehículos</span><h2>Autocaravanas disponibles en Sevilla</h2></div>
+      <div class="grid grid-2">{list.map((v) => <VehicleCard vehicle={v} />)}</div>
+    </div>
+  </section>
+
+  <PhotoCarousel />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Precios</span><h2>Tarifas por día</h2></div>
+      <PriceTable only={focus} />
+    </div>
+  </section>
+
+  <section class="section section--pine">
+    <div class="container"><Benefits /></div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="narrow">
+      <h2>Preguntas frecuentes</h2>
+      <FaqList items={faqs} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container"><Reviews /></div>
+  </section>
+
+  <Location />
+  <CtaBand />
+</Base>
+<style>
+  .lp-hero { background: linear-gradient(180deg, var(--sand) 0%, #fff 100%); padding: 1.5rem 0 3rem; }
+  .lp-hero__in { display: grid; grid-template-columns: 1.05fr .95fr; gap: 3rem; align-items: center; }
+  .lp-hero__img :global(img) { border-radius: 24px; box-shadow: 0 30px 60px rgba(60,95,77,.18); aspect-ratio: 4/3; object-fit: cover; width: 100%; }
+  .lp-bul { margin: 1.4rem 0 1.8rem; }
+  .lp-body { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 3rem; align-items: start; }
+  .lp-form { position: sticky; top: 92px; }
+  @media (max-width: 1100px) { .lp-body { grid-template-columns: minmax(0, 1fr); } .lp-form { position: static; } }
+  @media (max-width: 960px) {
+    .lp-hero__in { grid-template-columns: minmax(0, 1fr); }
+    .lp-form { position: static; }
+  }
+</style>

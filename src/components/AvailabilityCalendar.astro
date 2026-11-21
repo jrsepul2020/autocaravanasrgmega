@@ -1,0 +1,158 @@
+---
+/**
+ * Calendario de disponibilidad conectado a Google Calendar.
+ * CÓMO SE GESTIONA (admin): en Google Calendar, en el calendario de cada vehículo,
+ * crea un evento de día completo (p. ej. "RESERVADA MILEO") que cubra los días ocupados.
+ * Se marca en rojo automáticamente en la web. Los días sin eventos aparecen como libres.
+ * Los eventos cuyo título contenga "DISPONIBLE" o "LIBRE" se ignoran (no bloquean días).
+ */
+import { site } from '../data/site';
+import type { Vehicle } from '../data/vehicles';
+interface Props { vehicle: Vehicle; months?: number }
+const { vehicle, months = 2 } = Astro.props;
+const embed = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(vehicle.calendarId)}&ctz=Europe%2FMadrid&mode=MONTH&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&hl=es`;
+---
+<div class="avc" data-cal={vehicle.calendarId} data-key={site.googleApiKey} data-months={months} data-model={vehicle.id} data-embed={embed}>
+  <div class="avc__top">
+    <button type="button" class="avc__nav" data-prev aria-label="Mes anterior">‹</button>
+    <p class="avc__title"><strong>{vehicle.name}</strong></p>
+    <button type="button" class="avc__nav" data-next aria-label="Mes siguiente">›</button>
+  </div>
+  <div class="avc__months" aria-live="polite"><p class="avc__loading">Cargando disponibilidad…</p></div>
+  <div class="avc__legend">
+    <span><i class="free"></i> Libre</span>
+    <span><i class="busy"></i> Ocupado</span>
+    <span><i class="sel"></i> Tu selección</span>
+  </div>
+  <div class="avc__pick" hidden>
+    <p data-pick-text></p>
+    <a class="btn btn--primary btn--sm" data-pick-go href="#">Consultar estas fechas</a>
+  </div>
+  <p class="avc__hint">Pulsa el día de recogida y el de devolución para pedir precio.</p>
+</div>
+
+<script>
+  type Range = [string, string];
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+  async function loadBusy(cal: string, key: string): Promise<Range[]> {
+    const now = new Date(); now.setDate(1);
+    const max = new Date(now); max.setMonth(max.getMonth() + 14);
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal)}/events?key=${key}&singleEvents=true&maxResults=500&timeMin=${now.toISOString()}&timeMax=${max.toISOString()}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('gcal ' + res.status);
+    const j = await res.json();
+    return (j.items || []).filter((e: any) => e.status !== 'cancelled' && !/libre|disponible/i.test(e.summary || '')).map((e: any) => {
+      if (e.start.date) { // evento de día completo: end exclusivo
+        const end = new Date(e.end.date + 'T00:00:00'); end.setDate(end.getDate() - 1);
+        return [e.start.date, iso(end)] as Range;
+      }
+      return [e.start.dateTime.slice(0, 10), e.end.dateTime.slice(0, 10)] as Range;
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('.avc').forEach(async (el) => {
+    const months = Number(el.dataset.months) || 2;
+    const box = el.querySelector<HTMLElement>('.avc__months')!;
+    const today = iso(new Date());
+    let offset = 0;
+    let busy: Range[] = [];
+    let sel: string[] = [];
+    const isBusy = (d: string) => busy.some(([a, b]) => d >= a && d <= b);
+
+    function render() {
+      const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + offset);
+      let html = '';
+      for (let m = 0; m < months; m++) {
+        const first = new Date(base.getFullYear(), base.getMonth() + m, 1);
+        const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+        const lead = (first.getDay() + 6) % 7;
+        html += `<div class="avc__month"><p class="avc__mname">${MONTHS[first.getMonth()]} ${first.getFullYear()}</p><div class="avc__grid">`;
+        html += ['L','M','X','J','V','S','D'].map((d) => `<span class="avc__dow">${d}</span>`).join('');
+        html += '<span></span>'.repeat(lead);
+        for (let d = 1; d <= days; d++) {
+          const s = iso(new Date(first.getFullYear(), first.getMonth(), d));
+          const past = s < today;
+          const b = isBusy(s);
+          const inSel = sel.length === 2 ? s >= sel[0] && s <= sel[1] : sel[0] === s;
+          const cls = past ? 'past' : b ? 'busy' : 'free';
+          html += `<button type="button" class="avc__d ${cls}${inSel ? ' sel' : ''}" data-d="${s}" ${past || b ? 'disabled' : ''} aria-label="${d} de ${MONTHS[first.getMonth()]}${b ? ', ocupado' : past ? '' : ', libre'}">${d}</button>`;
+        }
+        html += '</div></div>';
+      }
+      box.innerHTML = html;
+      el.querySelector<HTMLButtonElement>('[data-prev]')!.disabled = offset <= 0;
+    }
+
+    function updatePick() {
+      const pick = el.querySelector<HTMLElement>('.avc__pick')!;
+      if (sel.length < 2) { pick.hidden = true; return; }
+      const f = (s: string) => s.split('-').reverse().join('/');
+      pick.hidden = false;
+      el.querySelector('[data-pick-text]')!.textContent = `Del ${f(sel[0])} al ${f(sel[1])}`;
+      const params = new URLSearchParams({ modelo: el.dataset.model!, salida: sel[0], llegada: sel[1] });
+      const go = el.querySelector<HTMLAnchorElement>('[data-pick-go]')!;
+      const form = document.querySelector<HTMLFormElement>('form.qf');
+      go.href = form ? '#' + form.id : `${import.meta.env.BASE_URL}contacto/?${params}#presupuesto`;
+      go.onclick = form ? () => {
+        (form.querySelector(`[name=modelo][value=${el.dataset.model}]`) as HTMLInputElement).checked = true;
+        (form.querySelector('[name=salida]') as HTMLInputElement).value = sel[0];
+        (form.querySelector('[name=llegada]') as HTMLInputElement).value = sel[1];
+        form.dispatchEvent(new Event('input'));
+      } : null;
+    }
+
+    box.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLButtonElement>('.avc__d');
+      if (!t || t.disabled) return;
+      const d = t.dataset.d!;
+      if (sel.length !== 1 || d < sel[0]) sel = [d];
+      else {
+        // no permitir rangos que crucen días ocupados
+        const crosses = busy.some(([a, b]) => a <= d && b >= sel[0]);
+        sel = crosses ? [d] : [sel[0], d];
+      }
+      render(); updatePick();
+    });
+    el.querySelector('[data-prev]')!.addEventListener('click', () => { offset = Math.max(0, offset - 1); render(); });
+    el.querySelector('[data-next]')!.addEventListener('click', () => { offset = Math.min(12, offset + 1); render(); });
+
+    try {
+      busy = await loadBusy(el.dataset.cal!, el.dataset.key!);
+      render();
+    } catch {
+      // Plan B: calendario público de Google embebido
+      box.innerHTML = `<iframe src="${el.dataset.embed}" title="Disponibilidad" loading="lazy" style="border:0;width:100%;height:520px"></iframe>`;
+      el.querySelector('.avc__top')!.setAttribute('hidden', '');
+      el.querySelector('.avc__hint')!.setAttribute('hidden', '');
+      el.querySelector('.avc__legend')!.setAttribute('hidden', '');
+    }
+  });
+</script>
+
+<style>
+  .avc { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.2rem; box-shadow: var(--shadow); }
+  .avc__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .6rem; }
+  .avc__title { margin: 0; color: var(--pine); }
+  .avc__nav { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; font-size: 1.4rem; line-height: 1; cursor: pointer; color: var(--pine); }
+  .avc__nav:disabled { opacity: .35; cursor: default; }
+  .avc__months { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem; min-height: 280px; }
+  .avc__loading { color: var(--muted); }
+  :global(.avc__mname) { font-weight: 700; text-transform: capitalize; margin: 0 0 .5rem; text-align: center; color: var(--pine); }
+  :global(.avc__grid) { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  :global(.avc__dow) { text-align: center; font-size: .75rem; font-weight: 650; color: var(--muted); padding-bottom: 2px; }
+  :global(.avc__d) { aspect-ratio: 1; border: 0; border-radius: 8px; font: inherit; font-size: .9rem; cursor: pointer; display: grid; place-items: center; }
+  :global(.avc__d.free) { background: #e5f3ea; color: #1d5c37; }
+  :global(.avc__d.free:hover) { background: #c9e8d4; }
+  :global(.avc__d.busy) { background: #fbe3dd; color: #b4381a; text-decoration: line-through; cursor: not-allowed; }
+  :global(.avc__d.past) { background: transparent; color: #c5c9c7; cursor: default; }
+  :global(.avc__d.sel) { background: var(--pine) !important; color: #fff !important; }
+  .avc__legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .85rem; color: var(--muted); margin-top: 1rem; }
+  .avc__legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: .3rem; }
+  .avc__legend .free { background: #e5f3ea; } .avc__legend .busy { background: #fbe3dd; } .avc__legend .sel { background: var(--pine); }
+  .avc__pick { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1rem; padding: .8rem 1rem; background: var(--sand); border-radius: 12px; }
+  .avc__pick p { margin: 0; font-weight: 650; color: var(--pine); }
+  .avc__hint { font-size: .85rem; color: var(--muted); margin: .8rem 0 0; }
+</style>

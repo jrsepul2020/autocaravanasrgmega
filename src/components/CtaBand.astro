@@ -1,0 +1,30 @@
+---
+import Icon from './Icon.astro';
+import { site, waLink } from '../data/site';
+interface Props { title?: string; text?: string; wa?: string }
+const {
+  title = '¿Tienes fechas en mente?',
+  text = 'Escríbenos y te confirmamos disponibilidad y precio cerrado en minutos.',
+  wa = 'Hola, quiero saber si tenéis disponibilidad para estas fechas: ',
+} = Astro.props;
+---
+<section class="cta">
+  <div class="container cta__in">
+    <div>
+      <p class="cta__t">{title}</p>
+      <p class="cta__p">{text}</p>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn--wa" href={waLink(wa)} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
+      <a class="btn btn--light" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
+      <a class="btn btn--primary" href="/calendario-disponibilidad/"><Icon name="calendar" /> Ver fechas libres</a>
+    </div>
+  </div>
+</section>
+<style>
+  .cta { background: var(--pine-dark); color: #fff; padding: 2.8rem 0; background-image: radial-gradient(circle at 90% -20%, rgba(79,122,100,.55), transparent 55%); }
+  .cta__t { color: #fff; }
+  .cta__in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem; }
+  .cta__t { font-family: var(--display); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 720; margin: 0 0 .2rem; }
+  .cta__p { margin: 0; color: #c9d8d0; }
+</style>

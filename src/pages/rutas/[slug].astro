@@ -1,0 +1,57 @@
+---
+import Base from '../../layouts/Base.astro';
+import VehicleCard from '../../components/VehicleCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { rutas, type Ruta } from '../../data/rutas';
+import { getVehicle } from '../../data/vehicles';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return rutas.map((r) => ({ params: { slug: r.slug }, props: { r } }));
+}
+const { r } = Astro.props as { r: Ruta };
+const v = getVehicle(r.vehicle);
+const others = rutas.filter((x) => x.slug !== r.slug);
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: r.title,
+  description: r.description,
+  author: { '@type': 'Organization', name: site.name },
+  publisher: { '@id': `${site.url}/#negocio` },
+  mainEntityOfPage: `${site.url}/rutas/${r.slug}/`,
+};
+---
+<Base title={`${r.metaTitle} | RG MEGA`} description={r.description} schema={[article]}
+  breadcrumbs={[{ name: 'Rutas', url: '/rutas/' }, { name: r.title.split(' en autocaravana')[0], url: `/rutas/${r.slug}/` }]}>
+  <article class="section" style="padding-top:2rem">
+    <div class="narrow prose">
+      <span class="eyebrow">Ruta desde Sevilla</span>
+      <h1>{r.title}</h1>
+      <div class="meta"><span class="pill">🗓 {r.days}</span><span class="pill">🛣 {r.km}</span><span class="pill">✨ {r.ideal}</span></div>
+      <p class="lead">{r.intro}</p>
+      <h2>Etapas de la ruta</h2>
+      <ol class="stages">
+        {r.stages.map((s) => <li><h3>{s.name}</h3><p>{s.text}</p></li>)}
+      </ol>
+      <h2>Consejos para esta ruta</h2>
+      <ul>{r.tips.map((t) => <li>{t}</li>)}</ul>
+      <h2>Vehículo recomendado</h2>
+      <p>Para esta ruta te recomendamos la <a href={v.slug}>{v.name}</a>. Recógela en Sevilla (Salteras) y empieza tu viaje el mismo día. Consulta la <a href="/calendario-disponibilidad/">disponibilidad</a> y las <a href="/tarifas/">tarifas</a>.</p>
+    </div>
+    <div class="narrow" style="margin-top:1.5rem"><VehicleCard vehicle={v} /></div>
+    <div class="narrow" style="margin-top:3rem">
+      <h2>Otras rutas desde Sevilla</h2>
+      <ul>{others.map((o) => <li><a href={`/rutas/${o.slug}/`}>{o.title}</a></li>)}</ul>
+    </div>
+  </article>
+  <CtaBand title="¿Te animas con esta ruta?" wa={`Hola, quiero hacer la ruta "${r.title}". ¿Qué fechas tenéis libres?`} />
+</Base>
+<style>
+  .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.2rem; }
+  .stages { list-style: none; padding: 0; counter-reset: st; display: grid; gap: 1rem; }
+  .stages li { counter-increment: st; position: relative; padding: 1rem 1.2rem 1rem 3.6rem; background: var(--sand); border-radius: 14px; }
+  .stages li::before { content: counter(st); position: absolute; left: 1rem; top: 1rem; width: 32px; height: 32px; border-radius: 50%; background: var(--terra); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.22); display: grid; place-items: center; font-weight: 700; }
+  .stages h3 { margin: 0 0 .2rem; font-size: 1.08rem; }
+  .stages p { margin: 0; }
+</style>

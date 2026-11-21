@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { rutas } from '../../data/rutas';
+const more = [
+  { t: 'Pueblos blancos y Sierra de Grazalema', d: 'Arcos, Grazalema, Zahara de la Sierra, Setenil y Ronda. 3-4 días.' },
+  { t: 'Córdoba y Granada', d: 'Mezquita, Alhambra y Sierra Nevada en invierno. 4-5 días.' },
+  { t: 'Extremadura monumental', d: 'Mérida, Cáceres y Trujillo por la Ruta de la Plata. 4-5 días.' },
+];
+---
+<Base
+  title="Rutas en Autocaravana y Camper desde Sevilla | RG MEGA"
+  description="Las mejores rutas en autocaravana desde Sevilla: costa de Cádiz, Doñana y Sierra de Aracena, Algarve, pueblos blancos y más. Etapas, días y consejos para tu viaje."
+  breadcrumbs={[{ name: 'Rutas', url: '/rutas/' }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Inspiración</span>
+        <h1>Rutas en autocaravana desde Sevilla</h1>
+        <p class="lead">Sevilla es el punto de partida perfecto: en menos de 2 horas llegas a la playa, a la montaña o a Portugal. Estas son nuestras rutas favoritas.</p>
+      </div>
+      <div class="grid grid-3">
+        {rutas.map((r) => (
+          <a class="card rt" href={`/rutas/${r.slug}/`}>
+            <span class="pill">{r.days} · {r.km}</span>
+            <h2>{r.title}</h2>
+            <p>{r.intro}</p>
+            <span class="rt__more">Ver ruta →</span>
+          </a>
+        ))}
+      </div>
+      <h2 style="margin-top:3rem">Más ideas de ruta</h2>
+      <div class="grid grid-3">
+        {more.map((m) => <div class="card"><h3>{m.t}</h3><p style="margin:0">{m.d}</p></div>)}
+      </div>
+    </div>
+  </section>
+  <CtaBand title="¿Ya sabes a dónde vas?" text="Cuéntanos tu ruta y te recomendamos el vehículo ideal." />
+</Base>
+<style>
+  .rt { text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: .7rem; transition: .2s; }
+  .rt:hover { border-color: var(--terra-ink); color: var(--ink); transform: translateY(-2px); }
+  .rt h2 { font-size: 1.35rem; margin: 0; }
+  .rt p { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
+  .rt__more { color: var(--terra-ink); font-weight: 650; }
+</style>

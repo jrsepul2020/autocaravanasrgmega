@@ -1,0 +1,24 @@
+---
+import VehiclePage from '../components/VehiclePage.astro';
+import { getVehicle } from '../data/vehicles';
+import { faqsBy } from '../data/faqs';
+const v = getVehicle('camper');
+const faqs = [
+  { q: '¿Cuántas personas pueden dormir en la Camper 120 UP?', a: 'Dos adultos duermen cómodamente en la cama doble trasera, y con la litera desmontable caben hasta 4 personas (ideal 2 adultos + 2 niños). Tiene 4 plazas homologadas para viajar.', tags: [] },
+  { q: '¿Cuánto cuesta alquilar la Camper 120 UP en Sevilla?', a: 'Desde {camper.desde} €/día en temporada baja (más de 14 días) y de {camper.min} a {camper.max} €/día para alquileres de 3 a 14 días según temporada. Un fin de semana de 3 días en temporada baja sale por {camper.baja.x3} €.', tags: [] },
+  { q: '¿Es fácil de aparcar?', a: 'Sí. Mide unos 6 metros, como una furgoneta grande, por lo que cabe en plazas de aparcamiento largas y se mueve con soltura por pueblos y ciudades.', tags: [] },
+  { q: '¿Tiene baño y ducha?', a: 'Sí, tiene baño con WC químico, lavabo plegable, ducha y agua caliente, además de cocina con 2 fuegos y un frigorífico de compresor de 138 litros.', tags: [] },
+  ...faqsBy('camper', 3),
+];
+---
+<VehiclePage
+  vehicle={v}
+  title="Alquiler Camper 120 UP en Sevilla · Furgoneta camper | RG MEGA"
+  description="Alquila la furgoneta camper Benimar 120 UP en Sevilla: 6 m, cama doble + litera, baño con ducha, nevera 138 L y placa solar. Desde {camper.desde} €/día, mascotas gratis. Mira fechas libres."
+  h1="Alquiler de furgoneta camper 120 UP en Sevilla"
+  faqs={faqs}
+>
+  <p>La <strong>Camper 120 UP de Benimar</strong> es una furgoneta camper de unos 6 metros que combina lo mejor de dos mundos: se conduce y aparca casi como un coche grande, pero dentro tienes <strong>cama doble, baño con ducha, cocina y un frigorífico de 138 litros</strong>.</p>
+  <p>Gracias a su <strong>placa solar de 120 W</strong> puedes pasar varios días sin enchufe, y la litera trasera desmontable permite viajar hasta 4 personas o usar el espacio como garaje para bicis y equipaje. Es la opción perfecta para <a href="/alquiler-autocaravana-fin-de-semana-sevilla/">escapadas de fin de semana desde Sevilla</a>, rutas por pueblos blancos o viajes en pareja.</p>
+  <p>Motor <strong>Fiat 2.2 de 140 CV</strong>, cambio manual de 6 velocidades, cámara trasera y control de crucero. Solo necesitas carnet B. Recogida y entrega en <strong>Salteras (Sevilla)</strong>, con parking gratuito para tu coche.</p>
+</VehiclePage>

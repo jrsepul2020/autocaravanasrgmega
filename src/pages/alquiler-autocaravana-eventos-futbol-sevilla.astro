@@ -1,0 +1,50 @@
+---
+import LandingPage from '../components/LandingPage.astro';
+import img from '../assets/img/camper-120-up-comedor.jpg';
+import { faqsBy } from '../data/faqs';
+const faqs = [
+  { q: '¿Puedo alquilar menos de 3 días para un partido o un evento?', a: 'El mínimo general es de 3 días, pero para eventos especiales (partidos, conciertos, finales, carreras…) estudiamos cada caso. Escríbenos con la fecha y el plan y buscamos la fórmula que mejor te encaje.', tags: [] },
+  { q: '¿Cuántos kilómetros hay de Sevilla al Santiago Bernabéu?', a: 'Unos 530 km por la A-4, alrededor de 1.060 km ida y vuelta. En un alquiler de 3 días se incluyen 750 km y el exceso se cobra a 0,40 €/km; si alargas a más de 7 días, los kilómetros son ilimitados. Te lo calculamos antes de reservar.', tags: [] },
+  { q: '¿Dónde dormimos con la autocaravana en Madrid?', a: 'Lo más cómodo es un camping o un área de autocaravanas en las afueras y moverse al estadio en metro o Cercanías. Evita aparcar junto al estadio el día de partido: suele haber cortes de tráfico y restricciones.', tags: [] },
+  { q: '¿Cuántas personas pueden ir al partido en la autocaravana?', a: 'Ambos vehículos tienen 4 plazas homologadas para viajar y 4 para dormir (la Camper 120 UP, 2 adultos + 2 niños cómodamente). Es la forma ideal de ir con amigos o en familia compartiendo gastos.', tags: [] },
+  ...faqsBy('finde', 3),
+];
+---
+<LandingPage
+  title="Alquiler de Autocaravana para Fútbol y Eventos desde Sevilla | RG MEGA"
+  description="Alquila una autocaravana en Sevilla para ir al fútbol: Sevilla FC, Real Betis, ver al Real Madrid en el Santiago Bernabéu, finales, conciertos y grandes eventos. Consúltanos alquileres a medida."
+  h1="Autocaravana para fútbol y eventos especiales"
+  eyebrow="Partidos, conciertos y eventos"
+  lead="Vive el partido o el evento desde la previa hasta la vuelta a casa. Nuestro mínimo es de 3 días, pero para eventos especiales consúltanos: buscamos la fórmula."
+  image={img}
+  imageAlt="Interior de la camper preparado para un viaje de fin de semana a un partido"
+  crumb="Fútbol y eventos"
+  faqs={faqs}
+  waText="Hola, quiero alquilar una autocaravana para ir a un partido / evento el día…"
+  bullets={['Partidos de Sevilla FC y Real Betis, en casa o fuera', 'Fin de semana para ver al Real Madrid en el Bernabéu', 'Conciertos, finales y grandes eventos', 'Mínimo 3 días… salvo eventos especiales: ¡pregúntanos!']}
+>
+  <h2>Alquiler de autocaravana para ir al fútbol desde Sevilla</h2>
+  <p>Ir al fútbol en autocaravana es otra experiencia: la previa con los amigos, comer y descansar a tu aire, dormir cerca del destino y volver sin depender de horarios de tren, avión ni hoteles con precios disparados en día de partido.</p>
+  <p>Aunque nuestro <strong>alquiler mínimo es de 3 días</strong>, para <strong>eventos especiales</strong> nos adaptamos. Cuéntanos la fecha y el plan por WhatsApp y te proponemos la mejor opción.</p>
+
+  <h3>Partidos del Sevilla FC y del Real Betis</h3>
+  <p>¿Acompañas a tu equipo cuando juega fuera? Una autocaravana es perfecta para los desplazamientos por Andalucía y el resto de España: Málaga, Cádiz, Granada, Madrid, Valencia… Viajad juntos, compartid gastos y llegad descansados al estadio. Y si viene gente de fuera a ver el derbi a Sevilla, también es una forma original de alojarse.</p>
+
+  <h3>Un fin de semana para ver al Real Madrid en el Santiago Bernabéu</h3>
+  <p>De Sevilla a Madrid hay unos <strong>530 km</strong> por la A-4 (unas 5 horas). Un plan típico de fin de semana:</p>
+  <ul>
+    <li><strong>Viernes</strong>: recogida en Salteras y viaje tranquilo a Madrid, con parada para comer en La Mancha.</li>
+    <li><strong>Sábado</strong>: mañana de turismo, previa y partido. Duerme en un camping o área de autocaravanas de las afueras y muévete al estadio en metro.</li>
+    <li><strong>Domingo</strong>: regreso a Sevilla y devolución por la tarde.</li>
+  </ul>
+  <p>Ten en cuenta el kilometraje: la ida y vuelta son unos 1.060 km y en un alquiler de 3 días se incluyen 750 km (exceso a 0,40 €/km). <strong>Te lo calculamos todo antes de reservar</strong>, sin sorpresas.</p>
+
+  <h3>Otros eventos especiales</h3>
+  <ul>
+    <li><strong>Conciertos y finales</strong> en Sevilla, Madrid o cualquier punto de España.</li>
+    <li><strong>Gran Premio de Motociclismo de Jerez</strong>: el gran clásico autocaravanista andaluz.</li>
+    <li><strong>Romería de El Rocío</strong> y <strong>Feria de Abril</strong>.</li>
+    <li>Bodas, festivales y celebraciones familiares.</li>
+  </ul>
+  <p>En estas fechas la demanda es muy alta y solo tenemos dos vehículos: <a href="/calendario-disponibilidad/">mira la disponibilidad</a> y escríbenos cuanto antes. Los precios publicados son orientativos; pregúntanos siempre por ofertas y promociones.</p>
+</LandingPage>
