@@ -6,53 +6,54 @@ import { type Vehicle, fromPrice } from '../data/vehicles';
 interface Props { vehicle: Vehicle; headingLevel?: 'h2' | 'h3' }
 const { vehicle: v, headingLevel = 'h3' } = Astro.props;
 const H = headingLevel;
+const kf = (re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value;
+const facts = [
+  { icon: 'users', text: `${kf(/viaje/i) ?? '4'} plazas` },
+  { icon: 'bed', text: `${kf(/dormir/i) ?? '4'} para dormir` },
+  { icon: 'key', text: 'Carnet B' },
+];
 ---
 <article class="vc">
   <a href={v.slug} class="vc__img" tabindex="-1" aria-hidden="true">
     <Image src={v.hero} alt={v.gallery[0].alt} widths={[480, 800, 1100]} sizes="(max-width: 900px) 100vw, 580px" />
-    <span class="vc__badge">{v.type}</span>
   </a>
   <div class="vc__body">
-    <H class="vc__name"><a href={v.slug}>Alquiler {v.name}</a></H>
+    <p class="vc__type">{v.type}</p>
+    <H class="vc__name"><a href={v.slug}>{v.name}</a></H>
     <p class="vc__tag">{v.tagline}</p>
     <ul class="vc__facts">
-      {v.keyFacts.slice(0, 4).map((f) => <li><small>{f.label}</small><strong>{f.value}</strong></li>)}
+      {facts.map((f) => <li><Icon name={f.icon} /><span>{f.text}</span></li>)}
     </ul>
-    <p class="vc__ideal"><Icon name="users" /> Ideal para: {v.idealFor}</p>
     <div class="vc__foot">
       <div class="vc__pricebox">
-        <p class="vc__price"><small>desde</small> <strong><span data-from={v.id}>{fromPrice(v)}</span> €<span class="vc__unit">/día</span></strong></p>
+        <p class="vc__price">Desde <span data-from={v.id}>{fromPrice(v)}</span> €/día</p>
         <PriceNote compact />
       </div>
-      <div class="btn-row">
-        <a class="btn btn--ghost btn--sm" href={v.slug}>Ver ficha</a>
-        <a class="btn btn--primary btn--sm" href={`/contacto/?modelo=${v.id}#presupuesto`}>Consultar fechas</a>
-      </div>
+      <a class="btn btn--primary btn--sm" href={v.slug}>Ver vehículo <Icon name="arrow" class="i-arrow" /></a>
     </div>
+    <a class="vc__dates" href={`/contacto/?modelo=${v.id}#presupuesto`}><Icon name="calendar" /> Consultar fechas de la {v.short}</a>
   </div>
 </article>
 <style>
-  .vc { background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
-  .vc:hover { transform: translateY(-4px); }
-  .vc__img { position: relative; display: block; aspect-ratio: 16/10; overflow: hidden; }
-  .vc__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
-  .vc:hover .vc__img img { transform: scale(1.04); }
-  .vc__badge { position: absolute; top: 14px; left: 14px; background: var(--pine-dark); color: var(--sub); padding: .35rem .85rem; border-radius: 999px; font-size: .8rem; font-weight: 700; box-shadow: 0 6px 16px -6px rgba(0,0,0,.45); }
-  .vc__body { padding: 1.5rem; display: flex; flex-direction: column; gap: .9rem; flex: 1; }
-  .vc__name { margin: 0; font-size: 1.5rem; }
+  .vc { background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; transition: box-shadow .3s, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .vc:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+  .vc__img { display: block; aspect-ratio: 16/9; overflow: hidden; background: var(--sand-2); }
+  .vc__img :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+  .vc:hover .vc__img :global(img) { transform: scale(1.04); }
+  .vc__body { padding: 1.4rem 1.5rem 1.3rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
+  .vc__type { margin: 0; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--price); }
+  .vc__name { margin: 0; font-size: 1.55rem; color: var(--ink); }
   .vc__name a { color: inherit; text-decoration: none; }
-  .vc__tag { margin: 0; color: var(--muted); }
-  .vc__facts { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
-  .vc__facts li { background: var(--sand); border-radius: 10px; padding: .5rem .6rem; display: grid; }
-  .vc__facts small { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .vc__facts strong { font-size: .9rem; color: var(--pine); }
-  .vc__ideal { margin: 0; font-size: .92rem; display: flex; gap: .45rem; align-items: flex-start; }
-  .vc__ideal :global(svg) { width: 18px; height: 18px; flex: none; margin-top: .2rem; color: var(--red); }
-  .vc__foot { margin: auto -1.5rem -1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem 1.3rem; background: var(--sand); }
-  .vc__price { margin: 0; color: var(--muted); }
-  .vc__pricebox { max-width: 260px; }
-  .vc__pricebox :global(.pn) { margin-top: .15rem; }
-  .vc__unit { font-size: .55em; font-weight: 500; margin-left: .1em; }
-  .vc__price strong { font-family: var(--display); font-size: 2rem; color: var(--red); }
-  @media (max-width: 480px) { .vc__facts { grid-template-columns: repeat(2, 1fr); } }
+  .vc__tag { margin: 0; color: var(--muted); font-size: .97rem; max-width: 46ch; }
+  .vc__facts { list-style: none; padding: 0; margin: .3rem 0 0; display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .9rem; color: var(--muted); }
+  .vc__facts li { display: inline-flex; align-items: center; gap: .4rem; }
+  .vc__facts :global(svg) { width: 17px; height: 17px; color: var(--pine-2); flex: none; }
+  .vc__facts span { color: var(--ink); font-weight: 500; }
+  .vc__foot { margin-top: auto; padding-top: 1rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: .9rem; }
+  .vc__price { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.45rem; color: var(--price); line-height: 1.1; }
+  .vc__pricebox { max-width: 270px; }
+  .vc__pricebox :global(.pn) { margin-top: .25rem; }
+  .vc__dates { display: inline-flex; align-items: center; gap: .4rem; margin-top: .4rem; font-size: .88rem; font-weight: 600; color: var(--forest); text-decoration: none; }
+  .vc__dates:hover { text-decoration: underline; color: var(--forest); }
+  .vc__dates :global(svg) { width: 16px; height: 16px; }
 </style>

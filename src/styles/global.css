@@ -6,8 +6,11 @@
   --pine-dark: #22392E;
   --pine-2: #4F7A64;
   --pine-3: #E6EFEA;
-  --sand: #E5F0E9;   /* verde salvia: fondos suaves (se distingue del blanco) */
-  --sand-2: #CFE3D6; /* salvia más intenso: fichas y separadores */
+  --sand: #F6F1E7;   /* crema cálido: fondo de secciones alternas */
+  --sand-2: #EBE2CF; /* crema más intenso: fichas y separadores */
+  --forest: #1F4A38; /* verde bosque: botones principales */
+  --forest-2: #163A2B;
+  --price: #A9660A;  /* ámbar oscuro: precios (4,6:1 sobre blanco) */
   --terra: #F6AE2D;
   --terra-ink: #9A6406; /* ámbar oscuro para textos sobre fondo claro (contraste AA) */
   --terra-2: #E89B12;
@@ -19,7 +22,7 @@
   --line: #e2ddd3;
   --white: #fff;
   --wa: #25d366;
-  --radius: 18px;
+  --radius: 14px;
   --radius-sm: 10px;
   --shadow: 0 1px 2px rgba(34,57,46,.08), 0 12px 32px -12px rgba(34,57,46,.28);
   --shadow-lg: 0 2px 4px rgba(34,57,46,.08), 0 24px 48px -16px rgba(34,57,46,.38);
@@ -52,7 +55,7 @@ ul { padding-left: 1.2em; }
 .narrow { width: min(100% - 32px, 820px); margin-inline: auto; }
 .section { padding: clamp(56px, 8vw, 100px) 0; }
 .section--sand { background: var(--sand); }
-.section--pine { background: var(--glow-sun), var(--pine-dark); color: #e8efeb; }
+.section--pine { background: var(--forest); color: #e8efeb; }
 .section--pine .lead { color: #c4d3cb; }
 .section--pine h2, .section--pine h3 { color: #fff; }
 /* Subtítulo: amarillo #FFC83C sobre pastilla verde oscuro (sobre blanco solo daría 1,5:1) */
@@ -63,7 +66,9 @@ ul { padding-left: 1.2em; }
 .eyebrow::before { content: ''; width: .55em; height: .55em; border-radius: 50%; background: var(--sub); box-shadow: 0 0 0 .22em rgba(255,200,60,.25); }
 .section--pine .eyebrow, .hero .eyebrow { background: rgba(255,200,60,.12); box-shadow: inset 0 0 0 1px rgba(255,200,60,.35); }
 .lead { font-size: 1.18rem; color: var(--muted); max-width: 62ch; }
-.section-head { max-width: 760px; margin-bottom: 2.4rem; }
+.section-head { max-width: 760px; margin-bottom: 2.2rem; }
+.section-head h2 { margin-bottom: .3em; }
+.section-head .lead { font-size: 1.08rem; margin: 0; }
 .section-head.center { text-align: center; margin-inline: auto; }
 .section-head.center .lead { margin-inline: auto; }
 
@@ -76,8 +81,12 @@ ul { padding-left: 1.2em; }
 }
 .btn:active { transform: scale(.97); }
 .btn svg { width: 1.2em; height: 1.2em; flex: none; }
-.btn--primary { background: var(--terra); color: #fff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,.22); box-shadow: 0 6px 18px rgba(246, 174, 45, .35); }
-.btn--primary:hover { background: var(--terra-2); color: #fff; }
+.btn--primary { background: var(--forest); color: #fff; font-weight: 650; box-shadow: 0 8px 20px -10px rgba(31,74,56,.7); }
+.btn--primary:hover { background: var(--forest-2); color: #fff; }
+.btn--outline-light { border-color: rgba(255,255,255,.85); color: #fff; background: rgba(0,0,0,.12); }
+.btn--outline-light:hover { background: #fff; color: var(--forest); border-color: #fff; }
+.btn svg.i-arrow { transition: transform .2s; }
+.btn:hover svg.i-arrow { transform: translateX(3px); }
 .btn--dark { background: var(--pine-dark); color: #fff; }
 .btn--dark:hover { background: var(--pine); color: #fff; }
 .btn--wa { background: var(--wa); color: #fff; box-shadow: 0 6px 18px rgba(37, 211, 102, .28); }
@@ -101,9 +110,9 @@ ul { padding-left: 1.2em; }
   content: ''; position: absolute; left: 0; top: .32em; width: 1.2rem; height: 1.2rem; border-radius: 50%;
   background: var(--pine-3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233C5F4D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/68% no-repeat;
 }
-.price-hot { color: var(--red); }
-.price-badge { display: inline-block; white-space: nowrap; background: var(--red); color: #fff; padding: .05em .45em; border-radius: 8px; }
-.pill.pill--hot { background: var(--red); color: #fff; }
+.price-hot { color: var(--price); }
+.price-badge { display: inline-block; white-space: nowrap; background: var(--price); color: #fff; padding: .05em .45em; border-radius: 8px; }
+.pill.pill--hot { background: var(--price); color: #fff; }
 .card--dark { background: var(--pine-dark); color: #e8efeb; border-color: var(--pine-dark); }
 .card--dark h2, .card--dark h3 { color: #fff; }
 .pill { display: inline-flex; align-items: center; gap: .4em; padding: .3em .8em; border-radius: 999px; background: var(--pine-3); color: var(--pine); font-size: .85rem; font-weight: 600; }

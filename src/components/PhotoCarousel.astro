@@ -13,7 +13,7 @@ import type { ImageMetadata } from 'astro';
 interface Props { title?: string; eyebrow?: string; lead?: string }
 const {
   title = 'Así son nuestras autocaravanas',
-  eyebrow = 'Galería',
+  eyebrow = '',
   lead = 'Fotos reales de la Benimar Mileo 268 y la Camper 120 UP, por dentro y por fuera.',
 } = Astro.props;
 
@@ -34,7 +34,7 @@ const photos = await Promise.all(
   <section class="section pc" aria-labelledby="pc-title">
     <div class="container pc__head">
       <div>
-        <span class="eyebrow">{eyebrow}</span>
+        {eyebrow && <span class="eyebrow">{eyebrow}</span>}
         <h2 id="pc-title">{title}</h2>
         <p class="lead">{lead}</p>
       </div>

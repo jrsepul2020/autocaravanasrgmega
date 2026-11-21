@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import QuoteForm from '../components/QuoteForm.astro';
 import Location from '../components/Location.astro';
+import Steps from '../components/Steps.astro';
 import Icon from '../components/Icon.astro';
 import { site, waLink } from '../data/site';
 const channels = [
@@ -33,6 +34,15 @@ const channels = [
         </div>
       </div>
       <div><QuoteForm /></div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head center">
+        <h2>Así de fácil es reservar</h2>
+        <p class="lead">Del primer mensaje a la carretera en 4 pasos.</p>
+      </div>
+      <Steps />
     </div>
   </section>
   <Location />

@@ -15,7 +15,7 @@ const reviews = [
       <figure class="rv__card">
         <div class="rv__stars" aria-label="5 de 5 estrellas">{[1,2,3,4,5].map(() => <Icon name="star" />)}</div>
         <blockquote>“{r.text}”</blockquote>
-        <figcaption><strong>{r.name}</strong> · alquiló la {r.model}</figcaption>
+        <figcaption><span class="rv__av" aria-hidden="true">{r.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span><span><strong>{r.name}</strong><small>Alquiló la {r.model}</small></span></figcaption>
       </figure>
     ))}
   </div>
@@ -26,20 +26,19 @@ const reviews = [
   </div>
 </div>
 <style>
-  .rv__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.2rem; }
-  .rv__card { position: relative; margin: 0; background: #fff; border-radius: var(--radius); padding: 1.6rem 1.5rem 1.4rem; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .8rem; overflow: hidden; }
-  .rv__card::before { content: '\201C'; position: absolute; right: .9rem; top: -.6rem; font-family: var(--display); font-weight: 700; font-size: 6rem; line-height: 1; color: var(--sand-2); pointer-events: none; }
-  .rv__card:nth-child(even) { background: var(--pine-dark); }
-  .rv__card:nth-child(even) blockquote { color: #e3ece7; }
-  .rv__card:nth-child(even) figcaption, .rv__card:nth-child(even) figcaption :global(*) { color: #b9cbc1; }
-  .rv__card:nth-child(even) figcaption strong { color: #fff; }
-  .rv__card:nth-child(even)::before { color: rgba(255,200,60,.22); }
-  .rv__stars { position: relative; display: flex; gap: 2px; color: var(--terra); }
-  .rv__stars :global(svg) { width: 18px; height: 18px; }
-  blockquote { position: relative; margin: 0; font-size: .98rem; color: #33403b; flex: 1; }
-  figcaption { font-size: .88rem; color: var(--muted); }
-  figcaption strong { color: var(--pine); }
-  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1.1rem 1.4rem; background: #fff; border-radius: 14px; box-shadow: var(--shadow); }
+  .rv__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1rem; }
+  .rv__card { margin: 0; background: #fff; border-radius: var(--radius); padding: 1.3rem 1.3rem 1.2rem; box-shadow: 0 0 0 1px rgba(31,74,56,.08), 0 10px 24px -16px rgba(31,74,56,.35); display: flex; flex-direction: column; gap: .75rem; }
+  .rv__stars { display: flex; gap: 2px; color: var(--terra); }
+  .rv__stars :global(svg) { width: 16px; height: 16px; }
+  blockquote { margin: 0; font-size: .95rem; line-height: 1.55; color: #33403b; flex: 1; }
+  figcaption { display: flex; align-items: center; gap: .65rem; font-size: .88rem; }
+  figcaption > span:last-child { display: grid; line-height: 1.3; }
+  figcaption strong { color: var(--ink); }
+  figcaption small { color: var(--muted); font-size: .8rem; }
+  .rv__av { width: 38px; height: 38px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--sand-2); color: var(--forest); font-family: var(--display); font-weight: 700; font-size: .9rem; }
+  .rv__card:nth-child(2) .rv__av { background: var(--forest); color: #fff; }
+  .rv__card:nth-child(3) .rv__av { background: var(--terra); color: #fff; }
+  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1rem; padding: 1rem 1.3rem; background: #fff; border-radius: var(--radius); box-shadow: 0 0 0 1px rgba(31,74,56,.08); }
   .rv__gbp p { margin: 0; flex: 1; min-width: 220px; }
-  :global(.rv__g) { width: 30px; height: 30px; }
+  :global(.rv__g) { width: 28px; height: 28px; }
 </style>

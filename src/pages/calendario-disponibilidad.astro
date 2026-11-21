@@ -6,6 +6,7 @@ import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
 import { vehicles, fromPrice } from '../data/vehicles';
 import PriceNote from '../components/PriceNote.astro';
+import Steps from '../components/Steps.astro';
 ---
 <Base
   title="Disponibilidad Autocaravanas de Alquiler en Sevilla · Calendario | RG MEGA"
@@ -36,6 +37,15 @@ import PriceNote from '../components/PriceNote.astro';
   </section>
   <section class="section section--sand">
     <div class="narrow"><QuoteForm title="Pide precio para tus fechas" /></div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head center">
+        <h2>Así de fácil es reservar</h2>
+        <p class="lead">Del primer mensaje a la carretera en 4 pasos.</p>
+      </div>
+      <Steps />
+    </div>
   </section>
   <CtaBand />
 </Base>

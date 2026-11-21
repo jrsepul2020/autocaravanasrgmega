@@ -2,11 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import QuoteForm from '../components/QuoteForm.astro';
 import VehicleCard from '../components/VehicleCard.astro';
-import Benefits from '../components/Benefits.astro';
-import Steps from '../components/Steps.astro';
-import PriceTable from '../components/PriceTable.astro';
 import Reviews from '../components/Reviews.astro';
 import FaqList from '../components/FaqList.astro';
 import Instagram from '../components/Instagram.astro';
@@ -14,14 +10,16 @@ import Location from '../components/Location.astro';
 import CtaBand from '../components/CtaBand.astro';
 import PhotoCarousel from '../components/PhotoCarousel.astro';
 import PriceNote from '../components/PriceNote.astro';
-import { site, waLink, offers, heroPrice } from '../data/site';
+import { offers, heroPrice } from '../data/site';
 import { offerPriceLabel } from '../data/sheet';
-import { vehicles, getVehicle, fromPrice, px } from '../data/vehicles';
-import { vehicles } from '../data/vehicles';
+import { vehicles, getVehicle, fromPrice } from '../data/vehicles';
+import { rutas } from '../data/rutas';
 import { faqsBy } from '../data/faqs';
 import hero from '../assets/img/benimar-mileo-268-alquiler-sevilla.jpg';
-import rutaCosta from '../assets/img/ruta-camper-costa.webp';
-import rutaMontana from '../assets/img/ruta-autocaravana-montana.webp';
+import imgBanner from '../assets/img/viaja-a-tu-ritmo.webp';
+import imgCadiz from '../assets/img/ruta-camper-costa.webp';
+import imgAracena from '../assets/img/escapada-sierra-aracena.webp';
+import imgAlgarve from '../assets/img/escapada-algarve.webp';
 
 const today = new Date().toISOString().slice(0, 10);
 const activeOffers = offers.filter((o) => o.until >= today);
@@ -29,13 +27,28 @@ const camperBaja = getVehicle('camper').prices.baja.short;
 const heroV = getVehicle(heroPrice.vehicle);
 const heroText = heroPrice.text || `${heroV.short} desde`;
 const heroAmount = heroPrice.price ?? fromPrice(heroV);
-const escapadas = [
-  { icon: 'sun', t: 'Fin de semana', d: `Viernes a domingo desde ${camperBaja} €/día (${camperBaja * 3} € los 3 días). Ideal para Doñana, Aracena o la costa.`, href: '/alquiler-autocaravana-fin-de-semana-sevilla/' },
+
+const ventajas = [
+  { icon: 'shield', t: 'Seguro y asistencia 24 h' },
+  { icon: 'paw', t: 'Mascotas gratis' },
+  { icon: 'parking', t: 'Parking gratis para tu coche' },
+  { icon: 'headset', t: 'Atención directa' },
+];
+
+const planes = [
+  { icon: 'sun', t: 'Fin de semana', d: `De viernes a domingo desde ${camperBaja} €/día (${camperBaja * 3} € los 3 días).`, href: '/alquiler-autocaravana-fin-de-semana-sevilla/' },
   { icon: 'calendar', t: 'Puentes y festivos', d: 'Constitución, Andalucía, Semana Santa, mayo… Reserva con tiempo.', href: '/alquiler-autocaravana-puente-sevilla/' },
-  { icon: 'star', t: 'Fútbol y eventos', d: 'Partidos del Sevilla o el Betis, el Real Madrid en el Bernabéu, conciertos… Consúltanos aunque sea menos de 3 días.', href: '/alquiler-autocaravana-eventos-futbol-sevilla/' },
-  { icon: 'route', t: 'Vacaciones largas', d: 'Más de 7 días con kilómetros ilimitados y tarifa reducida desde 15 días.', href: '/tarifas/' },
+  { icon: 'star', t: 'Fútbol y eventos', d: 'Sevilla, Betis, el Bernabéu, conciertos… Consúltanos aunque sean menos de 3 días.', href: '/alquiler-autocaravana-eventos-futbol-sevilla/' },
+  { icon: 'route', t: 'Vacaciones largas', d: 'Más de 7 días con km ilimitados y tarifa reducida desde 15 días.', href: '/tarifas/' },
   { icon: 'euro', t: 'Ofertas temporada baja', d: 'De octubre a marzo, la forma más barata de viajar en autocaravana.', href: '/ofertas-alquiler-autocaravana-sevilla/' },
 ];
+
+const destinoImg: Record<string, { img: ImageMetadata; name: string; d: string }> = {
+  'costa-de-cadiz-en-autocaravana': { img: imgCadiz, name: 'Costa de Cádiz', d: 'Playas salvajes, pueblos blancos y buena mesa a hora y media.' },
+  'huelva-donana-sierra-de-aracena': { img: imgAracena, name: 'Doñana y Sierra de Aracena', d: 'Naturaleza, senderos, jamón y castañares.' },
+  'algarve-portugal-en-autocaravana': { img: imgAlgarve, name: 'Algarve', d: 'Cruza la frontera: calas, acantilados y áreas para autocaravanas.' },
+};
+const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destinoImg[r.slug], href: `/rutas/${r.slug}/` }));
 ---
 <Base
   title="Alquiler de Autocaravanas en Sevilla desde {all.desde} €/día | RG MEGA"
@@ -45,43 +58,47 @@ const escapadas = [
   <section class="hero">
     <Image src={hero} alt="Autocaravana Benimar Mileo 268 de alquiler en Sevilla" class="hero__bg" widths={[800, 1400, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
     <div class="container hero__in">
-      <div class="hero__copy">
-        <span class="hero__pill"><Icon name="pin" /> Recogida y entrega en Sevilla</span>
-        <h1>Alquiler de autocaravanas en Sevilla</h1>
-        <p class="hero__lead">Dos autocaravanas Benimar nuevas, listas para tu escapada de fin de semana, puente o vacaciones. Sin intermediarios: te atendemos nosotros, de principio a fin.</p>
-        <div class="hero__price">
-          <p><Icon name="euro" /> <span data-hero-text>{heroText}</span> <strong class="price-badge"><span data-hero-price data-auto={heroPrice.price == null ? heroPrice.vehicle : undefined}>{heroAmount}</span> €/día</strong></p>
-          <PriceNote tone="dark" compact />
-        </div>
-        <ul class="hero__usp">
-          <li><Icon name="route" /> Km ilimitados desde 8 días</li>
-          <li><Icon name="shield" /> Seguro + asistencia 24 h</li>
-          <li><Icon name="paw" /> Mascotas gratis</li>
-          <li><Icon name="parking" /> Parking gratis para tu coche</li>
-        </ul>
-        <div class="btn-row">
-          <a class="btn btn--wa" href={waLink()} target="_blank" rel="noopener"><Icon name="whatsapp" /> Consultar por WhatsApp</a>
-          <a class="btn btn--primary" href="/calendario-disponibilidad/"><Icon name="calendar" /> Ver fechas libres</a>
-        </div>
+      <p class="hero__claim">Tu próxima escapada empieza aquí</p>
+      <h1>Alquiler de autocaravanas en Sevilla</h1>
+      <p class="hero__lead">Dos Benimar nuevas, con recogida y entrega en Sevilla. Sin intermediarios: te atendemos nosotros, de principio a fin.</p>
+      <div class="btn-row hero__btns">
+        <a class="btn btn--primary" href="#autocaravanas">Ver autocaravanas <Icon name="arrow" class="i-arrow" /></a>
+        <a class="btn btn--outline-light" href="/calendario-disponibilidad/">Consultar disponibilidad</a>
       </div>
-      <div class="hero__form">
-        <QuoteForm compact title="¿Qué fechas buscas?" />
+      <div class="hero__price">
+        <p><span data-hero-text>{heroText}</span> <strong class="price-badge"><span data-hero-price data-auto={heroPrice.price == null ? heroPrice.vehicle : undefined}>{heroAmount}</span> €/día</strong></p>
+        <PriceNote tone="dark" compact />
       </div>
     </div>
   </section>
 
-  <!-- TRUST STRIP -->
-  <div class="strip">
-    <div class="container strip__in">
-      <span><Icon name="check" /> Vehículos 2025</span>
-      <span><Icon name="check" /> Carnet B de coche</span>
-      <span><Icon name="check" /> Km ilimitados +7 días</span>
-      <span><Icon name="check" /> Respuesta en &lt; 24 h</span>
-      <a href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
-    </div>
+  <!-- BUSCADOR -->
+  <div class="container search-wrap">
+    <form class="search" action="/calendario-disponibilidad/#presupuesto" method="get" aria-label="Buscar disponibilidad">
+      <label class="search__f">
+        <span>Vehículo</span>
+        <select name="modelo">
+          <option value="">Cualquier vehículo</option>
+          {vehicles.map((v) => <option value={v.id}>{v.name}</option>)}
+        </select>
+      </label>
+      <label class="search__f">
+        <span>Recogida</span>
+        <input type="date" name="salida" />
+      </label>
+      <label class="search__f">
+        <span>Devolución</span>
+        <input type="date" name="llegada" />
+      </label>
+      <button class="btn btn--primary search__go" type="submit"><Icon name="calendar" /> Buscar disponibilidad</button>
+    </form>
+    <ul class="perks">
+      {ventajas.map((v) => <li><Icon name={v.icon} /><span>{v.t}</span></li>)}
+    </ul>
   </div>
 
-  <section class="offers container" aria-label="Ofertas" data-offers hidden={activeOffers.length === 0}>
+  <!-- OFERTAS -->
+  <section class="container offers" aria-label="Ofertas" data-offers hidden={activeOffers.length === 0}>
     <template><a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/"><span class="offer__tag">Oferta</span><strong data-f="title"></strong><span class="offer__text" data-f="text"></span><em class="offer__price" data-f="price"></em><Icon name="arrow" /></a></template>
     {activeOffers.map((o) => (
       <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/"><span class="offer__tag">Oferta</span><strong>{o.title}</strong><span class="offer__text">{o.text}</span><em class="offer__price" hidden={!o.price}>{offerPriceLabel(o)}</em><Icon name="arrow" /></a>
@@ -89,183 +106,226 @@ const escapadas = [
   </section>
 
   <!-- FLOTA -->
-  <section class="section" id="autocaravanas">
+  <section class="section section--sand" id="autocaravanas">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Nuestra flota</span>
-        <h2>Elige tu autocaravana de alquiler en Sevilla</h2>
-        <p class="lead">Solo tenemos dos vehículos, y eso es una ventaja: están siempre impecables, los conocemos al detalle y te los entregamos personalmente.</p>
+        <h2>Elige cómo quieres viajar</h2>
+        <p class="lead">Solo dos vehículos, siempre impecables: los conocemos al detalle y te los entregamos en persona.</p>
       </div>
       <div class="grid grid-2">
         {vehicles.map((v) => <VehicleCard vehicle={v} />)}
       </div>
-      <div class="compare">
-        <p class="compare__t">¿Cuál me conviene?</p>
-        <div class="grid grid-2">
-          <p><strong>Camper 120 UP</strong> si sois pareja o 2 adultos + 2 niños, queréis moveros por pueblos y ciudades y aparcar como un coche grande. Más económica.</p>
-          <p><strong>Mileo 268</strong> si viajáis 4 adultos, buscáis camas fijas amplias, ducha independiente y mucho espacio de carga para bicis o equipaje.</p>
-        </div>
-      </div>
     </div>
   </section>
 
+  <!-- BANNER -->
+  <section class="ritmo" aria-labelledby="ritmo-t">
+    <div class="ritmo__copy">
+      <h2 id="ritmo-t">Viaja a tu ritmo</h2>
+      <p>Para donde quieras, duerme frente al mar o en la sierra y vuelve cuando te apetezca. Tu casa va contigo.</p>
+      <a class="btn btn--light" href="/calendario-disponibilidad/">Consultar disponibilidad <Icon name="arrow" class="i-arrow" /></a>
+    </div>
+    <Image src={imgBanner} alt="Autocaravana Benimar en una carretera de montaña al atardecer" class="ritmo__img" widths={[700, 1100, 1536]} sizes="(max-width: 860px) 100vw, 60vw" />
+  </section>
+
+  <!-- GALERÍA -->
   <PhotoCarousel />
 
-  <!-- BENEFICIOS -->
-  <section class="section section--pine">
+  <!-- PARA CADA PLAN -->
+  <section class="section section--sand">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Por qué RG MEGA</span>
-        <h2>Una empresa local de Sevilla, no una plataforma</h2>
-        <p class="lead" style="color:#c4d3cb">Frente a las grandes cadenas y los portales entre particulares, aquí hablas con las personas que te entregan las llaves.</p>
+        <h2>Fin de semana, puente o vacaciones: tú decides</h2>
+        <p class="lead">Alquiler mínimo de 3 días (para eventos especiales, consúltanos). Sevilla está a menos de 2 horas de la costa, la sierra y Portugal.</p>
       </div>
-      <Benefits />
+      <div class="plans">
+        {planes.map((p) => (
+          <a class="plan" href={p.href}>
+            <span class="plan__ic"><Icon name={p.icon} /></span>
+            <strong>{p.t}</strong>
+            <span class="plan__d">{p.d}</span>
+            <span class="plan__go">Ver más <Icon name="arrow" /></span>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 
   <!-- ESCAPADAS -->
   <section class="section">
-    <div class="container esc">
-      <div class="esc__img">
-        <Image src={rutaCosta} alt="Camper en ruta por la costa al atardecer" widths={[500, 900]} sizes="(max-width: 860px) 100vw, 45vw" />
-        <Image src={rutaMontana} alt="Autocaravana en una carretera de montaña" widths={[400, 700]} sizes="(max-width: 860px) 50vw, 22vw" class="esc__img2" />
-      </div>
-      <div>
-        <span class="eyebrow">Para cada plan</span>
-        <h2>Fin de semana, puente o vacaciones: tú decides</h2>
-        <p class="lead">Alquiler mínimo de 3 días, perfecto para un viernes-domingo (y para eventos especiales, consúltanos). Sevilla está a menos de 2 horas de la costa de Cádiz, Huelva, Doñana, la Sierra de Aracena y el Algarve.</p>
-        <div class="esc__list">
-          {escapadas.map((e) => (
-            <a href={e.href} class="esc__item"><span class="esc__ic"><Icon name={e.icon} /></span><strong>{e.t}</strong><span class="esc__d">{e.d}</span><Icon name="arrow" class="esc__arr" /></a>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TARIFAS -->
-  <section class="section section--sand" id="precios">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Precios claros</span>
-        <h2>Precios del alquiler de autocaravanas en Sevilla</h2>
-        <p class="lead">Sin letra pequeña: precio por día con seguro, asistencia, equipamiento y parking incluidos.</p>
+        <h2>Escapadas que apetece vivir</h2>
+        <p class="lead">Ideas de rutas desde Sevilla para disfrutar en autocaravana.</p>
       </div>
-      <PriceTable showConditions={false} />
-      <div class="btn-row" style="margin-top:1.5rem">
-        <a class="btn btn--primary" href="/tarifas/">Ver tarifas y condiciones</a>
-        <a class="btn btn--ghost" href="/contacto/#presupuesto">Calcular mi precio</a>
+      <div class="dest">
+        {destinos.map((d) => (
+          <a class="dest__card" href={d.href}>
+            <Image src={d.img} alt={`Autocaravana en ruta: ${d.name}`} widths={[420, 700]} sizes="(max-width: 760px) 100vw, 380px" />
+            <span class="dest__txt"><strong>{d.name}</strong><span>{d.d}</span></span>
+          </a>
+        ))}
       </div>
+      <p class="more"><a href="/rutas/">Ver todas las rutas <Icon name="arrow" /></a></p>
     </div>
   </section>
 
-  <!-- PASOS -->
-  <section class="section section--pine">
-    <div class="container">
-      <div class="section-head center">
-        <span class="eyebrow">Así de fácil</span>
-        <h2>Reserva tu autocaravana en 4 pasos</h2>
-      </div>
-      <Steps />
-    </div>
-  </section>
-
-  <!-- RESEÑAS -->
+  <!-- OPINIONES -->
   <section class="section section--sand">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Opiniones</span>
-        <h2>Lo que dicen quienes ya han viajado</h2>
+    <div class="container reviews">
+      <div class="reviews__head">
+        <h2>Opiniones de nuestros viajeros</h2>
+        <p class="lead">La satisfacción de quienes ya han viajado con RG MEGA es lo que más nos motiva.</p>
       </div>
       <Reviews />
     </div>
   </section>
 
-  <!-- CONTENIDO SEO -->
-  <section class="section">
-    <div class="narrow prose">
-      <h2>Alquilar una autocaravana en Sevilla con RG MEGA</h2>
-      <p>Si buscas <strong>alquiler de autocaravanas en Sevilla</strong> con salida y llegada en la propia ciudad, en RG MEGA te lo ponemos fácil. Somos una empresa local con base en Salteras, en el Aljarafe sevillano, y alquilamos dos modelos Benimar del año: la <a href="/alquilar-benimar-mileo-268/">autocaravana perfilada Mileo 268</a> para 4 personas y la <a href="/alquiler-camper-sevilla/">furgoneta camper 120 UP</a>, compacta y muy fácil de conducir.</p>
-      <p>Ambas se conducen con el <strong>carnet B</strong> de coche, incluyen seguro, asistencia en carretera 24 horas y todo lo necesario para el viaje: menaje, mesa y sillas, gas, manguera y kit de limpieza. Solo tienes que traer ropa de cama y toallas.</p>
-      <h3>¿Cuánto cuesta alquilar una autocaravana en Sevilla?</h3>
-      <p>El precio depende del modelo, la temporada y la duración. La Camper 120 UP va de {px('{camper.desde}')} a {px('{camper.max}')} €/día y la Mileo 268 de {px('{mileo.desde}')} a {px('{mileo.max}')} €/día. Un <a href="/alquiler-autocaravana-fin-de-semana-sevilla/">fin de semana de 3 días</a> en temporada baja sale desde {px('{camper.baja.x3}')} €, y si alquilas más de 7 días los kilómetros son ilimitados. Consulta todas las <a href="/tarifas/">tarifas de alquiler</a>.</p>
-      <h3>Escapadas en autocaravana desde Sevilla</h3>
-      <p>Desde Sevilla tienes a mano algunas de las mejores <a href="/rutas/">rutas en autocaravana de Andalucía</a>: la costa de Cádiz con Zahara, Bolonia y Tarifa; las playas de Huelva y Doñana; los pueblos blancos de la Sierra de Grazalema; la Sierra de Aracena; o cruzar al Algarve portugués en poco más de dos horas. Para puentes como el de diciembre, Semana Santa o el Rocío, <a href="/alquiler-autocaravana-puente-sevilla/">reserva con antelación</a>: son las fechas que primero se ocupan.</p>
-    </div>
-  </section>
+  <Instagram />
 
+  <!-- DUDAS -->
   <section class="section section--sand">
     <div class="narrow">
       <div class="section-head">
-        <span class="eyebrow">Dudas frecuentes</span>
-        <h2>Preguntas sobre el alquiler de autocaravanas</h2>
+        <h2>Dudas frecuentes</h2>
+        <p class="lead">Lo que más nos preguntáis antes de reservar.</p>
       </div>
       <FaqList items={faqsBy('home', 8)} />
-      <p style="margin-top:1.2rem"><a href="/preguntas-frecuentes/">Ver todas las preguntas frecuentes →</a></p>
+      <p class="more"><a href="/preguntas-frecuentes/">Ver todas las preguntas frecuentes <Icon name="arrow" /></a></p>
     </div>
   </section>
 
-  <Instagram />
   <Location />
   <CtaBand />
 </Base>
 
-<style>
-  .hero { position: relative; color: #fff; overflow: hidden; isolation: isolate; }
-  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
-  .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, rgba(28,47,38,.92) 0%, rgba(28,47,38,.75) 45%, rgba(28,47,38,.25) 100%); }
-  .hero__in { display: grid; grid-template-columns: 1.15fr .85fr; gap: 3rem; align-items: center; padding: clamp(48px, 7vw, 96px) 0; }
-  .hero h1 { color: #fff; }
-  .hero__pill { display: inline-flex; gap: .4rem; align-items: center; background: rgba(255,255,255,.14); backdrop-filter: blur(6px); padding: .4rem .9rem; border-radius: 999px; font-size: .88rem; font-weight: 600; margin-bottom: 1.2rem; }
-  .hero__pill :global(svg) { width: 16px; height: 16px; }
-  .hero__lead { font-size: 1.18rem; color: #e3ece7; max-width: 56ch; }
-  .hero__price { margin: 1.4rem 0 0; }
-  .hero__price p { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .55rem; margin: 0; font-size: 1.15rem; font-weight: 600; }
-  .hero__price :global(svg) { width: 22px; height: 22px; color: var(--terra); flex: none; }
-  .hero__price .price-badge { font-family: var(--display); font-size: 1.35em; font-weight: 700; }
-  .hero__price :global(.pn) { margin-top: .35rem; }
-  .hero__usp { list-style: none; padding: 0; margin: 1.4rem 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: .7rem 1.2rem; }
-  .hero__usp li { display: flex; gap: .55rem; align-items: center; }
-  .hero__usp :global(svg) { width: 20px; height: 20px; color: var(--terra); flex: none; }
-  .strip { background: var(--pine); color: #e3ece7; font-size: .92rem; }
-  .strip__in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem 1.4rem; padding: .9rem 0; }
-  .strip span, .strip a { display: inline-flex; gap: .4rem; align-items: center; }
-  .strip a { color: #fff; font-weight: 700; text-decoration: none; }
-  .strip :global(svg) { width: 16px; height: 16px; color: var(--terra); }
-  .offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1rem; margin-top: 2rem; }
-  .offer { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto; column-gap: 1rem; align-items: center; padding: 1.1rem 1.3rem; border-radius: 14px; background: var(--pine-dark); text-decoration: none; color: #fff; transition: transform .2s; }
-  .offer:hover { color: #fff; transform: translateY(-2px); }
-  .offer__tag { grid-row: 1 / span 3; align-self: center; background: var(--red); color: #fff; font-weight: 700; font-size: .75rem; text-transform: uppercase; padding: .35rem .6rem; border-radius: 8px; }
-  .offer strong { color: var(--terra); font-family: var(--display); font-weight: 600; font-size: 1.1rem; }
-  .offer .offer__text { font-size: .88rem; color: #c9d8d0; grid-column: 2; }
-  .offer__price { grid-column: 2; justify-self: start; margin-top: .45rem; font-style: normal; font-weight: 700; font-size: .9rem; background: var(--red); color: #fff; padding: .2rem .6rem; border-radius: 8px; }
-  .offer__price[hidden] { display: none; }
-  .offer :global(svg) { grid-row: 1 / span 3; grid-column: 3; width: 20px; color: var(--terra); }
-  .compare { margin-top: 2rem; background: var(--glow-sun), var(--pine-dark); color: #e8efeb; box-shadow: var(--shadow-lg); border-radius: var(--radius); padding: 1.6rem 1.9rem; }
-  .compare__t { font-family: var(--display); font-weight: 600; font-size: 1.3rem; color: #fff; margin-bottom: .6rem; }
-  .compare :global(a) { color: var(--terra); }
-  .compare :global(strong) { color: #fff; }
-  .compare p { margin: 0; }
-  .esc { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; }
-  .esc__img { position: relative; padding: 0 0 18% 0; }
-  .esc__img :global(img) { border-radius: var(--radius); box-shadow: var(--shadow); }
-  .esc__img :global(.esc__img2) { position: absolute; width: 52%; right: 0; bottom: 0; border: 6px solid #fff; }
-  .esc__list { display: grid; gap: .7rem; }
-  .esc__item { display: grid; grid-template-columns: auto 1fr auto; column-gap: 1rem; align-items: center; padding: .95rem 1.1rem; background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(34,57,46,.08), 0 0 0 1px rgba(34,57,46,.07); text-decoration: none; color: var(--ink); transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
-  .esc__item:hover { transform: translateX(4px); box-shadow: var(--shadow); color: var(--ink); }
-  .esc__ic { grid-row: 1 / span 2; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--pine-dark); color: var(--sub); transition: background .25s, color .25s; }
-  .esc__ic :global(svg) { width: 22px; height: 22px; }
-  .esc__item:nth-child(3) .esc__ic { background: var(--red); color: #fff; }
-  .esc__item:nth-child(5) .esc__ic { background: var(--pine-2); color: #fff; }
-  .esc__item:hover .esc__ic { background: var(--terra); color: #fff; }
-  .esc__item strong { color: var(--pine); grid-column: 2; }
-  .esc__d { font-size: .92rem; color: var(--muted); grid-column: 2; }
-  .esc__item :global(.esc__arr) { grid-row: 1 / span 2; grid-column: 3; width: 20px; color: var(--terra); transition: transform .25s; }
-  .esc__item:hover :global(.esc__arr) { transform: translateX(3px); }
-  @media (max-width: 960px) {
-    .hero__in { grid-template-columns: 1fr; }
-    .hero::before { background: linear-gradient(180deg, rgba(28,47,38,.85), rgba(28,47,38,.7) 60%, rgba(28,47,38,.9)); }
-    .esc { grid-template-columns: 1fr; }
+<script>
+  // Buscador: fechas mínimas
+  const f = document.querySelector<HTMLFormElement>('form.search');
+  if (f) {
+    const a = f.querySelector<HTMLInputElement>('[name=salida]')!, b = f.querySelector<HTMLInputElement>('[name=llegada]')!;
+    const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+    a.min = b.min = t.toISOString().slice(0, 10);
+    a.addEventListener('change', () => { b.min = a.value || a.min; if (b.value && b.value < a.value) b.value = ''; });
+    // No enviar parámetros vacíos
+    f.addEventListener('submit', () => f.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[name]').forEach((el) => { el.disabled = !el.value; }));
+    addEventListener('pageshow', () => f.querySelectorAll<HTMLInputElement>('[name]').forEach((el) => { el.disabled = false; }));
   }
-  @media (max-width: 480px) { .hero__usp { grid-template-columns: 1fr; } }
+</script>
+
+<style>
+  /* HERO */
+  .hero { position: relative; color: #fff; overflow: hidden; isolation: isolate; min-height: clamp(520px, 78vh, 720px); display: flex; align-items: center; }
+  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
+    linear-gradient(90deg, rgba(20,32,26,.82) 0%, rgba(20,32,26,.55) 42%, rgba(20,32,26,.08) 75%),
+    linear-gradient(0deg, rgba(20,32,26,.55) 0%, transparent 35%),
+    linear-gradient(180deg, rgba(246,174,45,.18), transparent 40%); }
+  .hero__in { padding: clamp(56px, 8vw, 96px) 0 clamp(96px, 12vw, 140px); }
+  .hero__claim { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 6.2vw, 4.6rem); line-height: 1.02; letter-spacing: -.02em; margin: 0 0 .6rem; max-width: 12ch; text-wrap: balance; }
+  .hero h1 { color: #fff; font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 600; margin: 0 0 .9rem; letter-spacing: 0; }
+  .hero__lead { font-size: 1.08rem; color: #e6efe9; max-width: 46ch; margin: 0 0 1.6rem; }
+  .hero__btns { margin-bottom: 1.5rem; }
+  .hero__price p { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .55rem; margin: 0; font-weight: 600; font-size: 1.05rem; }
+  .hero__price .price-badge { font-family: var(--display); font-size: 1.3em; font-weight: 700; }
+  .hero__price :global(.pn) { margin-top: .35rem; max-width: 46ch; }
+
+  /* BUSCADOR */
+  .search-wrap { position: relative; z-index: 2; margin-top: -64px; }
+  .search { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 1rem; align-items: end; background: #fff; border-radius: var(--radius); padding: 1.2rem 1.4rem; box-shadow: var(--shadow-lg); }
+  .search__f { display: grid; gap: .35rem; font-size: .85rem; font-weight: 650; color: var(--ink); }
+  .search__f select, .search__f input { width: 100%; padding: .75em .9em; border: 1.5px solid var(--line); border-radius: 10px; font: inherit; font-weight: 500; font-size: .95rem; background: #fff; color: var(--ink); }
+  .search__f select:focus, .search__f input:focus { outline: none; border-color: var(--forest); box-shadow: 0 0 0 4px rgba(31,74,56,.12); }
+  .search__go { height: 48px; }
+  .perks { list-style: none; margin: 0; padding: 1.4rem 0 .4rem; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .perks li { display: flex; align-items: center; justify-content: center; gap: .65rem; padding: .3rem 1rem; font-weight: 600; font-size: .95rem; color: var(--ink); }
+  .perks li + li { border-left: 1px solid var(--line); }
+  .perks :global(svg) { width: 26px; height: 26px; color: var(--forest); flex: none; stroke-width: 1.7; }
+
+  /* OFERTAS */
+  .offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1rem; margin-block: 1.6rem 2.6rem; }
+  .offers[hidden] { display: none; }
+  .offer { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto; column-gap: 1rem; align-items: center; padding: 1.1rem 1.3rem; border-radius: var(--radius); background: #fff; box-shadow: 0 0 0 1px rgba(31,74,56,.1), 0 10px 24px -18px rgba(31,74,56,.5); text-decoration: none; color: var(--ink); transition: box-shadow .25s, transform .25s cubic-bezier(.2,.8,.2,1); }
+  .offer:hover { color: var(--ink); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .offer__tag { grid-row: 1 / span 3; align-self: center; background: var(--red); color: #fff; font-weight: 700; font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; padding: .35rem .6rem; border-radius: 8px; }
+  .offer strong { color: var(--forest); font-family: var(--display); font-weight: 700; font-size: 1.1rem; }
+  .offer .offer__text { font-size: .9rem; color: var(--muted); grid-column: 2; }
+  .offer__price { grid-column: 2; justify-self: start; margin-top: .45rem; font-style: normal; font-weight: 700; font-size: .88rem; color: var(--price); }
+  .offer__price[hidden] { display: none; }
+  .offer :global(svg) { grid-row: 1 / span 3; grid-column: 3; width: 20px; color: var(--forest); }
+
+  /* BANNER DIAGONAL */
+  .ritmo { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); background: var(--forest); color: #fff; min-height: 340px; overflow: hidden; }
+  .ritmo__copy { position: relative; z-index: 1; align-self: center; padding: 3rem max(16px, calc((100vw - var(--max)) / 2)) 3rem; padding-right: 2rem; }
+  .ritmo h2 { color: #fff; font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: .4em; }
+  .ritmo p { color: #d4e3da; max-width: 40ch; margin-bottom: 1.5rem; }
+  .ritmo__img { width: 100%; height: 100%; object-fit: cover; clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%); margin-left: -12%; width: 112%; }
+
+  /* PLANES */
+  .plans { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; }
+  .plan { display: flex; flex-direction: column; gap: .4rem; padding: 1.3rem 1.2rem 1.1rem; background: #fff; border-radius: var(--radius); box-shadow: 0 0 0 1px rgba(31,74,56,.08); text-decoration: none; color: var(--ink); transition: box-shadow .25s, transform .25s cubic-bezier(.2,.8,.2,1); }
+  .plan:hover { color: var(--ink); transform: translateY(-3px); box-shadow: var(--shadow); }
+  .plan__ic { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--forest); color: var(--sub); margin-bottom: .4rem; }
+  .plan:nth-child(even) .plan__ic { background: var(--terra); color: #fff; }
+  .plan__ic :global(svg) { width: 23px; height: 23px; }
+  .plan strong { font-family: var(--display); font-size: 1.12rem; color: var(--forest); }
+  .plan__d { font-size: .88rem; color: var(--muted); flex: 1; }
+  .plan__go { display: inline-flex; align-items: center; gap: .3rem; margin-top: .4rem; font-size: .85rem; font-weight: 700; color: var(--price); }
+  .plan__go :global(svg) { width: 15px; height: 15px; transition: transform .2s; }
+  .plan:hover .plan__go :global(svg) { transform: translateX(3px); }
+
+  /* DESTINOS */
+  .dest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem; }
+  .dest__card { position: relative; display: block; aspect-ratio: 4/3; border-radius: var(--radius); overflow: hidden; color: #fff; text-decoration: none; box-shadow: var(--shadow); isolation: isolate; }
+  .dest__card :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+  .dest__card:hover :global(img) { transform: scale(1.05); }
+  .dest__card::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(15,26,20,.85) 0%, rgba(15,26,20,.25) 45%, transparent 70%); }
+  .dest__txt { position: absolute; left: 1.2rem; right: 1.2rem; bottom: 1.1rem; display: grid; gap: .2rem; }
+  .dest__txt strong { font-family: var(--display); font-size: 1.4rem; }
+  .dest__txt span { font-size: .9rem; color: #e6efe9; }
+  .dest__card:hover { color: #fff; }
+
+  /* OPINIONES */
+  .reviews { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 2.2fr); gap: 2.5rem; align-items: start; }
+  .reviews__head h2 { margin-bottom: .4em; }
+  @media (min-width: 700px) { .reviews :global(.rv__grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .reviews__score { display: flex; align-items: center; gap: .5rem; margin-top: 1rem; font-weight: 700; color: var(--forest); }
+  .reviews__stars { display: inline-flex; gap: 2px; color: var(--terra); }
+  .reviews__stars :global(svg) { width: 18px; height: 18px; }
+
+  .more { margin: 1.4rem 0 0; }
+  .more a { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--forest); text-decoration: none; }
+  .more a:hover { text-decoration: underline; }
+  .more :global(svg) { width: 16px; height: 16px; }
+
+  @media (max-width: 1080px) {
+    .plans { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .reviews { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  }
+  @media (max-width: 860px) {
+    .search { grid-template-columns: 1fr 1fr; }
+    .search__f:first-child, .search__go { grid-column: 1 / -1; }
+    .perks { grid-template-columns: 1fr 1fr; row-gap: .8rem; }
+    .perks li { justify-content: flex-start; }
+    .perks li + li { border-left: 0; }
+    .ritmo { grid-template-columns: minmax(0, 1fr); }
+    .ritmo__img { order: -1; clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%); margin-left: 0; width: 100%; aspect-ratio: 16/9; height: auto; }
+    .ritmo__copy { padding: 1rem 16px 3rem; }
+    .dest { grid-template-columns: minmax(0, 1fr); }
+    .dest__card { aspect-ratio: 16/9; }
+    .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .offer { grid-template-columns: minmax(0, 1fr) auto; row-gap: .3rem; }
+    .offer__tag { grid-row: auto; grid-column: 1; justify-self: start; }
+    .offer strong, .offer .offer__text, .offer__price { grid-column: 1; }
+    .offer :global(svg) { grid-row: 1 / span 4; grid-column: 2; }
+    .hero__claim { font-size: 2.4rem; }
+    .search { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
+    .perks { grid-template-columns: minmax(0, 1fr); }
+    .plans { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+    .plan { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: .9rem; row-gap: .15rem; padding: 1rem; }
+    .plan__ic { grid-row: 1 / span 3; margin: 0; width: 44px; height: 44px; }
+    .plan__go { margin-top: .2rem; }
+  }
 </style>
