@@ -27,13 +27,19 @@ const reviews = [
 </div>
 <style>
   .rv__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.2rem; }
-  .rv__card { margin: 0; background: #fff; border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--line); display: flex; flex-direction: column; gap: .8rem; }
-  .rv__stars { display: flex; gap: 2px; color: #f4b400; }
+  .rv__card { position: relative; margin: 0; background: #fff; border-radius: var(--radius); padding: 1.6rem 1.5rem 1.4rem; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .8rem; overflow: hidden; }
+  .rv__card::before { content: '\201C'; position: absolute; right: .9rem; top: -.6rem; font-family: var(--display); font-weight: 700; font-size: 6rem; line-height: 1; color: var(--sand-2); pointer-events: none; }
+  .rv__card:nth-child(even) { background: var(--pine-dark); }
+  .rv__card:nth-child(even) blockquote { color: #e3ece7; }
+  .rv__card:nth-child(even) figcaption, .rv__card:nth-child(even) figcaption :global(*) { color: #b9cbc1; }
+  .rv__card:nth-child(even) figcaption strong { color: #fff; }
+  .rv__card:nth-child(even)::before { color: rgba(255,200,60,.22); }
+  .rv__stars { position: relative; display: flex; gap: 2px; color: var(--terra); }
   .rv__stars :global(svg) { width: 18px; height: 18px; }
-  blockquote { margin: 0; font-size: .98rem; color: #33403b; flex: 1; }
+  blockquote { position: relative; margin: 0; font-size: .98rem; color: #33403b; flex: 1; }
   figcaption { font-size: .88rem; color: var(--muted); }
   figcaption strong { color: var(--pine); }
-  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem 1.3rem; background: #fff; border: 1px dashed var(--line); border-radius: 14px; }
+  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1.1rem 1.4rem; background: #fff; border-radius: 14px; box-shadow: var(--shadow); }
   .rv__gbp p { margin: 0; flex: 1; min-width: 220px; }
   :global(.rv__g) { width: 30px; height: 30px; }
 </style>

@@ -46,16 +46,16 @@ const order: SeasonKey[] = ['baja', 'media', 'alta', 'especial'];
   )}
 </div>
 <style>
-  .pt__scroll { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); background: #fff; box-shadow: var(--shadow); }
+  .pt__scroll { overflow-x: auto; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow-lg); }
   table { width: 100%; border-collapse: collapse; min-width: 560px; }
   th, td { padding: .9rem 1rem; text-align: center; border-bottom: 1px solid var(--line); }
-  thead th { background: var(--pine); color: #fff; font-family: var(--display); font-size: 1.05rem; }
-  .pt__sub th { background: var(--pine-2); font-family: var(--font); font-size: .8rem; font-weight: 600; padding: .5rem; }
+  thead th { background: var(--pine-dark); color: #fff; font-family: var(--display); font-size: 1.05rem; }
+  .pt__sub th { background: var(--pine); color: var(--sub); font-family: var(--font); font-size: .8rem; font-weight: 600; padding: .5rem; }
   tbody th { text-align: left; font-weight: 400; max-width: 340px; }
   tbody th strong { display: inline; color: var(--pine); }
   tbody th small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.4; margin-top: .2rem; }
-  .pt__dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: .45rem; }
-  td b { font-family: var(--display); font-size: 1.3rem; color: var(--red); }
+  .pt__dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: .5rem; box-shadow: 0 0 0 3px rgba(0,0,0,.06); }
+  td b { font-family: var(--display); font-size: 1.35rem; color: var(--red); font-variant-numeric: tabular-nums; }
   td b small { font-size: .62em; font-weight: 500; margin-left: .1em; }
   tbody tr:last-child > * { border-bottom: 0; }
   tbody tr:nth-child(even) { background: var(--sand); }

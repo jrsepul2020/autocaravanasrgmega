@@ -1,20 +1,34 @@
 ---
+import Icon from './Icon.astro';
 const steps = [
-  { t: 'Elige fechas', d: 'Mira el calendario de disponibilidad y elige Mileo 268 o Camper 120 UP.' },
-  { t: 'Escríbenos', d: 'Por WhatsApp, teléfono o formulario. Te damos precio cerrado en menos de 24 h.' },
-  { t: 'Reserva', d: 'Confirmas con el 50 % (o el 100 % si faltan menos de 30 días).' },
-  { t: 'Recoge y disfruta', d: 'Te lo explicamos todo en Salteras, dejas tu coche en nuestro parking y ¡a la carretera!' },
+  { icon: 'calendar', t: 'Elige fechas', d: 'Mira el calendario de disponibilidad y elige Mileo 268 o Camper 120 UP.' },
+  { icon: 'whatsapp', t: 'Escríbenos', d: 'Por WhatsApp, teléfono o formulario. Te damos precio cerrado en menos de 24 h.' },
+  { icon: 'check', t: 'Reserva', d: 'Confirmas con el 50 % (o el 100 % si faltan menos de 30 días).' },
+  { icon: 'key', t: 'Recoge y disfruta', d: 'Te lo explicamos todo en Salteras, dejas tu coche en nuestro parking y ¡a la carretera!' },
 ];
 ---
 <ol class="st">
   {steps.map((s, i) => (
-    <li><span class="st__n">{i + 1}</span><h3>{s.t}</h3><p>{s.d}</p></li>
+    <li><div class="st__top"><span class="st__n">{i + 1}</span><span class="st__i"><Icon name={s.icon} /></span></div><h3>{s.t}</h3><p>{s.d}</p></li>
   ))}
 </ol>
 <style>
-  .st { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 1.5rem; counter-reset: s; }
-  .st li { position: relative; background: #fff; border-radius: var(--radius); padding: 1.6rem 1.4rem; border: 1px solid var(--line); }
-  .st__n { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--terra); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.22); font-family: var(--display); font-weight: 750; font-size: 1.2rem; margin-bottom: 1rem; }
-  .st h3 { margin: 0 0 .3rem; font-size: 1.2rem; }
+  .st { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 1.2rem; position: relative; }
+  .st li { position: relative; background: #fff; border-radius: var(--radius); padding: 1.6rem 1.4rem 1.5rem; box-shadow: var(--shadow); }
+  .st__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
+  .st__n { font-family: var(--display); font-weight: 700; font-size: 3.4rem; line-height: .9; color: var(--terra); letter-spacing: -.03em; }
+  .st__i { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--pine-dark); color: var(--sub); }
+  .st__i :global(svg) { width: 22px; height: 22px; }
+  .st li:last-child .st__i { background: var(--red); color: #fff; }
+  .st h3 { margin: 0 0 .35rem; font-size: 1.25rem; }
   .st p { margin: 0; color: var(--muted); font-size: .95rem; }
+  /* Sobre banda oscura */
+  :global(.section--pine) .st li { background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+  :global(.section--pine) .st h3 { color: #fff; }
+  :global(.section--pine) .st p { color: #c4d3cb; }
+  :global(.section--pine) .st__i { background: rgba(255,200,60,.14); color: var(--sub); }
+  :global(.section--pine) .st li:last-child { background: var(--terra); box-shadow: 0 18px 40px -18px rgba(246,174,45,.8); }
+  :global(.section--pine) .st li:last-child .st__n { color: #fff; }
+  :global(.section--pine) .st li:last-child h3, :global(.section--pine) .st li:last-child p { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.22); }
+  :global(.section--pine) .st li:last-child .st__i { background: var(--pine-dark); color: var(--sub); }
 </style>

@@ -32,11 +32,12 @@ const H = headingLevel;
   </div>
 </article>
 <style>
-  .vc { background: #fff; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .vc { background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+  .vc:hover { transform: translateY(-4px); }
   .vc__img { position: relative; display: block; aspect-ratio: 16/10; overflow: hidden; }
   .vc__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
   .vc:hover .vc__img img { transform: scale(1.04); }
-  .vc__badge { position: absolute; top: 14px; left: 14px; background: rgba(255,255,255,.95); color: var(--pine); padding: .3rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 650; }
+  .vc__badge { position: absolute; top: 14px; left: 14px; background: var(--pine-dark); color: var(--sub); padding: .35rem .85rem; border-radius: 999px; font-size: .8rem; font-weight: 700; box-shadow: 0 6px 16px -6px rgba(0,0,0,.45); }
   .vc__body { padding: 1.5rem; display: flex; flex-direction: column; gap: .9rem; flex: 1; }
   .vc__name { margin: 0; font-size: 1.5rem; }
   .vc__name a { color: inherit; text-decoration: none; }
@@ -46,8 +47,8 @@ const H = headingLevel;
   .vc__facts small { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .vc__facts strong { font-size: .9rem; color: var(--pine); }
   .vc__ideal { margin: 0; font-size: .92rem; display: flex; gap: .45rem; align-items: flex-start; }
-  .vc__ideal :global(svg) { width: 18px; height: 18px; flex: none; margin-top: .2rem; color: var(--terra-ink); }
-  .vc__foot { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .vc__ideal :global(svg) { width: 18px; height: 18px; flex: none; margin-top: .2rem; color: var(--red); }
+  .vc__foot { margin: auto -1.5rem -1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem 1.3rem; background: var(--sand); }
   .vc__price { margin: 0; color: var(--muted); }
   .vc__pricebox { max-width: 260px; }
   .vc__pricebox :global(.pn) { margin-top: .15rem; }

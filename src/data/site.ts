@@ -71,22 +71,22 @@ export const seasons: Record<SeasonKey, { label: string; when: string; color: st
   baja: {
     label: 'Temporada baja',
     when: 'De octubre a marzo (excepto Navidad, Gran Premio de Jerez, puentes y festivos)',
-    color: '#3f8f5a',
+    color: '#4F7A64',
   },
   media: {
     label: 'Temporada media',
     when: 'Abril, mayo, del 1 al 15 de junio y del 16 al 30 de septiembre (excepto Semana Santa, Feria, Rocío, puentes y festivos)',
-    color: '#d9822b',
+    color: '#FFC83C',
   },
   alta: {
     label: 'Temporada alta',
     when: 'Verano: julio y agosto (y segunda quincena de junio / primera de septiembre)',
-    color: '#c0392b',
+    color: '#D62828',
   },
   especial: {
     label: 'Temporada especial',
     when: 'Navidad, Semana Santa, Feria de Sevilla, Romería de El Rocío, Gran Premio de Jerez, puentes y festivos',
-    color: '#8e44ad',
+    color: '#F6AE2D',
   },
 };
 

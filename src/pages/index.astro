@@ -30,11 +30,11 @@ const heroV = getVehicle(heroPrice.vehicle);
 const heroText = heroPrice.text || `${heroV.short} desde`;
 const heroAmount = heroPrice.price ?? fromPrice(heroV);
 const escapadas = [
-  { t: 'Fin de semana', d: `Viernes a domingo desde ${camperBaja} €/día (${camperBaja * 3} € los 3 días). Ideal para Doñana, Aracena o la costa.`, href: '/alquiler-autocaravana-fin-de-semana-sevilla/' },
-  { t: 'Puentes y festivos', d: 'Constitución, Andalucía, Semana Santa, mayo… Reserva con tiempo.', href: '/alquiler-autocaravana-puente-sevilla/' },
-  { t: 'Fútbol y eventos', d: 'Partidos del Sevilla o el Betis, el Real Madrid en el Bernabéu, conciertos… Consúltanos aunque sea menos de 3 días.', href: '/alquiler-autocaravana-eventos-futbol-sevilla/' },
-  { t: 'Vacaciones largas', d: 'Más de 7 días con kilómetros ilimitados y tarifa reducida desde 15 días.', href: '/tarifas/' },
-  { t: 'Ofertas temporada baja', d: 'De octubre a marzo, la forma más barata de viajar en autocaravana.', href: '/ofertas-alquiler-autocaravana-sevilla/' },
+  { icon: 'sun', t: 'Fin de semana', d: `Viernes a domingo desde ${camperBaja} €/día (${camperBaja * 3} € los 3 días). Ideal para Doñana, Aracena o la costa.`, href: '/alquiler-autocaravana-fin-de-semana-sevilla/' },
+  { icon: 'calendar', t: 'Puentes y festivos', d: 'Constitución, Andalucía, Semana Santa, mayo… Reserva con tiempo.', href: '/alquiler-autocaravana-puente-sevilla/' },
+  { icon: 'star', t: 'Fútbol y eventos', d: 'Partidos del Sevilla o el Betis, el Real Madrid en el Bernabéu, conciertos… Consúltanos aunque sea menos de 3 días.', href: '/alquiler-autocaravana-eventos-futbol-sevilla/' },
+  { icon: 'route', t: 'Vacaciones largas', d: 'Más de 7 días con kilómetros ilimitados y tarifa reducida desde 15 días.', href: '/tarifas/' },
+  { icon: 'euro', t: 'Ofertas temporada baja', d: 'De octubre a marzo, la forma más barata de viajar en autocaravana.', href: '/ofertas-alquiler-autocaravana-sevilla/' },
 ];
 ---
 <Base
@@ -136,7 +136,7 @@ const escapadas = [
         <p class="lead">Alquiler mínimo de 3 días, perfecto para un viernes-domingo (y para eventos especiales, consúltanos). Sevilla está a menos de 2 horas de la costa de Cádiz, Huelva, Doñana, la Sierra de Aracena y el Algarve.</p>
         <div class="esc__list">
           {escapadas.map((e) => (
-            <a href={e.href} class="esc__item"><strong>{e.t}</strong><span>{e.d}</span><Icon name="arrow" /></a>
+            <a href={e.href} class="esc__item"><span class="esc__ic"><Icon name={e.icon} /></span><strong>{e.t}</strong><span class="esc__d">{e.d}</span><Icon name="arrow" class="esc__arr" /></a>
           ))}
         </div>
       </div>
@@ -160,7 +160,7 @@ const escapadas = [
   </section>
 
   <!-- PASOS -->
-  <section class="section">
+  <section class="section section--pine">
     <div class="container">
       <div class="section-head center">
         <span class="eyebrow">Así de fácil</span>
@@ -220,7 +220,7 @@ const escapadas = [
   .hero__pill :global(svg) { width: 16px; height: 16px; }
   .hero__lead { font-size: 1.18rem; color: #e3ece7; max-width: 56ch; }
   .hero__price { margin: 1.4rem 0 0; }
-  .hero__price p { display: flex; align-items: center; gap: .55rem; margin: 0; font-size: 1.15rem; font-weight: 600; }
+  .hero__price p { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .55rem; margin: 0; font-size: 1.15rem; font-weight: 600; }
   .hero__price :global(svg) { width: 22px; height: 22px; color: var(--terra); flex: none; }
   .hero__price .price-badge { font-family: var(--display); font-size: 1.35em; font-weight: 700; }
   .hero__price :global(.pn) { margin-top: .35rem; }
@@ -241,7 +241,7 @@ const escapadas = [
   .offer__price { grid-column: 2; justify-self: start; margin-top: .45rem; font-style: normal; font-weight: 700; font-size: .9rem; background: var(--red); color: #fff; padding: .2rem .6rem; border-radius: 8px; }
   .offer__price[hidden] { display: none; }
   .offer :global(svg) { grid-row: 1 / span 3; grid-column: 3; width: 20px; color: var(--terra); }
-  .compare { margin-top: 2rem; background: var(--pine-dark); color: #e8efeb; border-radius: var(--radius); padding: 1.6rem 1.9rem; }
+  .compare { margin-top: 2rem; background: var(--glow-sun), var(--pine-dark); color: #e8efeb; box-shadow: var(--shadow-lg); border-radius: var(--radius); padding: 1.6rem 1.9rem; }
   .compare__t { font-family: var(--display); font-weight: 600; font-size: 1.3rem; color: #fff; margin-bottom: .6rem; }
   .compare :global(a) { color: var(--terra); }
   .compare :global(strong) { color: #fff; }
@@ -251,11 +251,17 @@ const escapadas = [
   .esc__img :global(img) { border-radius: var(--radius); box-shadow: var(--shadow); }
   .esc__img :global(.esc__img2) { position: absolute; width: 52%; right: 0; bottom: 0; border: 6px solid #fff; }
   .esc__list { display: grid; gap: .7rem; }
-  .esc__item { display: grid; grid-template-columns: 1fr auto; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink); transition: .2s; }
-  .esc__item:hover { border-color: var(--terra-ink); background: var(--sand); color: var(--ink); }
-  .esc__item strong { color: var(--pine); }
-  .esc__item span { font-size: .92rem; color: var(--muted); grid-column: 1; }
-  .esc__item :global(svg) { grid-row: 1 / span 2; grid-column: 2; align-self: center; width: 20px; color: var(--terra-ink); }
+  .esc__item { display: grid; grid-template-columns: auto 1fr auto; column-gap: 1rem; align-items: center; padding: .95rem 1.1rem; background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(34,57,46,.08), 0 0 0 1px rgba(34,57,46,.07); text-decoration: none; color: var(--ink); transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+  .esc__item:hover { transform: translateX(4px); box-shadow: var(--shadow); color: var(--ink); }
+  .esc__ic { grid-row: 1 / span 2; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--pine-dark); color: var(--sub); transition: background .25s, color .25s; }
+  .esc__ic :global(svg) { width: 22px; height: 22px; }
+  .esc__item:nth-child(3) .esc__ic { background: var(--red); color: #fff; }
+  .esc__item:nth-child(5) .esc__ic { background: var(--pine-2); color: #fff; }
+  .esc__item:hover .esc__ic { background: var(--terra); color: #fff; }
+  .esc__item strong { color: var(--pine); grid-column: 2; }
+  .esc__d { font-size: .92rem; color: var(--muted); grid-column: 2; }
+  .esc__item :global(.esc__arr) { grid-row: 1 / span 2; grid-column: 3; width: 20px; color: var(--terra); transition: transform .25s; }
+  .esc__item:hover :global(.esc__arr) { transform: translateX(3px); }
   @media (max-width: 960px) {
     .hero__in { grid-template-columns: 1fr; }
     .hero::before { background: linear-gradient(180deg, rgba(28,47,38,.85), rgba(28,47,38,.7) 60%, rgba(28,47,38,.9)); }

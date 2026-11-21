@@ -21,11 +21,13 @@ const json = {
 {schema && <script type="application/ld+json" set:html={JSON.stringify(json)} />}
 <style>
   .faq { display: grid; gap: .7rem; }
-  details { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 0 1.2rem; transition: box-shadow .2s; }
+  details { background: #fff; border-radius: 14px; padding: 0 1.2rem; box-shadow: 0 1px 2px rgba(34,57,46,.08); transition: box-shadow .2s, background .2s; }
+  details:hover { box-shadow: var(--shadow); }
   details[open] { box-shadow: var(--shadow); }
-  summary { cursor: pointer; list-style: none; padding: 1.1rem 2rem 1.1rem 0; position: relative; }
+  summary { cursor: pointer; list-style: none; padding: 1.1rem 2.6rem 1.1rem 0; position: relative; }
   summary::-webkit-details-marker { display: none; }
-  summary::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 1.6rem; color: var(--terra-ink); font-weight: 300; transition: transform .2s; }
+  summary::after { content: '+'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pine-dark); color: var(--sub); font-size: 1.25rem; font-weight: 500; line-height: 1; transition: transform .25s cubic-bezier(.2,.8,.2,1), background .2s; }
+  details[open] summary::after { background: var(--terra); color: #fff; }
   details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
   summary h3 { margin: 0; font-size: 1.05rem; font-family: var(--font); font-weight: 700; color: var(--pine); letter-spacing: 0; }
   details p { margin: 0 0 1.2rem; color: #3a4642; }
