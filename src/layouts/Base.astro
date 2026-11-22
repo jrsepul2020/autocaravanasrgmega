@@ -54,7 +54,7 @@ const business = {
   geo: { '@type': 'GeoCoordinates', latitude: site.gbp.lat, longitude: site.gbp.lng },
   openingHoursSpecification: [{
     '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    dayOfWeek: site.hoursSchema.days,
     opens: site.hoursSchema.opens,
     closes: site.hoursSchema.closes,
   }],

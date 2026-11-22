@@ -12,7 +12,7 @@ const { title = 'Recogida y entrega en Sevilla (Salteras)' } = Astro.props;
       <p class="lead">Recoges y devuelves la autocaravana en nuestras instalaciones, a {site.distanceToSevilla} por la A-66 y muy cerca de Bormujos, Camas, Santiponce y todo el Aljarafe. Tu coche se queda gratis en nuestro parking cerrado.</p>
       <ul class="loc__list">
         <li><Icon name="pin" /><span>{site.address.street}<br />{site.address.postalCode} {site.address.city} (Sevilla)</span></li>
-        <li><Icon name="clock" /><span>{site.hours} · también festivos</span></li>
+        <li><Icon name="clock" /><span>{site.hours}<br /><small>Fuera de horario, fines de semana o festivos: pacta con nosotros la entrega y la devolución</small></span></li>
         <li><Icon name="parking" /><span>Parking cerrado y cubierto gratuito para tu coche</span></li>
       </ul>
       <div class="btn-row">

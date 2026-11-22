@@ -48,7 +48,7 @@ export const faqs: Faq[] = [
   },
   {
     q: '¿Puedo recoger o devolver la autocaravana en fin de semana o festivo?',
-    a: 'Sí. Tenemos horarios flexibles de 9:00 a 22:00 todos los días, también fines de semana y festivos. Pacta con nosotros la hora que mejor te venga.',
+    a: 'Nuestro horario de oficina es de lunes a viernes, de 9:00 a 18:00. Si necesitas recoger o devolver la autocaravana en fin de semana, festivo o fuera de ese horario, consúltanos y pactamos contigo la hora.',
     tags: ['finde', 'puente', 'recogida'],
   },
   {

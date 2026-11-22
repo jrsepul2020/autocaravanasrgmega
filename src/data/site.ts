@@ -20,8 +20,9 @@ export const site = {
     postalCode: '41909',
     country: 'ES',
   },
-  hours: 'Lunes a domingo, de 9:00 a 22:00',
-  hoursSchema: { opens: '09:00', closes: '22:00' },
+  // Debe coincidir con el horario de la ficha de Google Business
+  hours: 'Lunes a viernes, de 9:00 a 18:00',
+  hoursSchema: { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' },
   // Distancia orientativa al centro de Sevilla
   distanceToSevilla: '15 minutos del centro de Sevilla',
 
@@ -37,8 +38,8 @@ export const site = {
   },
   // Enlace "Cómo llegar" / ficha de Google Maps
   mapsUrl: 'https://www.google.com/maps?cid=3712490990555489543',
-  // Pega aquí el enlace para escribir reseña (Google Business > "Pedir reseñas"); mientras, abre la ficha
-  gbpReviewUrl: 'https://www.google.com/maps?cid=3712490990555489543',
+  // Enlace para escribir reseña (Google Business > "Pedir reseñas")
+  gbpReviewUrl: 'https://g.page/r/CQfl5ePiaoUzEBM/review',
   // Mapa embebido de la ficha
   mapEmbed: 'https://maps.google.com/maps?cid=3712490990555489543&output=embed&hl=es',
 
