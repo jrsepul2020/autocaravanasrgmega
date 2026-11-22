@@ -115,6 +115,8 @@ export function apply(d: LiveData) {
       upcoming.forEach((x) => box.append(fill(tpl, { name: x.name, from: fmtDate(x.from), to: fmtDate(x.to) })));
     });
   }
+  // Interruptor "Mostrar precios desde" de la pestaña Portada
+  if (d.showFrom !== null && d.showFrom !== undefined) document.documentElement.classList.toggle('no-from', !d.showFrom);
   (window as any).__rgLive = d;
   window.dispatchEvent(new CustomEvent('rg:live', { detail: d }));
 }

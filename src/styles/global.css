@@ -137,6 +137,9 @@ ul { padding-left: 1.2em; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--pine-2); box-shadow: 0 0 0 4px rgba(23, 81, 63, .12); }
 :focus-visible { outline: 3px solid var(--terra-ink); outline-offset: 2px; }
 
+/* Interruptor de la hoja "Mostrar precios desde" = NO */
+.no-from .js-from { display: none !important; }
+
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 760px) {

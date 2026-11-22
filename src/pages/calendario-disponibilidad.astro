@@ -4,8 +4,7 @@ import { Image } from 'astro:assets';
 import QuoteForm from '../components/QuoteForm.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { vehicles, fromPrice } from '../data/vehicles';
-import PriceNote from '../components/PriceNote.astro';
+import { vehicles } from '../data/vehicles';
 import Steps from '../components/Steps.astro';
 ---
 <Base
@@ -29,14 +28,12 @@ import Steps from '../components/Steps.astro';
               <h2>{v.name}</h2>
               <span class="cal-opt__tag">{v.tagline}</span>
               <span class="cal-opt__foot">
-                <span class="cal-opt__price">Desde <strong><span data-from={v.id}>{fromPrice(v)}</span> €/día</strong></span>
                 <span class="btn btn--primary btn--sm"><Icon name="calendar" /> Ver disponibilidad</span>
               </span>
             </span>
           </a>
         ))}
       </div>
-      <div class="cal-pricenote"><PriceNote compact /></div>
       <p class="cal-note"><Icon name="calendar" /> El calendario se actualiza a diario. Si una fecha aparece libre pero tienes prisa, confírmala por WhatsApp: respondemos en minutos.</p>
     </div>
   </section>

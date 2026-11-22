@@ -8,7 +8,7 @@ const upcoming = specialDates.filter((d) => d.to >= today).slice(0, 8);
 const fmt = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 const faqs = [
   { q: '¿Con cuánta antelación debo reservar para un puente?', a: 'Para puentes como el de diciembre, Semana Santa, Feria o El Rocío recomendamos reservar con 1-2 meses de antelación: solo tenemos dos vehículos y son las primeras fechas en ocuparse.', tags: [] },
-  { q: '¿Qué precio tiene el alquiler en puentes y festivos?', a: 'En puentes y festivos se aplica la temporada especial: {camper.especial.short} €/día la Camper 120 UP y {mileo.especial.short} €/día la Mileo 268 (3-14 días). Si sumas días antes o después del puente se aplica la tarifa normal a esos días.', tags: [] },
+  { q: '¿Qué precio tiene el alquiler en puentes y festivos?', a: 'En puentes y festivos se aplica la tarifa de temporada especial (la tienes en la página de Tarifas). Si sumas días antes o después del puente, a esos días se les aplica la tarifa normal.', tags: [] },
   ...faqsBy('puente', 5),
 ];
 ---

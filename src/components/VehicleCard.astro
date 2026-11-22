@@ -1,8 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import PriceNote from './PriceNote.astro';
-import { type Vehicle, fromPrice } from '../data/vehicles';
+import { type Vehicle } from '../data/vehicles';
 interface Props { vehicle: Vehicle; headingLevel?: 'h2' | 'h3' }
 const { vehicle: v, headingLevel = 'h3' } = Astro.props;
 const H = headingLevel;
@@ -25,10 +24,6 @@ const facts = [
       {facts.map((f) => <li><Icon name={f.icon} /><span>{f.text}</span></li>)}
     </ul>
     <div class="vc__foot">
-      <div class="vc__pricebox">
-        <p class="vc__price">Desde <span data-from={v.id}>{fromPrice(v)}</span> €/día</p>
-        <PriceNote compact />
-      </div>
       <a class="btn btn--primary btn--sm" href={v.slug}>Ver vehículo <Icon name="arrow" class="i-arrow" /></a>
     </div>
     <a class="vc__dates" href={v.calSlug}><Icon name="calendar" /> Consultar fechas de la {v.short}</a>
@@ -50,9 +45,6 @@ const facts = [
   .vc__facts :global(svg) { width: 18px; height: 18px; color: var(--forest); flex: none; }
   .vc__facts span { color: var(--ink); font-weight: 500; }
   .vc__foot { margin-top: auto; padding-top: 1rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: .9rem; }
-  .vc__price { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.45rem; color: var(--price); line-height: 1.1; }
-  .vc__pricebox { max-width: 270px; }
-  .vc__pricebox :global(.pn) { margin-top: .25rem; }
   .vc__dates { display: inline-flex; align-items: center; gap: .4rem; margin-top: .4rem; font-size: .88rem; font-weight: 600; color: var(--forest); text-decoration: none; }
   .vc__dates:hover { text-decoration: underline; color: var(--forest); }
   .vc__dates :global(svg) { width: 16px; height: 16px; }

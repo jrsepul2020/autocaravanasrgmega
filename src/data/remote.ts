@@ -5,7 +5,7 @@
  */
 import { fetchLive } from './sheet';
 import { vehicles } from './vehicles';
-import { offers, specialDates, heroPrice } from './site';
+import { offers, specialDates, heroPrice, display } from './site';
 
 const live = await fetchLive();
 
@@ -17,7 +17,8 @@ if (live) {
   if (live.offers) offers.splice(0, offers.length, ...live.offers);
   if (live.special) specialDates.splice(0, specialDates.length, ...live.special);
   if (live.hero) Object.assign(heroPrice, live.hero);
-  console.log(`[sheet] Datos cargados de Google Sheets: ${Object.keys(live.prices).length} vehículos, ${live.offers?.length ?? '–'} ofertas, ${live.special?.length ?? '–'} fechas especiales.`);
+  if (live.showFrom !== null) display.showFrom = live.showFrom;
+  console.log(`[sheet] Datos cargados de Google Sheets: ${Object.keys(live.prices).length} vehículos, ${live.offers?.length ?? '–'} ofertas, ${live.special?.length ?? '–'} fechas especiales, precios desde: ${display.showFrom ? 'SI' : 'NO'}.`);
 } else {
   console.log('[sheet] Sin Google Sheets (o no responde): se usan los precios del código.');
 }

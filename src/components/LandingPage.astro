@@ -5,7 +5,6 @@ import Base from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import QuoteForm from './QuoteForm.astro';
 import VehicleCard from './VehicleCard.astro';
-import PriceTable from './PriceTable.astro';
 import FaqList from './FaqList.astro';
 import Benefits from './Benefits.astro';
 import Reviews from './Reviews.astro';
@@ -13,7 +12,7 @@ import Location from './Location.astro';
 import CtaBand from './CtaBand.astro';
 import PhotoCarousel from './PhotoCarousel.astro';
 import { waLink } from '../data/site';
-import { vehicles, fromPrice, type Vehicle } from '../data/vehicles';
+import { vehicles, type Vehicle } from '../data/vehicles';
 import { px } from '../data/vehicles';
 import type { Faq } from '../data/faqs';
 
@@ -25,7 +24,6 @@ interface Props {
 const { title, description, h1, eyebrow, lead, image, imageAlt, crumb, faqs, bullets, waText, focus } = Astro.props;
 const list = focus ? [...vehicles].sort((a) => (a.id === focus ? -1 : 1)) : vehicles;
 const fromV = focus ? vehicles.find((v) => v.id === focus)! : undefined;
-const fromAmount = fromV ? fromPrice(fromV) : Math.min(...vehicles.map(fromPrice));
 ---
 <Base title={title} description={description} breadcrumbs={[{ name: crumb, url: Astro.url.pathname }]}>
   <section class="lp-hero">
@@ -35,7 +33,6 @@ const fromAmount = fromV ? fromPrice(fromV) : Math.min(...vehicles.map(fromPrice
         <h1>{h1}</h1>
         <p class="lead">{px(lead)}</p>
         <ul class="check-list lp-bul">{bullets.map((b) => <li>{px(b)}</li>)}</ul>
-        <p class="lp-price">{fromV ? fromV.short : 'Alquiler'} desde <strong><span data-from={focus ?? 'all'}>{fromAmount}</span> €<small>/día</small></strong></p>
         <div class="btn-row">
           <a class="btn btn--primary" href={fromV ? fromV.calSlug : '/calendario-disponibilidad/'}><Icon name="calendar" /> Ver disponibilidad</a>
           <a class="btn btn--wa" href={waLink(waText)} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
@@ -67,10 +64,16 @@ const fromAmount = fromV ? fromPrice(fromV) : Math.min(...vehicles.map(fromPrice
     <div class="container"><Benefits /></div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <div class="section-head"><span class="eyebrow">Precios</span><h2>Tarifas por día</h2></div>
-      <PriceTable only={focus} />
+  <section class="section lp-rates">
+    <div class="container lp-rates__in">
+      <div>
+        <h2>Precios por temporada</h2>
+        <p>El precio depende del modelo, la temporada y los días de alquiler. Consulta la tabla actualizada o pídenos precio exacto para tus fechas.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn--primary" href="/tarifas/">Ver tarifas</a>
+        <a class="btn btn--ghost" href="/ofertas-alquiler-autocaravana-sevilla/">Ver ofertas</a>
+      </div>
     </div>
   </section>
 
@@ -96,9 +99,9 @@ const fromAmount = fromV ? fromPrice(fromV) : Math.min(...vehicles.map(fromPrice
   .lp-hero__in { display: grid; grid-template-columns: 1.05fr .95fr; gap: 3.5rem; align-items: center; }
   .lp-hero__img :global(img) { border-radius: var(--radius); aspect-ratio: 4/3; object-fit: cover; width: 100%; }
   .lp-bul { margin: 1.4rem 0 1.4rem; }
-  .lp-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: .45rem; margin: 0 0 1.4rem; color: var(--muted); }
-  .lp-price strong { font-family: var(--display); font-size: 2.4rem; line-height: 1; color: var(--price); letter-spacing: -.02em; }
-  .lp-price small { font-size: .45em; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-left: .1em; }
+  .lp-rates__in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.2rem 3rem; }
+  .lp-rates h2 { margin-bottom: .3em; }
+  .lp-rates p { margin: 0; color: var(--muted); max-width: 60ch; }
   .lp-body-sec { padding-top: clamp(24px, 4vw, 48px); border-top: 1px solid var(--line); }
   .lp-body { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 3rem; align-items: start; }
   .lp-form { position: sticky; top: 92px; }

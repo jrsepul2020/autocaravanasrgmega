@@ -6,10 +6,9 @@ import AvailabilityCalendar from '../../components/AvailabilityCalendar.astro';
 import QuoteForm from '../../components/QuoteForm.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Icon from '../../components/Icon.astro';
-import PriceNote from '../../components/PriceNote.astro';
 import PriceTable from '../../components/PriceTable.astro';
 import Steps from '../../components/Steps.astro';
-import { vehicles, fromPrice, type Vehicle } from '../../data/vehicles';
+import { vehicles, type Vehicle } from '../../data/vehicles';
 import { site } from '../../data/site';
 
 export function getStaticPaths() {
@@ -25,7 +24,7 @@ const kf = (re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value;
 ---
 <Base
   title={`Disponibilidad ${v.name} · Calendario y precio por día | RG MEGA Sevilla`}
-  description={`Calendario en tiempo real de la ${v.name} de alquiler en Sevilla: días libres y reservados, precio por día de cada temporada y presupuesto al momento. Desde {${v.id}.desde} €/día.`}
+  description={`Calendario en tiempo real de la ${v.name} de alquiler en Sevilla: días libres y reservados, precio por día de cada temporada y presupuesto al momento.`}
   breadcrumbs={[{ name: 'Disponibilidad', url: '/calendario-disponibilidad/' }, { name: v.short, url: v.calSlug }]}
 >
   <section class="section" style="padding-top:2rem">
@@ -44,8 +43,6 @@ const kf = (re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value;
         <a class="cv-card" href={v.slug}>
           <Image src={v.hero} alt={v.gallery[0].alt} widths={[360, 600]} sizes="(max-width: 900px) 100vw, 340px" />
           <span class="cv-card__body">
-            <span class="cv-card__price">Desde <strong><span data-from={v.id}>{fromPrice(v)}</span> €/día</strong></span>
-            <PriceNote compact />
             <span class="cv-card__link">Ver ficha de la {v.short} <Icon name="arrow" /></span>
           </span>
         </a>

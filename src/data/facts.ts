@@ -3,7 +3,7 @@
  * Los usan el bloque "Datos clave" de la web y /llms.txt (pensados para buscadores con IA).
  * Se calculan al compilar, con los precios de Google Sheets si están disponibles.
  */
-import { site, pricing } from './site';
+import { site, pricing, display } from './site';
 import { getVehicle, fromPrice } from './vehicles';
 
 export function keyFacts() {
@@ -11,7 +11,9 @@ export function keyFacts() {
   return [
     { k: 'Qué', v: `Alquiler de autocaravanas y campers en Sevilla. Empresa local con dos vehículos Benimar: ${m.name} (${m.type.toLowerCase()}, 4 plazas) y ${c.name} (${c.type.toLowerCase()}, 4 plazas).` },
     { k: 'Dónde', v: `Recogida y devolución en ${site.address.street}, ${site.address.postalCode} ${site.address.city} (Sevilla), a ${site.distanceToSevilla}. Polígono cerrado y protegido, al lado de Santiponce y muy cerca de Itálica.` },
-    { k: 'Precio', v: `${c.short} desde ${fromPrice(c)} €/día y ${m.short} desde ${fromPrice(m)} €/día, según temporada y duración. Precios orientativos con IVA.` },
+    { k: 'Precio', v: display.showFrom
+      ? `${c.short} desde ${fromPrice(c)} €/día y ${m.short} desde ${fromPrice(m)} €/día, según temporada y duración. Precios orientativos con IVA.`
+      : 'Según modelo, temporada y duración, con IVA. Tabla completa en la página de Tarifas o precio exacto para tus fechas en el formulario.' },
     { k: 'Mínimo', v: `${pricing.minDays} días de alquiler (para eventos especiales, consultar).` },
     { k: 'Kilómetros', v: `${pricing.km.shortStay}; ${pricing.km.longStay.toLowerCase()}.` },
     { k: 'Incluido', v: 'Seguro, asistencia en carretera 24 h, menaje, mesa y sillas, gas y kit de limpieza. Mascotas y parking para tu coche gratis.' },

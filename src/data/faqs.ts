@@ -1,9 +1,16 @@
+import { display } from './site';
+
 export type Faq = { q: string; a: string; tags: string[] };
 
 export const faqs: Faq[] = [
   {
     q: '¿Cuánto cuesta alquilar una autocaravana en Sevilla?',
-    a: 'En RG MEGA la Camper 120 UP cuesta desde {camper.desde} €/día y la Benimar Mileo 268 desde {mileo.desde} €/día (temporada baja, más de 14 días). En temporada media y alta el precio va de {camper.media.short} a {all.max} €/día según modelo y duración. El seguro, la asistencia 24 h y todo el equipamiento están incluidos. Son precios orientativos: pregúntanos siempre por ofertas especiales y promociones.',
+    // Única respuesta con cifras de precio en las preguntas frecuentes. Con el interruptor "Mostrar precios desde" en NO, sin cifras.
+    get a() {
+      return display.showFrom
+        ? 'En RG MEGA la Camper 120 UP cuesta desde {camper.desde} €/día y la Benimar Mileo 268 desde {mileo.desde} €/día (temporada baja, más de 14 días). En temporada media y alta el precio va de {camper.media.short} a {all.max} €/día según modelo y duración. El seguro, la asistencia 24 h y todo el equipamiento están incluidos. Son precios orientativos: pregúntanos siempre por ofertas especiales y promociones.'
+        : 'Depende del modelo, la temporada y la duración del viaje: la Camper 120 UP es la opción más económica y la temporada baja (de octubre a marzo, salvo festivos) la más barata. El seguro, la asistencia 24 h y todo el equipamiento están incluidos. Tienes la tabla completa en Tarifas y el precio exacto de tus fechas en el formulario.';
+    },
     tags: ['precio', 'home', 'barata'],
   },
   {

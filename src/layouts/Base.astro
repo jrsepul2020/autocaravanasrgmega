@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import MobileBar from '../components/MobileBar.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import '../data/remote'; // lee Google Sheets al compilar
-import { site } from '../data/site';
+import { site, display } from '../data/site';
 import { vehicles, fromPrice, px } from '../data/vehicles';
 
 interface Props {
@@ -88,7 +88,7 @@ const webPage = {
 const allSchema = [business, webSite, webPage, ...(crumbsSchema ? [crumbsSchema] : []), ...schema];
 ---
 <!doctype html>
-<html lang="es">
+<html lang="es" class={display.showFrom ? undefined : 'no-from'}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />

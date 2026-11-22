@@ -21,7 +21,6 @@ import imgPlanVacaciones from '../assets/img/ruta-autocaravana-montana.webp';
 
 const today = new Date().toISOString().slice(0, 10);
 const activeOffers = offers.filter((o) => o.until >= today);
-const camperBaja = getVehicle('camper').prices.baja.short;
 
 const ventajas = [
   { icon: 'shield', t: 'Seguro y asistencia 24 h' },
@@ -31,7 +30,7 @@ const ventajas = [
 ];
 
 const planes = [
-  { img: imgPlanFinde, t: 'Fin de semana', d: `De viernes a domingo desde ${camperBaja} €/día (${camperBaja * 3} € los 3 días).`, href: '/alquiler-autocaravana-fin-de-semana-sevilla/' },
+  { img: imgPlanFinde, t: 'Fin de semana', d: 'Recoge el viernes y vuelve el domingo: el plan perfecto para estrenarte.', href: '/alquiler-autocaravana-fin-de-semana-sevilla/' },
   { img: imgAracena, t: 'Puentes y festivos', d: 'Constitución, Andalucía, Semana Santa, mayo… Reserva con tiempo.', href: '/alquiler-autocaravana-puente-sevilla/' },
   { img: imgPlanEventos, t: 'Fútbol y eventos', d: 'Sevilla, Betis, el Bernabéu, conciertos… Consúltanos aunque sean menos de 3 días.', href: '/alquiler-autocaravana-eventos-futbol-sevilla/' },
   { img: imgPlanVacaciones, t: 'Vacaciones largas', d: 'Más de 7 días con km ilimitados y tarifa reducida desde 15 días.', href: '/tarifas/' },
@@ -61,7 +60,7 @@ const destinoImg: Record<string, { img: ImageMetadata; name: string; d: string }
 const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destinoImg[r.slug], href: `/rutas/${r.slug}/` }));
 ---
 <Base
-  title="Alquiler de Autocaravanas en Sevilla desde {all.desde} €/día | RG MEGA"
+  title="Alquiler de Autocaravanas en Sevilla · Mileo 268 y Camper 120 UP | RG MEGA"
   description="Alquiler de autocaravanas y campers en Sevilla: Benimar Mileo 268 y Camper 120 UP nuevas. Recogida en Salteras, seguro y asistencia 24 h incluidos, mascotas gratis. Fin de semana, puentes y vacaciones."
 >
   <!-- HERO: las dos autocaravanas, cada una con su nombre y su precio -->
@@ -82,7 +81,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
             <Image src={v.hero} alt={`${v.name} de alquiler en Sevilla`} widths={[480, 800, 1100]} sizes="(max-width: 560px) 50vw, (max-width: 900px) 100vw, 600px" loading="eager" fetchpriority={i === 0 ? 'high' : 'auto'} />
             <span class="hv__cap">
               <span class="hv__name"><strong>{v.short}</strong><small>{v.type}</small></span>
-              <span class="hv__price">desde <b><span data-from={v.id}>{fromPrice(v)}</span> €</b>/día</span>
+              <span class="hv__go">Ver ficha <Icon name="arrow" /></span>
             </span>
           </a>
         ))}
@@ -172,10 +171,9 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
             <tr><th scope="row">{row.k}</th><td>{row.m}</td><td>{row.c}</td></tr>
           ))}
           <tr class="cmp__price">
-            <th scope="row">Precio</th>
+            <th scope="row">Reserva</th>
             {[mileo, camper].map((v) => (
               <td>
-                <span class="cmp__from">desde <b><span data-from={v.id}>{fromPrice(v)}</span> €</b>/día</span>
                 <span class="cmp__btns">
                   <a class="btn btn--light btn--sm" href={v.calSlug}><Icon name="calendar" /> Disponibilidad</a>
                   <a class="cmp__link" href={v.slug}>Ver ficha <Icon name="arrow" /></a>
@@ -308,8 +306,9 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .hv__name { display: grid; line-height: 1.15; }
   .hv__name strong { font-family: var(--display); font-size: 1.45rem; }
   .hv__name small { font-size: .82rem; color: var(--on-dark); }
-  .hv__price { font-size: .9rem; color: var(--on-dark); white-space: nowrap; }
-  .hv__price b { font-family: var(--display); font-size: 1.6rem; color: #fff; margin-left: .2rem; letter-spacing: -.02em; }
+  .hv__go { display: inline-flex; align-items: center; gap: .3rem; font-size: .9rem; font-weight: 700; color: #fff; border-bottom: 2px solid rgba(255,255,255,.45); padding-bottom: .1rem; white-space: nowrap; }
+  .hv__go :global(svg) { width: 15px; height: 15px; transition: transform .2s; }
+  .hv:hover .hv__go :global(svg) { transform: translateX(3px); }
 
   /* BUSCADOR + VENTAJAS */
   .finder { position: relative; z-index: 2; padding-bottom: clamp(56px, 7vw, 88px); }
@@ -361,8 +360,6 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .cmp__veh small { color: var(--on-dark); font-size: .85rem; font-weight: 500; }
   .cmp__veh:hover strong { text-decoration: underline; text-underline-offset: 4px; }
   .cmp__price td, .cmp__price th { border-bottom: 0; padding-top: 1.4rem; }
-  .cmp__from { display: block; color: var(--on-dark); font-size: .95rem; margin-bottom: .9rem; }
-  .cmp__from b { font-family: var(--display); font-size: 2.2rem; color: #fff; letter-spacing: -.02em; margin-left: .2rem; }
   .cmp__btns { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem 1.2rem; }
   .cmp__link { display: inline-flex; align-items: center; gap: .35rem; color: #fff; font-weight: 600; text-decoration: none; border-bottom: 2px solid rgba(255,255,255,.4); }
   .cmp__link:hover { color: #fff; border-bottom-color: #fff; }
@@ -381,7 +378,6 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .cmp__veh :global(img) { width: 100%; }
     .cmp__veh strong { font-size: 1.2rem; }
     .cmp__t thead th:first-of-type { padding-left: 0; }
-    .cmp__from b { font-size: 1.7rem; }
     .cmp__btns .btn { width: 100%; white-space: normal; padding-inline: .6em; }
   }
 
@@ -456,8 +452,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .hv__cap { left: .7rem; right: .7rem; bottom: .65rem; flex-direction: column; align-items: flex-start; gap: .15rem; }
     .hv__name strong { font-size: 1.1rem; }
     .hv__name small { display: none; }
-    .hv__price { font-size: .78rem; white-space: normal; }
-    .hv__price b { font-size: 1.25rem; }
+    .hv__go { font-size: .8rem; }
     .finder__card { padding: 1.1rem; margin-top: -56px; }
     .search { grid-template-columns: minmax(0, 1fr); }
     .perks { grid-template-columns: minmax(0, 1fr); gap: .8rem; }

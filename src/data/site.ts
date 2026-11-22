@@ -158,6 +158,9 @@ export const offers: { title: string; text: string; until: string; vehicle?: str
 
 /* ---------- Precio destacado de la portada (respaldo de la pestaña "Portada") ---------- */
 // price: null = automático (el precio más bajo de ese vehículo). text vacío = "<vehículo> desde".
+/** Interruptor de la hoja (pestaña Portada, "Mostrar precios desde"): false = se ocultan los "desde X €/día". */
+export const display = { showFrom: true };
+
 export const heroPrice: { vehicle: 'mileo' | 'camper'; text: string; price: number | null } = {
   vehicle: 'camper',
   text: '',

@@ -3,14 +3,14 @@ import LandingPage from '../components/LandingPage.astro';
 import img from '../assets/img/camper-120-up-exterior.jpg';
 import { faqsBy } from '../data/faqs';
 const faqs = [
-  { q: '¿Cuánto cuesta alquilar una camper en Sevilla?', a: 'Nuestra Camper 120 UP cuesta desde {camper.desde} €/día en temporada baja para alquileres largos y entre {camper.min} y {camper.max} €/día para alquileres de 3 a 14 días. Incluye seguro, asistencia 24 h, equipamiento completo y parking para tu coche.', tags: [] },
+  { q: '¿Cuánto cuesta alquilar una camper en Sevilla?', a: 'Depende de la temporada y de los días de alquiler; la temporada baja y los alquileres de más de 14 días son lo más económico. Incluye seguro, asistencia 24 h, equipamiento completo y parking para tu coche. Consulta la tabla en Tarifas o pide precio para tus fechas.', tags: [] },
   { q: '¿Qué diferencia hay entre una camper y una autocaravana?', a: 'La camper es una furgoneta camperizada (unos 6 m), más ágil y fácil de aparcar. La autocaravana perfilada como la Mileo 268 es más ancha, con más espacio interior, camas fijas más grandes y garaje. Ambas tienen baño, ducha y cocina.', tags: [] },
   ...faqsBy('camper', 4),
 ];
 ---
 <LandingPage
-  title="Alquiler de Camper en Sevilla desde {camper.desde} €/día | Furgoneta camper RG MEGA"
-  description="Alquiler de furgonetas camper en Sevilla con baño, ducha, cocina y placa solar. Camper Benimar 120 UP desde {camper.desde} €/día, mascotas gratis y recogida en Salteras. Fines de semana y vacaciones."
+  title="Alquiler de Camper en Sevilla · Furgoneta camper Benimar | RG MEGA"
+  description="Alquiler de furgonetas camper en Sevilla con baño, ducha, cocina y placa solar. Camper Benimar 120 UP con mascotas gratis y recogida en Salteras. Fines de semana y vacaciones."
   h1="Alquiler de camper en Sevilla"
   eyebrow="Furgoneta camper · Sevilla"
   lead="Una camper compacta, nueva y totalmente equipada para recorrer Andalucía a tu ritmo. Recógela en Sevilla y empieza la aventura el mismo día."

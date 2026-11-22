@@ -51,7 +51,7 @@ const product = {
         {v.keyFacts.map((f) => <li><small>{f.label}</small><strong>{f.value}</strong></li>)}
       </ul>
 
-      <p class="vp-tldr"><strong>En resumen:</strong> alquila la {v.name} ({v.type.toLowerCase()}) en Sevilla desde <span data-from={v.id}>{fromPrice(v)}</span> €/día, con recogida en Salteras, mínimo {pricing.minDays} días, seguro y asistencia 24 h incluidos y carnet B. Ideal para {v.idealFor.charAt(0).toLowerCase() + v.idealFor.slice(1)}.</p>
+      <p class="vp-tldr"><strong>En resumen:</strong> alquila la {v.name} ({v.type.toLowerCase()}) en Sevilla con recogida en Salteras, mínimo {pricing.minDays} días, seguro y asistencia 24 h incluidos y carnet B. Ideal para {v.idealFor.charAt(0).toLowerCase() + v.idealFor.slice(1)}.</p>
 
       <div class="prose">
         <slot />
@@ -79,8 +79,8 @@ const product = {
     <aside class="vp-aside">
       <div class="vp-sticky">
         <div class="vp-price">
-          <p><small>Alquiler desde</small><strong><span data-from={v.id}>{fromPrice(v)}</span> €<span class="vp-unit">/día</span></strong></p>
-          <div class="vp-note"><PriceNote compact /></div>
+          <p class="js-from"><small>Alquiler desde</small><strong><span data-from={v.id}>{fromPrice(v)}</span> €<span class="vp-unit">/día</span></strong></p>
+          <div class="vp-note js-from"><PriceNote compact /></div>
           <a class="btn btn--wa" href={waLink(`Hola, me interesa alquilar la ${v.name}. ¿Tenéis disponibilidad para…?`)} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
           <a class="btn btn--ghost" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
         </div>

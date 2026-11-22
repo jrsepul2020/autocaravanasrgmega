@@ -33,6 +33,8 @@ export type LiveData = {
   prices: Partial<Record<VehicleId, Partial<Record<SeasonKey, { short: number; long: number }>>>>;
   offers: Offer[] | null;
   hero: Hero | null;
+  /** Pestaña Portada → "Mostrar precios desde" (SI/NO). null = sin dato. */
+  showFrom: boolean | null;
   special: { name: string; from: string; to: string }[] | null;
 };
 
@@ -118,7 +120,7 @@ const at = (row: string[], i: number) => (i >= 0 ? row[i] ?? '' : '');
 
 /** Convierte el CSV de cada pestaña en datos. Ignora filas incompletas. Las cabeceras (fila 1) se saltan. */
 export function normalize(csv: Partial<Record<TabKey, string>>): LiveData {
-  const out: LiveData = { prices: {}, offers: null, special: null, hero: null };
+  const out: LiveData = { prices: {}, offers: null, special: null, hero: null, showFrom: null };
 
   if (csv.precios) {
     for (const [veh, temp, short, long] of parseCsv(csv.precios).slice(1)) {
@@ -150,11 +152,12 @@ export function normalize(csv: Partial<Record<TabKey, string>>): LiveData {
   }
   if (csv.portada) {
     const [h = [], row = []] = parseCsv(csv.portada);
-    const c = { veh: col(h, ['vehiculo', 'modelo']), text: col(h, ['texto']), price: col(h, ['precio'], ['texto']) };
-    // Si la pestaña no existe, Google devuelve otra: solo la aceptamos si tiene sus columnas propias.
-    const v = vehicleOf(at(row, c.veh));
-    if (c.veh >= 0 && c.text >= 0 && c.price >= 0 && col(h, ['temporada', 'titulo', 'mostrar']) < 0 && v) {
-      out.hero = { vehicle: v, text: at(row, c.text), price: num(at(row, c.price)) };
+    const c = { veh: col(h, ['vehiculo', 'modelo']), text: col(h, ['texto']), price: col(h, ['precio'], ['texto', 'mostrar']), show: col(h, ['mostrar precio']) };
+    // Si la pestaña no existe, Google devuelve otra: solo la aceptamos si no tiene columnas de otras pestañas.
+    if (col(h, ['temporada', 'titulo']) < 0) {
+      const v = vehicleOf(at(row, c.veh));
+      if (c.veh >= 0 && c.text >= 0 && c.price >= 0 && v) out.hero = { vehicle: v, text: at(row, c.text), price: num(at(row, c.price)) };
+      if (c.show >= 0 && at(row, c.show)) out.showFrom = yes(at(row, c.show));
     }
   }
   return out;
