@@ -26,13 +26,21 @@ export const site = {
   distanceToSevilla: '15 minutos del centro de Sevilla',
 
   /* ---------- Google Business Profile ---------- */
+  // Ficha "Autocaravanas RGMEGA" (Agencia de alquiler de autocaravanas).
+  // OJO: el enlace antiguo maps.app.goo.gl/cWAUWQo41G5M5MXa9 apuntaba a OTRA ficha ("RGMega").
+  gbp: {
+    name: 'Autocaravanas RGMEGA',          // nombre exacto de la ficha (mantener igual en Google y en la web)
+    cid: '3712490990555489543',             // ID de la ficha en Google Maps
+    kgmid: '/g/11xrlt7th_',                 // ID de la entidad en Google
+    lat: 37.4577184,
+    lng: -6.0565255,
+  },
   // Enlace "Cómo llegar" / ficha de Google Maps
-  mapsUrl: 'https://maps.app.goo.gl/cWAUWQo41G5M5MXa9',
-  // Pega aquí el enlace para escribir reseña (Google Business > "Pedir reseñas")
-  gbpReviewUrl: 'https://maps.app.goo.gl/cWAUWQo41G5M5MXa9',
-  // Mapa embebido (búsqueda por dirección). Puedes sustituirlo por el iframe "Compartir > Insertar mapa" de tu ficha
-  mapEmbed:
-    'https://www.google.com/maps?q=Calle+Extremadura+133,+41909+Salteras,+Sevilla&output=embed',
+  mapsUrl: 'https://www.google.com/maps?cid=3712490990555489543',
+  // Pega aquí el enlace para escribir reseña (Google Business > "Pedir reseñas"); mientras, abre la ficha
+  gbpReviewUrl: 'https://www.google.com/maps?cid=3712490990555489543',
+  // Mapa embebido de la ficha
+  mapEmbed: 'https://maps.google.com/maps?cid=3712490990555489543&output=embed&hl=es',
 
   /* ---------- Redes ---------- */
   social: {
