@@ -7,9 +7,8 @@ import Reviews from '../components/Reviews.astro';
 import FaqList from '../components/FaqList.astro';
 import Location from '../components/Location.astro';
 import CtaBand from '../components/CtaBand.astro';
-import PhotoCarousel from '../components/PhotoCarousel.astro';
-import { offers, site, waLink } from '../data/site';
-import { vehicles, getVehicle } from '../data/vehicles';
+import { offers, site, heroPrice } from '../data/site';
+import { vehicles, getVehicle, fromPrice } from '../data/vehicles';
 import { rutas } from '../data/rutas';
 import { faqsBy } from '../data/faqs';
 import hero from '../assets/img/benimar-mileo-268-alquiler-sevilla.jpg';
@@ -30,9 +29,9 @@ const offerPhotos = {
   camper: await getImage({ src: getVehicle('camper').hero, width: 900, height: 506, format: 'webp' }),
   mileo: await getImage({ src: getVehicle('mileo').hero, width: 900, height: 506, format: 'webp' }),
 };
-const marqueeItems = activeOffers.length
-  ? activeOffers.map((o) => (o.price ? `${o.title} · desde ${o.price} €/día` : o.title))
-  : ['Consulta nuestras ofertas especiales de alquiler'];
+const heroV = getVehicle(heroPrice.vehicle);
+const heroText = heroPrice.text || `${heroV.short} desde`;
+const heroAmount = heroPrice.price ?? fromPrice(heroV);
 
 const ventajas = [
   { icon: 'shield', t: 'Seguro y asistencia 24 h' },
@@ -67,113 +66,19 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
       <p class="hero__claim">Tu próxima escapada empieza aquí</p>
       <h1>Alquiler de autocaravanas en Sevilla</h1>
       <p class="hero__lead">Dos Benimar nuevas, con recogida y entrega en Sevilla. Sin intermediarios: te atendemos nosotros, de principio a fin.</p>
-      <div class="btn-row hero__btns">
-        <a class="btn btn--primary" href="/alquilar-benimar-mileo-268/">Ver autocaravanas <Icon name="arrow" class="i-arrow" /></a>
-        <a class="btn btn--outline-light" href="/calendario-disponibilidad/">Consultar disponibilidad</a>
+      <p class="hero__price"><span data-hero-text>{heroText}</span> <strong><span data-hero-price data-auto={heroPrice.vehicle}>{heroAmount}</span> €<small>/día</small></strong></p>
+      <div class="hero__btns">
+        <a class="btn btn--light btn--lg" href="/calendario-disponibilidad/"><Icon name="calendar" /> Consultar disponibilidad</a>
+        <a class="hero__link" href="/alquilar-benimar-mileo-268/">Ver las autocaravanas <Icon name="arrow" /></a>
       </div>
     </div>
   </section>
 
-  <!-- MARQUEE + VENTAJAS -->
-  <div class="intro">
-    <div class="search-wrap">
-      <div class="search-card search-card--full">
-        <ul class="perks">
-          {ventajas.map((v) => (
-            <li>
-              <Icon name={v.icon} />
-              {'href' in v && v.href ? <a href={v.href}>{v.t}</a> : <span>{v.t}</span>}
-            </li>
-          ))}
-        </ul>
-        <div class="marquee" role="region" aria-label="Ofertas disponibles" data-offers-marquee>
-          <div class="marquee__track">
-            {[...marqueeItems, ...marqueeItems].map((item) => (
-              <a class="marquee__item" href="/ofertas-alquiler-autocaravana-sevilla/">
-                <Icon name="star" />
-                <span>{item}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- OFERTAS -->
-  <section class="section section--sand offers-sec" aria-labelledby="ofertas-t" data-offers-wrap hidden={activeOffers.length === 0}>
+  <!-- BUSCADOR + VENTAJAS -->
+  <section class="finder" id="buscar-disponibilidad" aria-labelledby="buscar-t">
     <div class="container">
-      <div class="offers-head">
-        <h2 id="ofertas-t">Ofertas del momento</h2>
-        <a class="more-link" href="/ofertas-alquiler-autocaravana-sevilla/">Ver todas las ofertas <Icon name="arrow" /></a>
-      </div>
-      <div class="offers" data-offers>
-        <template>
-          <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/" data-vehicle="camper">
-            <span class="offer__model" data-f="vehicle"></span>
-            <span class="offer__media" aria-hidden="true">
-              <img class="offer__photo" data-for="camper" src={offerPhotos.camper.src} width={offerPhotos.camper.attributes.width} height={offerPhotos.camper.attributes.height} alt="" loading="lazy" decoding="async" />
-              <img class="offer__photo" data-for="mileo" src={offerPhotos.mileo.src} width={offerPhotos.mileo.attributes.width} height={offerPhotos.mileo.attributes.height} alt="" loading="lazy" decoding="async" />
-            </span>
-            <span class="offer__body">
-              <span class="offer__tag"><Icon name="star" /> Oferta</span>
-              <strong class="offer__title" data-f="title"></strong>
-              <span class="offer__text" data-f="text"></span>
-              <span class="offer__until" data-f="until"></span>
-              <span class="offer__cta">Reservar esta oferta <Icon name="arrow" /></span>
-            </span>
-            <span class="offer__stamp">
-              <small class="offer__veh" data-f="vehicle"></small>
-              <span class="offer__from">desde</span>
-              <b><span data-f="amount"></span>€</b>
-              <small>/día</small>
-            </span>
-          </a>
-        </template>
-        {activeOffers.map((o) => (
-          <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/" data-vehicle={offerVehicleId(o.vehicle)}>
-            <span class="offer__model" hidden={!o.vehicle}>{o.vehicle}</span>
-            <span class="offer__media" aria-hidden="true">
-              <img class="offer__photo" data-for="camper" src={offerPhotos.camper.src} width={offerPhotos.camper.attributes.width} height={offerPhotos.camper.attributes.height} alt="" loading="lazy" decoding="async" />
-              <img class="offer__photo" data-for="mileo" src={offerPhotos.mileo.src} width={offerPhotos.mileo.attributes.width} height={offerPhotos.mileo.attributes.height} alt="" loading="lazy" decoding="async" />
-            </span>
-            <span class="offer__body">
-              <span class="offer__tag"><Icon name="star" /> Oferta</span>
-              <strong class="offer__title">{o.title}</strong>
-              <span class="offer__text">{o.text}</span>
-              <span class="offer__until" hidden={!untilLabel(o.until)}>{untilLabel(o.until)}</span>
-              <span class="offer__cta">Reservar esta oferta <Icon name="arrow" /></span>
-            </span>
-            <span class="offer__stamp" hidden={!o.price}>
-              <small class="offer__veh" hidden={!o.vehicle}>{o.vehicle}</small>
-              <span class="offer__from">desde</span>
-              <b><span>{o.price}</span>€</b>
-              <small>/día</small>
-            </span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- BUSCADOR -->
-  <section class="section section--sand search-sec" id="buscar-disponibilidad" aria-labelledby="buscar-t">
-    <div class="container">
-      <div class="contact-cta" role="group" aria-label="Contacto rápido">
-        <p class="contact-cta__t">¿Tienes dudas? Pregunta sin compromiso</p>
-        <div class="contact-cta__actions">
-          <a class="contact-cta__link" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
-          <span class="contact-cta__sep" aria-hidden="true"></span>
-          <a class="btn contact-cta__wa" href={waLink('Hola, quiero consultar disponibilidad')} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
-          <span class="contact-cta__sep" aria-hidden="true"></span>
-          <a class="contact-cta__link" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
-        </div>
-      </div>
-      <div class="section-head">
-        <h2 id="buscar-t">Cuando quieres salir, consulta disponibilidad</h2>
-        <p class="lead">Elige fechas y vehículo: te llevamos al calendario para confirmar disponibilidad.</p>
-      </div>
-      <div class="search-card search-card--solo">
+      <div class="finder__card">
+        <h2 id="buscar-t" class="finder__t">¿Cuándo quieres salir?</h2>
         <form class="search" action="/calendario-disponibilidad/#presupuesto" method="get" aria-label="Buscar disponibilidad">
           <label class="search__f">
             <span>Vehículo</span>
@@ -190,8 +95,64 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
             <span>Devolución</span>
             <input type="date" name="llegada" />
           </label>
-          <button class="btn btn--primary search__go" type="submit"><Icon name="calendar" /> Buscar disponibilidad</button>
+          <button class="btn btn--primary search__go" type="submit">Ver disponibilidad <Icon name="arrow" class="i-arrow" /></button>
         </form>
+      </div>
+      <ul class="perks">
+        {ventajas.map((v) => (
+          <li>
+            <Icon name={v.icon} />
+            {'href' in v && v.href ? <a href={v.href}>{v.t}</a> : <span>{v.t}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- OFERTAS -->
+  <section class="section section--sand offers-sec" aria-labelledby="ofertas-t" data-offers-wrap hidden={activeOffers.length === 0}>
+    <div class="container">
+      <div class="offers-head">
+        <h2 id="ofertas-t">Ofertas del momento</h2>
+        <a class="more-link" href="/ofertas-alquiler-autocaravana-sevilla/">Ver todas las ofertas <Icon name="arrow" /></a>
+      </div>
+      <div class="offers" data-offers>
+        <template>
+          <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/" data-vehicle="camper">
+            <span class="offer__media" aria-hidden="true">
+              <img class="offer__photo" data-for="camper" src={offerPhotos.camper.src} width={offerPhotos.camper.attributes.width} height={offerPhotos.camper.attributes.height} alt="" loading="lazy" decoding="async" />
+              <img class="offer__photo" data-for="mileo" src={offerPhotos.mileo.src} width={offerPhotos.mileo.attributes.width} height={offerPhotos.mileo.attributes.height} alt="" loading="lazy" decoding="async" />
+            </span>
+            <span class="offer__body">
+              <span class="offer__model" data-f="vehicle"></span>
+              <strong class="offer__title" data-f="title"></strong>
+              <span class="offer__text" data-f="text"></span>
+              <span class="offer__until" data-f="until"></span>
+              <span class="offer__foot">
+                <span class="offer__stamp">desde <b><span data-f="amount"></span> €</b>/día</span>
+                <span class="offer__cta">Reservar <Icon name="arrow" /></span>
+              </span>
+            </span>
+          </a>
+        </template>
+        {activeOffers.map((o) => (
+          <a class="offer" href="/ofertas-alquiler-autocaravana-sevilla/" data-vehicle={offerVehicleId(o.vehicle)}>
+            <span class="offer__media" aria-hidden="true">
+              <img class="offer__photo" data-for="camper" src={offerPhotos.camper.src} width={offerPhotos.camper.attributes.width} height={offerPhotos.camper.attributes.height} alt="" loading="lazy" decoding="async" />
+              <img class="offer__photo" data-for="mileo" src={offerPhotos.mileo.src} width={offerPhotos.mileo.attributes.width} height={offerPhotos.mileo.attributes.height} alt="" loading="lazy" decoding="async" />
+            </span>
+            <span class="offer__body">
+              <span class="offer__model" hidden={!o.vehicle}>{o.vehicle}</span>
+              <strong class="offer__title">{o.title}</strong>
+              <span class="offer__text">{o.text}</span>
+              <span class="offer__until" hidden={!untilLabel(o.until)}>{untilLabel(o.until)}</span>
+              <span class="offer__foot">
+                <span class="offer__stamp" hidden={!o.price}>desde <b><span>{o.price}</span> €</b>/día</span>
+                <span class="offer__cta">Reservar <Icon name="arrow" /></span>
+              </span>
+            </span>
+          </a>
+        ))}
       </div>
     </div>
   </section>
@@ -199,6 +160,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   <!-- BANNER -->
   <section class="ritmo" aria-labelledby="ritmo-t">
     <div class="ritmo__copy">
+      <span class="eyebrow">Libertad total</span>
       <h2 id="ritmo-t">Viaja a tu ritmo</h2>
       <p>Para donde quieras, duerme frente al mar o en la sierra y vuelve cuando te apetezca. Tu casa va contigo.</p>
       <a class="btn btn--light" href="/calendario-disponibilidad/">Consultar disponibilidad <Icon name="arrow" class="i-arrow" /></a>
@@ -206,11 +168,8 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     <Image src={imgBanner} alt="Autocaravana Benimar en una carretera de montaña al atardecer" class="ritmo__img" widths={[700, 1100, 1536]} sizes="(max-width: 860px) 100vw, 50vw" />
   </section>
 
-  <!-- GALERÍA -->
-  <PhotoCarousel />
-
   <!-- PARA CADA PLAN -->
-  <section class="section section--sand plans-sec">
+  <section class="section plans-sec">
     <div class="container plans-sec__in">
       <div class="section-head plans-sec__head">
         <h2>Fin de semana, puente o vacaciones: tú decides</h2>
@@ -271,7 +230,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
         <h2>Dudas frecuentes</h2>
         <p class="lead">Lo que más nos preguntáis antes de reservar.</p>
       </div>
-      <FaqList items={faqsBy('home', 8)} />
+      <FaqList items={faqsBy('home', 6)} />
       <p class="more"><a href="/preguntas-frecuentes/">Ver todas las preguntas frecuentes <Icon name="arrow" /></a></p>
     </div>
   </section>
@@ -295,155 +254,112 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
 
 <style>
   /* HERO */
-  .hero { position: relative; color: #fff; overflow: hidden; isolation: isolate; min-height: clamp(520px, 78vh, 720px); display: flex; align-items: center; }
+  .hero { position: relative; color: #fff; overflow: hidden; isolation: isolate; min-height: clamp(560px, 82vh, 760px); display: flex; align-items: center; }
   .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
   .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
-    linear-gradient(90deg, rgba(20,32,26,.82) 0%, rgba(20,32,26,.55) 42%, rgba(20,32,26,.08) 75%),
-    linear-gradient(0deg, rgba(20,32,26,.55) 0%, transparent 35%),
-    linear-gradient(180deg, rgba(250,176,44,.18), transparent 40%); }
-  .hero__in { padding: clamp(56px, 8vw, 96px) 0 clamp(96px, 12vw, 140px); }
-  .hero__claim { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 6.2vw, 4.6rem); line-height: 1.02; letter-spacing: -.02em; margin: 0 0 .6rem; max-width: 12ch; text-wrap: balance; }
-  .hero h1 { color: #fff; font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 600; margin: 0 0 .9rem; letter-spacing: 0; }
-  .hero__lead { font-size: 1.08rem; color: var(--on-dark); max-width: 46ch; margin: 0 0 1.6rem; }
-  .hero__btns { margin-bottom: 0; }
-  .hero__btns .btn--primary { border-color: #fff; }
+    linear-gradient(90deg, rgba(14,24,19,.86) 0%, rgba(14,24,19,.6) 40%, rgba(14,24,19,.05) 75%),
+    linear-gradient(0deg, rgba(14,24,19,.5) 0%, transparent 30%); }
+  .hero__in { padding: clamp(64px, 8vw, 104px) 0 clamp(120px, 13vw, 160px); }
+  .hero__claim { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 6.4vw, 4.8rem); line-height: 1; letter-spacing: -.025em; margin: 0 0 .9rem; max-width: 12ch; text-wrap: balance; }
+  .hero h1 { color: var(--terra); font-family: var(--font); font-size: .85rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 .8rem; }
+  .hero__lead { font-size: 1.1rem; color: var(--on-dark); max-width: 44ch; margin: 0 0 1.4rem; }
+  .hero__price { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin: 0 0 1.6rem; font-size: 1.05rem; color: var(--on-dark); }
+  .hero__price strong { font-family: var(--display); font-size: clamp(2.2rem, 4vw, 2.9rem); line-height: 1; color: #fff; letter-spacing: -.02em; }
+  .hero__price small { font-size: .45em; font-weight: 500; margin-left: .1em; color: var(--on-dark); letter-spacing: 0; }
+  .hero__btns { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; }
+  .hero__link { display: inline-flex; align-items: center; gap: .4rem; color: #fff; font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--terra); padding-bottom: .15rem; }
+  .hero__link:hover { color: #fff; }
+  .hero__link :global(svg) { width: 16px; height: 16px; transition: transform .2s; }
+  .hero__link:hover :global(svg) { transform: translateX(3px); }
 
-  /* MARQUEE + VENTAJAS */
-  .search-wrap { position: relative; z-index: 2; margin-top: -64px; width: 100%; }
-  .search-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); overflow: hidden; }
-  .search-card--full { border-radius: 0; box-shadow: 0 18px 40px -24px rgba(23,53,40,.45); background: var(--forest); }
-  .search-card--solo { background: #fff; }
-  .marquee { overflow: hidden; background: var(--forest); padding: 1.05rem 0; border-top: 1px solid rgba(255,255,255,.18); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
-  .marquee__track { display: flex; width: max-content; gap: 2.75rem; animation: marquee 28s linear infinite; }
-  .marquee:hover .marquee__track { animation-play-state: paused; }
-  .marquee__item { display: inline-flex; align-items: center; gap: .55rem; white-space: nowrap; font-weight: 700; font-size: 1.05rem; color: #fff; text-decoration: none; }
-  .marquee__item:hover { color: var(--sub); }
-  .marquee__item :global(svg) { width: 16px; height: 16px; color: var(--terra); flex: none; }
-  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee__track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; padding-inline: 1rem; }
-  }
-  .search { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 1rem; align-items: end; padding: 1.3rem 1.4rem 1.2rem; }
+  /* BUSCADOR + VENTAJAS */
+  .finder { position: relative; z-index: 2; padding-bottom: clamp(56px, 7vw, 88px); }
+  .finder__card { margin-top: -72px; background: #fff; border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line), 0 24px 60px -24px rgba(14,24,19,.35); padding: 1.4rem 1.5rem 1.5rem; }
+  .finder__t { font-size: 1.25rem; margin: 0 0 .9rem; }
+  .search { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 1rem; align-items: end; }
   .search__f { display: grid; gap: .35rem; font-size: .85rem; font-weight: 650; color: var(--ink); }
-  .search__f select, .search__f input { width: 100%; padding: .75em .9em; border: 1.5px solid var(--line); border-radius: 10px; font: inherit; font-weight: 500; font-size: .95rem; background: #fff; color: var(--ink); }
+  .search__f select, .search__f input { width: 100%; height: 50px; padding: 0 .9em; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font: inherit; font-weight: 500; font-size: .95rem; background: #fff; color: var(--ink); }
   .search__f select:focus, .search__f input:focus { outline: none; border-color: var(--forest); box-shadow: 0 0 0 4px rgba(31,74,56,.12); }
-  .search__go { height: 48px; }
-  .search-sec { padding-block: clamp(48px, 6vw, 72px); }
-  .contact-cta {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 1.5rem;
-    background: var(--forest); color: #fff; border-radius: var(--radius); padding: 1.15rem 1.4rem;
-    margin-bottom: 1.6rem; box-shadow: var(--shadow);
-  }
-  .contact-cta__t { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.15rem; color: #fff; }
-  .contact-cta__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.1rem; }
-  .contact-cta__link { display: inline-flex; align-items: center; gap: .45rem; color: #fff; text-decoration: none; font-weight: 650; font-size: .98rem; }
-  .contact-cta__link:hover { color: var(--sub); }
-  .contact-cta__link :global(svg) { width: 20px; height: 20px; color: var(--terra); flex: none; }
-  .contact-cta__wa { background: #fff; color: var(--forest); padding: .55em 1em; font-size: .95rem; }
-  .contact-cta__wa:hover { background: var(--sand); color: var(--forest); }
-  .contact-cta__wa :global(svg) { color: var(--wa); }
-  .contact-cta__sep { width: 1px; height: 28px; background: rgba(255,255,255,.3); flex: none; }
-  @media (max-width: 720px) {
-    .contact-cta { flex-direction: column; align-items: flex-start; }
-    .contact-cta__sep { display: none; }
-  }
-  .perks { list-style: none; margin: 0; padding: 1.05rem clamp(1rem, 3vw, 2rem); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--forest); }
-  .perks li { display: flex; align-items: center; justify-content: center; gap: .65rem; padding: .35rem 1rem; font-weight: 600; font-size: 1rem; color: #fff; }
-  .perks li + li { border-left: 1px solid rgba(255,255,255,.22); }
-  .perks a { color: #fff; text-decoration: none; }
-  .perks a:hover { color: var(--sub); }
-  .perks :global(svg) { width: 26px; height: 26px; color: var(--terra); flex: none; stroke-width: 1.8; }
-
-  /* SEPARACIÓN DEL BLOQUE INICIAL */
-  .intro { background: #fff; padding-bottom: clamp(2.5rem, 5vw, 4rem); position: relative; z-index: 1; width: 100%; }
+  .search__go { height: 50px; }
+  .perks { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+  .perks li { display: flex; align-items: center; gap: .7rem; font-weight: 600; font-size: .98rem; color: var(--ink); }
+  .perks a { color: var(--ink); text-decoration: none; }
+  .perks a:hover { color: var(--forest); }
+  .perks :global(svg) { width: 24px; height: 24px; color: var(--forest); flex: none; stroke-width: 1.8; }
 
   /* OFERTAS */
-  .offers-sec { padding-block: clamp(56px, 7vw, 88px); }
   .offers-sec[hidden] { display: none; }
-  .offers-sec > .container { width: min(100% - 24px, 1480px); }
-  .offers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1.5rem; margin-bottom: 1.4rem; }
+  .offers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1.5rem; margin-bottom: 1.8rem; }
   .offers-head h2 { margin: 0; }
   .more-link { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--forest); text-decoration: none; }
   .more-link :global(svg) { width: 16px; height: 16px; transition: transform .2s; }
   .more-link:hover :global(svg) { transform: translateX(3px); }
-  .offers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem; }
-  .offer { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "model model" "media media" "body stamp"; align-items: center; gap: 0; border-radius: var(--radius); color: #fff; text-decoration: none;
-    background: radial-gradient(120% 140% at 100% 0%, rgba(250,176,44,.38) 0%, rgba(250,176,44,0) 48%), linear-gradient(135deg, var(--forest) 0%, var(--forest-2) 100%);
-    box-shadow: 0 18px 40px -22px rgba(23,53,40,.8); transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
-  .offer::before { content: ''; position: absolute; z-index: -1; right: -60px; bottom: -70px; width: 260px; height: 260px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.12); }
-  .offer:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 26px 50px -24px rgba(23,53,40,.9); }
-  .offer__model { grid-area: model; padding: .85rem 1.35rem .55rem; font-family: var(--display); font-weight: 700; font-size: 1.05rem; letter-spacing: .02em; color: #fff; }
-  .offer__model:empty, .offer__model[hidden] { display: none; }
-  .offer__media { grid-area: media; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--forest-2); }
-  .offer__photo { display: none; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+  .offers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+  .offer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); background: #fff; border-radius: var(--radius); overflow: hidden; color: var(--ink); text-decoration: none; box-shadow: var(--shadow); transition: box-shadow .3s, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .offer:hover { color: var(--ink); transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .offer__media { position: relative; overflow: hidden; background: var(--sand-2); min-height: 220px; }
+  .offer__photo { display: none; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
   .offer:not([data-vehicle="mileo"]) .offer__photo[data-for="camper"],
   .offer[data-vehicle="mileo"] .offer__photo[data-for="mileo"] { display: block; position: absolute; inset: 0; }
-  .offer:hover .offer__photo { transform: scale(1.05); }
-  .offer__body { grid-area: body; display: grid; gap: .45rem; justify-items: start; align-content: center; padding: 1.35rem 1.2rem 1.4rem 1.5rem; }
-  .offer__tag { display: inline-flex; align-items: center; gap: .35rem; background: var(--terra); color: #fff; font-weight: 800; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: .38rem .7rem; border-radius: 999px; text-shadow: 0 1px 1px rgba(0,0,0,.2); }
-  .offer__tag :global(svg) { width: 12px; height: 12px; }
-  .offer__title { font-family: var(--display); font-weight: 700; font-size: clamp(1.25rem, 2.2vw, 1.5rem); line-height: 1.15; color: #fff; }
-  .offer__text { font-size: .93rem; color: var(--on-dark); max-width: 48ch; }
-  .offer__until { font-size: .8rem; font-weight: 600; color: var(--sub); }
-  .offer__cta { display: inline-flex; align-items: center; gap: .4rem; margin-top: .35rem; font-weight: 700; font-size: .92rem; color: #fff; border-bottom: 2px solid var(--terra); padding-bottom: .1rem; }
+  .offer:hover .offer__photo { transform: scale(1.04); }
+  .offer__body { display: flex; flex-direction: column; gap: .45rem; padding: 1.4rem 1.5rem; }
+  .offer__model { font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .offer__title { font-family: var(--display); font-weight: 700; font-size: clamp(1.2rem, 2vw, 1.4rem); line-height: 1.15; }
+  .offer__text { font-size: .93rem; color: var(--muted); }
+  .offer__until { font-size: .82rem; font-weight: 600; color: var(--ink); display: inline-flex; align-items: center; gap: .4rem; }
+  .offer__until::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--terra); }
+  .offer__foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-top: auto; padding-top: .9rem; border-top: 1px solid var(--line); }
+  .offer__stamp { font-size: .9rem; color: var(--muted); }
+  .offer__stamp b { font-family: var(--display); font-size: 1.9rem; color: var(--price); letter-spacing: -.02em; margin-inline: .1rem; }
+  .offer__cta { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; font-size: .95rem; color: var(--forest); }
   .offer__cta :global(svg) { width: 16px; height: 16px; transition: transform .2s; }
   .offer:hover .offer__cta :global(svg) { transform: translateX(4px); }
-  .offer__stamp { grid-area: stamp; display: grid; justify-items: center; align-content: center; width: 138px; height: 138px; border-radius: 50%; background: #fff; color: var(--price); text-align: center; line-height: 1; transform: rotate(-7deg); box-shadow: 0 0 0 5px rgba(255,255,255,.18), 0 14px 28px -12px rgba(0,0,0,.55); position: relative; transition: transform .35s cubic-bezier(.2,.8,.2,1); margin: 1rem 1.4rem 1rem .2rem; }
-  .offer:hover .offer__stamp { transform: rotate(0deg) scale(1.04); }
-  .offer__stamp::after { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px dashed rgba(60,95,77,.45); }
-  .offer__stamp b { font-family: var(--display); font-weight: 800; font-size: 2.6rem; letter-spacing: -.03em; color: var(--price); }
-  .offer__from, .offer__stamp > small:last-child { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-  .offer__from { margin-top: .15rem; }
-  .offer__veh { font-size: .68rem; font-weight: 700; color: var(--forest); max-width: 100px; line-height: 1.15; margin-bottom: .15rem; }
   .offer [hidden], .offer__stamp:has([data-f=amount][hidden]) { display: none; }
-  @media (max-width: 900px) {
-    .offers { grid-template-columns: minmax(0, 1fr); }
-  }
+  @media (max-width: 1000px) { .offers { grid-template-columns: minmax(0, 1fr); } }
 
-  /* BANNER DIAGONAL */
-  .ritmo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--forest); color: #fff; min-height: 420px; overflow: hidden; }
-  .ritmo__copy { align-self: center; padding: 2.4rem 2.5rem 2.4rem max(16px, calc((100vw - var(--max)) / 2)); }
-  .ritmo h2 { color: #fff; font-size: clamp(1.9rem, 3.6vw, 2.6rem); margin-bottom: .35em; }
-  .ritmo p { color: #fff; opacity: .95; font-size: 1.08rem; max-width: 40ch; margin-bottom: 1.4rem; }
-  .ritmo__img { width: 100%; height: 100%; min-height: 420px; max-height: 520px; object-fit: cover; object-position: center 60%; clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%); }
+  /* BANNER */
+  .ritmo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--forest); color: #fff; min-height: 440px; overflow: hidden; }
+  .ritmo__copy { align-self: center; padding: 3rem 2.5rem 3rem max(16px, calc((100vw - var(--max)) / 2)); }
+  .ritmo h2 { color: #fff; font-size: clamp(2rem, 3.8vw, 2.8rem); margin-bottom: .35em; }
+  .ritmo p { color: var(--on-dark); font-size: 1.1rem; max-width: 40ch; margin-bottom: 1.6rem; }
+  .ritmo__img { width: 100%; height: 100%; min-height: 440px; max-height: 540px; object-fit: cover; object-position: center 60%; }
 
-  /* PLANES */
-  .plans-sec > .container,
-  .plans-sec__in { width: min(100% - 24px, 1480px); }
+  /* PLANES: composición abierta, sin cajas */
   .plans-sec__head { max-width: 52rem; }
-  .plans { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.25rem; }
-  .plan { display: flex; flex-direction: column; gap: .55rem; padding: 0 0 1.25rem; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; text-decoration: none; color: var(--ink); transition: box-shadow .25s, transform .25s cubic-bezier(.2,.8,.2,1); }
-  .plan:hover { color: var(--ink); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-  .plan__ic { display: block; width: 100%; aspect-ratio: 16 / 11; border-radius: 0; overflow: hidden; margin: 0; background: var(--sand); }
-  .plan__ic :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+  .plans { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2rem 1.5rem; }
+  .plan { display: flex; flex-direction: column; gap: .5rem; text-decoration: none; color: var(--ink); }
+  .plan:hover { color: var(--ink); }
+  .plan__ic { display: block; aspect-ratio: 4 / 5; border-radius: var(--radius); overflow: hidden; background: var(--sand); margin-bottom: .5rem; }
+  .plan__ic :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
   .plan:hover .plan__ic :global(img) { transform: scale(1.05); }
-  .plan strong { font-family: var(--display); font-size: clamp(1.15rem, 1.5vw, 1.3rem); color: var(--forest); padding-inline: 1.15rem; margin-top: .15rem; }
-  .plan__d { font-size: 1.125rem; line-height: 1.45; color: var(--muted); flex: 1; padding-inline: 1.15rem; }
-  .plan__go { display: inline-flex; align-items: center; gap: .3rem; margin-top: .15rem; padding-inline: 1.15rem; font-size: .95rem; font-weight: 700; color: var(--price); }
+  .plan strong { font-family: var(--display); font-size: 1.25rem; }
+  .plan__d { font-size: .95rem; line-height: 1.5; color: var(--muted); flex: 1; }
+  .plan__go { display: inline-flex; align-items: center; gap: .3rem; font-size: .95rem; font-weight: 700; color: var(--forest); }
   .plan__go :global(svg) { width: 15px; height: 15px; transition: transform .2s; }
   .plan:hover .plan__go :global(svg) { transform: translateX(3px); }
 
-  /* DESTINOS */
-  .dest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem; }
-  .dest__card { position: relative; display: block; aspect-ratio: 4/3; border-radius: var(--radius); overflow: hidden; color: #fff; text-decoration: none; box-shadow: var(--shadow); isolation: isolate; }
+  /* DESTINOS: fotografía protagonista */
+  .dest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+  .dest__card { position: relative; display: block; aspect-ratio: 4/5; border-radius: var(--radius); overflow: hidden; color: #fff; text-decoration: none; isolation: isolate; }
   .dest__card :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
   .dest__card:hover :global(img) { transform: scale(1.05); }
-  .dest__card::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(15,26,20,.85) 0%, rgba(15,26,20,.25) 45%, transparent 70%); }
-  .dest__txt { position: absolute; left: 1.2rem; right: 1.2rem; bottom: 1.1rem; display: grid; gap: .2rem; }
-  .dest__txt strong { font-family: var(--display); font-size: 1.4rem; }
-  .dest__txt span { font-size: .9rem; color: var(--on-dark); }
+  .dest__card::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(14,24,19,.85) 0%, rgba(14,24,19,.2) 45%, transparent 70%); }
+  .dest__txt { position: absolute; left: 1.4rem; right: 1.4rem; bottom: 1.3rem; display: grid; gap: .25rem; }
+  .dest__txt strong { font-family: var(--display); font-size: 1.55rem; }
+  .dest__txt span { font-size: .93rem; color: var(--on-dark); }
   .dest__card:hover { color: #fff; }
 
-  /* OPINIONES */
-  .reviews { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 2.2fr); gap: 2.5rem; align-items: start; }
+  /* OPINIONES: citas abiertas con separador, sin tarjetas */
+  .reviews { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 2.2fr); gap: 3rem; align-items: start; }
   .reviews__head h2 { margin-bottom: .4em; }
+  .reviews :global(.rv__grid) { gap: 2rem 2.5rem; }
   @media (min-width: 700px) { .reviews :global(.rv__grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .reviews__score { display: flex; align-items: center; gap: .5rem; margin-top: 1rem; font-weight: 700; color: var(--forest); }
-  .reviews__stars { display: inline-flex; gap: 2px; color: var(--terra); }
-  .reviews__stars :global(svg) { width: 18px; height: 18px; }
+  .reviews :global(.rv__card) { background: transparent; box-shadow: none; border-radius: 0; padding: 1.2rem 0 0; border-top: 2px solid var(--line); }
+  .reviews :global(blockquote) { font-size: 1rem; }
+  .reviews :global(.rv__gbp) { background: transparent; box-shadow: none; border-top: 2px solid var(--line); border-radius: 0; padding: 1.2rem 0 0; margin-top: 2rem; }
 
-  .kf-wrap { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
-  .more { margin: 1.4rem 0 0; }
+  .kf-wrap { margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+  .more { margin: 1.6rem 0 0; }
   .more a { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--forest); text-decoration: none; }
   .more a:hover { text-decoration: underline; }
   .more :global(svg) { width: 16px; height: 16px; }
@@ -455,32 +371,26 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   @media (max-width: 860px) {
     .search { grid-template-columns: 1fr 1fr; }
     .search__f:first-child, .search__go { grid-column: 1 / -1; }
-    .perks { grid-template-columns: 1fr 1fr; row-gap: .8rem; }
-    .perks li { justify-content: flex-start; }
-    .perks li + li { border-left: 0; }
+    .perks { grid-template-columns: 1fr 1fr; }
     .ritmo { grid-template-columns: minmax(0, 1fr); }
-    .ritmo__img { order: -1; clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%); aspect-ratio: 16/8; height: auto; min-height: 0; }
-    .ritmo__copy { padding: 1.2rem 16px 2.4rem; }
+    .ritmo__img { order: -1; aspect-ratio: 16/9; height: auto; min-height: 0; }
+    .ritmo__copy { padding: 2rem 16px 2.8rem; }
     .dest { grid-template-columns: minmax(0, 1fr); }
-    .dest__card { aspect-ratio: 16/9; }
+    .dest__card { aspect-ratio: 16/10; }
     .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  @media (max-width: 520px) {
-    .offer { grid-template-columns: minmax(0, 1fr); grid-template-areas: "model" "media" "body"; }
-    .offer__media { aspect-ratio: 16 / 10; }
-    .offer__body { padding: 1.2rem 1.15rem 1.3rem; }
-    .offer__stamp { position: absolute; top: .85rem; right: .85rem; width: 98px; height: 98px; margin: 0; z-index: 1; }
-    .offer__stamp b { font-size: 1.75rem; }
-    .offer__veh { font-size: .56rem; max-width: 70px; }
-    .offer__from, .offer__stamp > small:last-child { font-size: .62rem; }
-    .offer__text { margin-top: .2rem; }
-    .hero__claim { font-size: 2.4rem; }
-    .search { grid-template-columns: minmax(0, 1fr); padding: 1rem; }
-    .perks { grid-template-columns: minmax(0, 1fr); }
-    .plans { grid-template-columns: minmax(0, 1fr); gap: .85rem; }
-    .plan { display: grid; grid-template-columns: 96px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 1rem; row-gap: .2rem; padding: .85rem; align-items: start; }
-    .plan__ic { grid-row: 1 / span 3; width: 96px; height: 96px; aspect-ratio: 1; border-radius: 12px; }
-    .plan strong, .plan__d, .plan__go { padding-inline: 0; }
-    .plan__go { margin-top: .15rem; }
+  @media (max-width: 560px) {
+    .hero__claim { font-size: 2.5rem; }
+    .hero::before { background: linear-gradient(180deg, rgba(14,24,19,.55) 0%, rgba(14,24,19,.78) 55%, rgba(14,24,19,.85) 100%); }
+    .hero__btns .btn { width: 100%; }
+    .finder__card { padding: 1.1rem; margin-top: -56px; }
+    .search { grid-template-columns: minmax(0, 1fr); }
+    .perks { grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+    .offer { grid-template-columns: minmax(0, 1fr); }
+    .offer__media { min-height: 0; aspect-ratio: 16 / 9; }
+    .offer__body { padding: 1.2rem; }
+    .plans { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
+    .plan { display: grid; grid-template-columns: 104px minmax(0, 1fr); column-gap: 1rem; row-gap: .15rem; align-items: start; }
+    .plan__ic { grid-row: 1 / span 3; aspect-ratio: 1; margin: 0; border-radius: 12px; }
   }
 </style>
