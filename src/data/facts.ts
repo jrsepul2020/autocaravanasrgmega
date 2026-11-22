@@ -10,7 +10,7 @@ export function keyFacts() {
   const c = getVehicle('camper'), m = getVehicle('mileo');
   return [
     { k: 'Qué', v: `Alquiler de autocaravanas y campers en Sevilla. Empresa local con dos vehículos Benimar: ${m.name} (${m.type.toLowerCase()}, 4 plazas) y ${c.name} (${c.type.toLowerCase()}, 4 plazas).` },
-    { k: 'Dónde', v: `Recogida y devolución en ${site.address.street}, ${site.address.postalCode} ${site.address.city} (Sevilla), a ${site.distanceToSevilla}.` },
+    { k: 'Dónde', v: `Recogida y devolución en ${site.address.street}, ${site.address.postalCode} ${site.address.city} (Sevilla), a ${site.distanceToSevilla}. Polígono cerrado y protegido, al lado de Santiponce y muy cerca de Itálica.` },
     { k: 'Precio', v: `${c.short} desde ${fromPrice(c)} €/día y ${m.short} desde ${fromPrice(m)} €/día, según temporada y duración. Precios orientativos con IVA.` },
     { k: 'Mínimo', v: `${pricing.minDays} días de alquiler (para eventos especiales, consultar).` },
     { k: 'Kilómetros', v: `${pricing.km.shortStay}; ${pricing.km.longStay.toLowerCase()}.` },
