@@ -7,11 +7,10 @@ import Reviews from '../components/Reviews.astro';
 import FaqList from '../components/FaqList.astro';
 import Location from '../components/Location.astro';
 import CtaBand from '../components/CtaBand.astro';
-import { offers, site, heroPrice } from '../data/site';
+import { offers, site } from '../data/site';
 import { vehicles, getVehicle, fromPrice } from '../data/vehicles';
 import { rutas } from '../data/rutas';
 import { faqsBy } from '../data/faqs';
-import hero from '../assets/img/benimar-mileo-268-alquiler-sevilla.jpg';
 import imgBanner from '../assets/img/viaja-a-tu-ritmo.webp';
 import imgCadiz from '../assets/img/ruta-camper-costa.webp';
 import imgAracena from '../assets/img/escapada-sierra-aracena.webp';
@@ -29,9 +28,6 @@ const offerPhotos = {
   camper: await getImage({ src: getVehicle('camper').hero, width: 900, height: 506, format: 'webp' }),
   mileo: await getImage({ src: getVehicle('mileo').hero, width: 900, height: 506, format: 'webp' }),
 };
-const heroV = getVehicle(heroPrice.vehicle);
-const heroText = heroPrice.text || `${heroV.short} desde`;
-const heroAmount = heroPrice.price ?? fromPrice(heroV);
 
 const ventajas = [
   { icon: 'shield', t: 'Seguro y asistencia 24 h' },
@@ -59,17 +55,28 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   title="Alquiler de Autocaravanas en Sevilla desde {all.desde} €/día | RG MEGA"
   description="Alquiler de autocaravanas y campers en Sevilla: Benimar Mileo 268 y Camper 120 UP nuevas. Recogida en Salteras, seguro y asistencia 24 h incluidos, mascotas gratis. Fin de semana, puentes y vacaciones."
 >
-  <!-- HERO -->
+  <!-- HERO: las dos autocaravanas, cada una con su nombre y su precio -->
   <section class="hero">
-    <Image src={hero} alt="Autocaravana Benimar Mileo 268 de alquiler en Sevilla" class="hero__bg" widths={[800, 1400, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
     <div class="container hero__in">
-      <p class="hero__claim">Tu próxima escapada empieza aquí</p>
-      <h1>Alquiler de autocaravanas en Sevilla</h1>
-      <p class="hero__lead">Dos Benimar nuevas, con recogida y entrega en Sevilla. Sin intermediarios: te atendemos nosotros, de principio a fin.</p>
-      <p class="hero__price"><span data-hero-text>{heroText}</span> <strong><span data-hero-price data-auto={heroPrice.vehicle}>{heroAmount}</span> €<small>/día</small></strong></p>
-      <div class="hero__btns">
-        <a class="btn btn--light btn--lg" href="/calendario-disponibilidad/"><Icon name="calendar" /> Consultar disponibilidad</a>
-        <a class="hero__link" href="/alquilar-benimar-mileo-268/">Ver las autocaravanas <Icon name="arrow" /></a>
+      <div class="hero__copy">
+        <p class="hero__claim">Tu próxima escapada empieza aquí</p>
+        <h1>Alquiler de autocaravanas en Sevilla</h1>
+        <p class="hero__lead">Dos Benimar nuevas para elegir: la <strong>Mileo 268</strong>, perfilada para 4 con garaje, y la <strong>Camper 120 UP</strong>, compacta y fácil de conducir. Recogida en Sevilla y trato directo, sin intermediarios.</p>
+        <div class="hero__btns">
+          <a class="btn btn--light btn--lg" href="/calendario-disponibilidad/"><Icon name="calendar" /> Consultar disponibilidad</a>
+          <a class="hero__link" href="/tarifas/">Ver precios <Icon name="arrow" /></a>
+        </div>
+      </div>
+      <div class="hero__fleet">
+        {vehicles.map((v, i) => (
+          <a class="hv" href={v.slug}>
+            <Image src={v.hero} alt={`${v.name} de alquiler en Sevilla`} widths={[480, 800, 1100]} sizes="(max-width: 560px) 50vw, (max-width: 900px) 100vw, 600px" loading="eager" fetchpriority={i === 0 ? 'high' : 'auto'} />
+            <span class="hv__cap">
+              <span class="hv__name"><strong>{v.short}</strong><small>{v.type}</small></span>
+              <span class="hv__price">desde <b><span data-from={v.id}>{fromPrice(v)}</span> €</b>/día</span>
+            </span>
+          </a>
+        ))}
       </div>
     </div>
   </section>
@@ -254,23 +261,30 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
 
 <style>
   /* HERO */
-  .hero { position: relative; color: #fff; overflow: hidden; isolation: isolate; min-height: clamp(560px, 82vh, 760px); display: flex; align-items: center; }
-  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
-  .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
-    linear-gradient(90deg, rgba(14,24,19,.86) 0%, rgba(14,24,19,.6) 40%, rgba(14,24,19,.05) 75%),
-    linear-gradient(0deg, rgba(14,24,19,.5) 0%, transparent 30%); }
-  .hero__in { padding: clamp(64px, 8vw, 104px) 0 clamp(120px, 13vw, 160px); }
-  .hero__claim { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 6.4vw, 4.8rem); line-height: 1; letter-spacing: -.025em; margin: 0 0 .9rem; max-width: 12ch; text-wrap: balance; }
-  .hero h1 { color: var(--terra); font-family: var(--font); font-size: .85rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 .8rem; }
-  .hero__lead { font-size: 1.1rem; color: var(--on-dark); max-width: 44ch; margin: 0 0 1.4rem; }
-  .hero__price { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin: 0 0 1.6rem; font-size: 1.05rem; color: var(--on-dark); }
-  .hero__price strong { font-family: var(--display); font-size: clamp(2.2rem, 4vw, 2.9rem); line-height: 1; color: #fff; letter-spacing: -.02em; }
-  .hero__price small { font-size: .45em; font-weight: 500; margin-left: .1em; color: var(--on-dark); letter-spacing: 0; }
+  .hero { background: var(--forest); color: #fff; }
+  .hero__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 4vw, 3.5rem); align-items: center; padding: clamp(40px, 5vw, 64px) 0 clamp(112px, 11vw, 140px); }
+  .hero__claim { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 5.2vw, 4.2rem); line-height: 1; letter-spacing: -.025em; margin: 0 0 .9rem; max-width: 12ch; text-wrap: balance; }
+  .hero h1 { color: rgba(255,255,255,.8); font-family: var(--font); font-size: .85rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 .9rem; display: flex; align-items: center; gap: .65em; }
+  .hero h1::before { content: ''; width: 1.8em; height: 2px; border-radius: 2px; background: var(--terra); }
+  .hero__lead { font-size: 1.08rem; color: var(--on-dark); max-width: 46ch; margin: 0 0 1.4rem; }
+  .hero__lead strong { color: #fff; }
   .hero__btns { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; }
-  .hero__link { display: inline-flex; align-items: center; gap: .4rem; color: #fff; font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--terra); padding-bottom: .15rem; }
-  .hero__link:hover { color: #fff; }
+  .hero__link { display: inline-flex; align-items: center; gap: .4rem; color: #fff; font-weight: 600; text-decoration: none; border-bottom: 2px solid rgba(255,255,255,.4); padding-bottom: .15rem; }
+  .hero__link:hover { color: #fff; border-bottom-color: #fff; }
   .hero__link :global(svg) { width: 16px; height: 16px; transition: transform .2s; }
   .hero__link:hover :global(svg) { transform: translateX(3px); }
+  .hero__fleet { display: grid; gap: 12px; }
+  .hv { position: relative; display: block; aspect-ratio: 16 / 8; border-radius: var(--radius); overflow: hidden; color: #fff; text-decoration: none; isolation: isolate; }
+  .hv :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+  .hv:hover :global(img) { transform: scale(1.04); }
+  .hv::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(14,24,19,.82) 0%, rgba(14,24,19,.15) 50%, transparent 70%); }
+  .hv:hover { color: #fff; }
+  .hv__cap { position: absolute; left: 1.1rem; right: 1.1rem; bottom: .9rem; display: flex; align-items: flex-end; justify-content: space-between; gap: .5rem 1rem; flex-wrap: wrap; }
+  .hv__name { display: grid; line-height: 1.15; }
+  .hv__name strong { font-family: var(--display); font-size: 1.45rem; }
+  .hv__name small { font-size: .82rem; color: var(--on-dark); }
+  .hv__price { font-size: .9rem; color: var(--on-dark); white-space: nowrap; }
+  .hv__price b { font-family: var(--display); font-size: 1.6rem; color: #fff; margin-left: .2rem; letter-spacing: -.02em; }
 
   /* BUSCADOR + VENTAJAS */
   .finder { position: relative; z-index: 2; padding-bottom: clamp(56px, 7vw, 88px); }
@@ -364,6 +378,9 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .plans { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .reviews { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   }
+  @media (max-width: 900px) {
+    .hero__in { grid-template-columns: minmax(0, 1fr); }
+  }
   @media (max-width: 860px) {
     .search { grid-template-columns: 1fr 1fr; }
     .search__f:first-child, .search__go { grid-column: 1 / -1; }
@@ -376,9 +393,15 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 560px) {
-    .hero__claim { font-size: 2.5rem; }
-    .hero::before { background: linear-gradient(180deg, rgba(14,24,19,.55) 0%, rgba(14,24,19,.78) 55%, rgba(14,24,19,.85) 100%); }
+    .hero__claim { font-size: 2.4rem; }
     .hero__btns .btn { width: 100%; }
+    .hero__fleet { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .hv { aspect-ratio: 4 / 5; border-radius: 12px; }
+    .hv__cap { left: .7rem; right: .7rem; bottom: .65rem; flex-direction: column; align-items: flex-start; gap: .15rem; }
+    .hv__name strong { font-size: 1.1rem; }
+    .hv__name small { display: none; }
+    .hv__price { font-size: .78rem; }
+    .hv__price b { font-size: 1.25rem; }
     .finder__card { padding: 1.1rem; margin-top: -56px; }
     .search { grid-template-columns: minmax(0, 1fr); }
     .perks { grid-template-columns: minmax(0, 1fr); gap: .8rem; }

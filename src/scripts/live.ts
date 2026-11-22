@@ -56,7 +56,12 @@ export function apply(d: LiveData) {
   if (d.hero) {
     const names: Record<string, string> = { mileo: 'Mileo 268', camper: 'Camper 120 UP' };
     const n = d.hero.price ?? minOf(d.hero.vehicle);
-    document.querySelectorAll<HTMLElement>('[data-hero-text]').forEach((el) => { el.textContent = d.hero!.text || `${names[d.hero!.vehicle]} desde`; });
+    document.querySelectorAll<HTMLElement>('[data-hero-text]').forEach((el) => {
+      // Portada: si la oferta destacada queda sin texto, se oculta el aviso
+      const box = el.closest<HTMLElement>('.hero__offer');
+      if (box) { box.hidden = !d.hero!.text; if (d.hero!.text) el.textContent = d.hero!.text; return; }
+      el.textContent = d.hero!.text || `${names[d.hero!.vehicle]} desde`;
+    });
     if (n) document.querySelectorAll<HTMLElement>('[data-hero-price]').forEach((el) => { el.textContent = String(n); });
   } else {
     // Sin pestaña "Portada": precio automático del vehículo indicado en la página
