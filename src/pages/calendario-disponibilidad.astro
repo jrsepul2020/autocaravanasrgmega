@@ -18,20 +18,18 @@ import Steps from '../components/Steps.astro';
       <div class="section-head">
         <span class="eyebrow">Calendario actualizado</span>
         <h1>Disponibilidad de autocaravanas en Sevilla</h1>
-        <p class="lead">Los días en verde están libres. Pulsa el día de recogida y el de devolución en el calendario del vehículo que prefieras y te calculamos el precio.</p>
+        <p class="lead">Cada día muestra su precio orientativo. Los días en rojo ya están reservados. Pulsa el día de recogida y el de devolución y verás el precio de tu viaje al momento.</p>
+        <div class="cal-jump">{vehicles.map((v) => <a class="btn btn--ghost btn--sm" href={`#cal-${v.id}`}>{v.name}</a>)}</div>
       </div>
-      <div class="cal-grid">
-        {vehicles.map((v) => (
-          <div>
-            <div class="cal-head">
-              <h2><a href={v.slug}>{v.name}</a></h2>
-              <span class="pill pill--hot">desde <span data-from={v.id}>{fromPrice(v)}</span> €/día</span>
-            </div>
-            <PriceNote compact />
-            <AvailabilityCalendar vehicle={v} months={1} />
+      {vehicles.map((v) => (
+        <div class="cal-veh" id={`cal-${v.id}`}>
+          <div class="cal-head">
+            <h2><a href={v.slug}>{v.name}</a></h2>
+            <span class="pill pill--hot">desde <span data-from={v.id}>{fromPrice(v)}</span> €/día</span>
           </div>
-        ))}
-      </div>
+          <AvailabilityCalendar vehicle={v} months={4} summary />
+        </div>
+      ))}
       <p class="cal-note"><Icon name="calendar" /> El calendario se actualiza a diario. Si una fecha aparece libre pero tienes prisa, confírmala por WhatsApp: respondemos en minutos.</p>
     </div>
   </section>
@@ -50,7 +48,8 @@ import Steps from '../components/Steps.astro';
   <CtaBand />
 </Base>
 <style>
-  .cal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2rem; }
+  .cal-veh { margin-top: 2.2rem; scroll-margin-top: 90px; }
+  .cal-jump { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
   .cal-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
   .cal-head h2 { margin: 0; font-size: 1.5rem; }
   .cal-head a { color: inherit; text-decoration: none; }

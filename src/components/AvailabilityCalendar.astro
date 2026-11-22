@@ -1,51 +1,95 @@
 ---
 /**
- * Calendario de disponibilidad conectado a Google Calendar.
+ * Calendario de disponibilidad y precios, conectado a Google Calendar.
+ *
  * CÓMO SE GESTIONA (admin): en Google Calendar, en el calendario de cada vehículo,
  * crea un evento de día completo (p. ej. "RESERVADA MILEO") que cubra los días ocupados.
- * Se marca en rojo automáticamente en la web. Los días sin eventos aparecen como libres.
- * Los eventos cuyo título contenga "DISPONIBLE" o "LIBRE" se ignoran (no bloquean días).
+ * Se marca en rojo automáticamente. Los eventos con "DISPONIBLE" o "LIBRE" en el título se ignoran.
+ *
+ * - Muestra también los 3 meses anteriores con sus reservas (se puede navegar hacia atrás).
+ * - Cada día lleva su precio orientativo según temporada (tarifa de 3 a 14 días).
+ * - Los precios y fechas especiales se actualizan en vivo desde Google Sheets.
+ * - summary: muestra el panel "Resumen de tu reserva" con el precio calculado.
  */
-import { site } from '../data/site';
+import Icon from './Icon.astro';
+import { site, specialDates, pricing, seasons, priceDisclaimer } from '../data/site';
 import type { Vehicle } from '../data/vehicles';
-interface Props { vehicle: Vehicle; months?: number }
-const { vehicle, months = 2 } = Astro.props;
+interface Props { vehicle: Vehicle; months?: number; summary?: boolean }
+const { vehicle, months = 2, summary = false } = Astro.props;
 const embed = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(vehicle.calendarId)}&ctz=Europe%2FMadrid&mode=MONTH&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&hl=es`;
+const data = JSON.stringify({
+  prices: vehicle.prices, special: specialDates, minDays: pricing.minDays,
+  seasons: Object.fromEntries(Object.entries(seasons).map(([k, v]) => [k, v.label.replace('Temporada ', '')])),
+  name: vehicle.name, short: vehicle.short, wa: site.whatsapp,
+});
 ---
-<div class="avc" data-cal={vehicle.calendarId} data-key={site.googleApiKey} data-months={months} data-model={vehicle.id} data-embed={embed}>
-  <div class="avc__top">
-    <button type="button" class="avc__nav" data-prev aria-label="Mes anterior">‹</button>
-    <p class="avc__title"><strong>{vehicle.name}</strong></p>
-    <button type="button" class="avc__nav" data-next aria-label="Mes siguiente">›</button>
+<div class:list={['avc', { 'avc--summary': summary }]} data-cal={vehicle.calendarId} data-key={site.googleApiKey} data-months={months} data-model={vehicle.id} data-embed={embed} data-info={data}>
+  <div class="avc__main">
+    <div class="avc__top">
+      <button type="button" class="avc__nav" data-prev aria-label="Meses anteriores"><Icon name="arrow" /></button>
+      <p class="avc__range" data-range></p>
+      <button type="button" class="avc__nav" data-next aria-label="Meses siguientes"><Icon name="arrow" /></button>
+    </div>
+    <div class="avc__months" aria-live="polite"><p class="avc__loading">Cargando disponibilidad…</p></div>
+    <div class="avc__legend">
+      <span><i class="free"></i> Libre</span>
+      <span><i class="busy"></i> Reservado</span>
+      <span><i class="past"></i> Pasado</span>
+      <span><i class="sel"></i> Tu selección</span>
+      <span class="avc__legend-note">Precio por día orientativo (3 a 14 días)</span>
+    </div>
   </div>
-  <div class="avc__months" aria-live="polite"><p class="avc__loading">Cargando disponibilidad…</p></div>
-  <div class="avc__legend">
-    <span><i class="free"></i> Libre</span>
-    <span><i class="busy"></i> Ocupado</span>
-    <span><i class="sel"></i> Tu selección</span>
-  </div>
-  <div class="avc__pick" hidden>
-    <p data-pick-text></p>
-    <a class="btn btn--primary btn--sm" data-pick-go href="#">Consultar estas fechas</a>
-  </div>
-  <p class="avc__hint">Pulsa el día de recogida y el de devolución para pedir precio.</p>
+
+  {summary ? (
+    <aside class="avc__sum" aria-live="polite">
+      <div class="avc__sum-head">
+        <span class="avc__sum-ic"><Icon name="calendar" /></span>
+        <div><p class="avc__sum-t">Resumen de tu reserva</p><p class="avc__sum-s">{vehicle.name}</p></div>
+      </div>
+      <div class="avc__box">
+        <p class="avc__box-h">Fechas</p>
+        <p data-sum-dates>Elige en el calendario el día de recogida y el de devolución.</p>
+      </div>
+      <div class="avc__box avc__box--price">
+        <p class="avc__box-h">Precio orientativo</p>
+        <ul class="avc__lines" data-sum-lines><li><span>Sin fechas seleccionadas</span><span>—</span></li></ul>
+        <p class="avc__total"><span>Total</span><strong data-sum-total>0 €</strong></p>
+        <p class="avc__km" data-sum-km></p>
+        <p class="avc__warn" data-sum-warn hidden></p>
+      </div>
+      <p class="avc__disc">{priceDisclaimer}</p>
+      <a class="btn btn--primary avc__go" data-pick-go href="#" aria-disabled="true">Pedir esta reserva <Icon name="arrow" class="i-arrow" /></a>
+      <a class="btn btn--wa avc__wa" data-pick-wa href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener"><Icon name="whatsapp" /> Consultar por WhatsApp</a>
+      <button type="button" class="avc__clear" data-clear hidden>Borrar selección</button>
+    </aside>
+  ) : (
+    <div class="avc__pick" hidden>
+      <p data-pick-text></p>
+      <a class="btn btn--primary btn--sm" data-pick-go href="#">Consultar estas fechas</a>
+    </div>
+  )}
 </div>
 
 <script>
+  import { estimate, parseDate, setSpecialDates } from '../scripts/pricing';
   type Range = [string, string];
   const pad = (n: number) => String(n).padStart(2, '0');
   const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const BACK = 3;      // meses hacia atrás visibles
+  const AHEAD = 14;    // meses hacia delante
+  const eur = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €';
+  const fmt = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
 
   async function loadBusy(cal: string, key: string): Promise<Range[]> {
-    const now = new Date(); now.setDate(1);
-    const max = new Date(now); max.setMonth(max.getMonth() + 14);
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal)}/events?key=${key}&singleEvents=true&maxResults=500&timeMin=${now.toISOString()}&timeMax=${max.toISOString()}`;
+    const min = new Date(); min.setDate(1); min.setMonth(min.getMonth() - BACK); min.setHours(0, 0, 0, 0);
+    const max = new Date(); max.setDate(1); max.setMonth(max.getMonth() + AHEAD);
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal)}/events?key=${key}&singleEvents=true&maxResults=2500&timeMin=${min.toISOString()}&timeMax=${max.toISOString()}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('gcal ' + res.status);
     const j = await res.json();
     return (j.items || []).filter((e: any) => e.status !== 'cancelled' && !/libre|disponible/i.test(e.summary || '')).map((e: any) => {
-      if (e.start.date) { // evento de día completo: end exclusivo
+      if (e.start.date) { // día completo: end exclusivo
         const end = new Date(e.end.date + 'T00:00:00'); end.setDate(end.getDate() - 1);
         return [e.start.date, iso(end)] as Range;
       }
@@ -54,16 +98,38 @@ const embed = `https://calendar.google.com/calendar/embed?src=${encodeURICompone
   }
 
   document.querySelectorAll<HTMLElement>('.avc').forEach(async (el) => {
+    const info = JSON.parse(el.dataset.info!);
     const months = Number(el.dataset.months) || 2;
+    const hasSummary = el.classList.contains('avc--summary');
     const box = el.querySelector<HTMLElement>('.avc__months')!;
     const today = iso(new Date());
     let offset = 0;
     let busy: Range[] = [];
     let sel: string[] = [];
+    setSpecialDates(info.special);
+
+    // Precios y fechas especiales en vivo (Google Sheets)
+    const applyLive = (d: any) => {
+      if (!d) return;
+      if (d.prices?.[el.dataset.model!]) Object.assign(info.prices, d.prices[el.dataset.model!]);
+      if (d.special?.length) setSpecialDates(d.special);
+    };
+    applyLive((window as any).__rgLive);
+    window.addEventListener('rg:live', (e: any) => { applyLive(e.detail); render(); update(); });
+
     const isBusy = (d: string) => busy.some(([a, b]) => d >= a && d <= b);
+    const dayPrice = (s: string) => {
+      const r = estimate(info.prices, parseDate(s)!, parseDate(s)!);
+      const k = Object.keys(r!.breakdown)[0];
+      return { price: info.prices[k].short as number, season: k };
+    };
 
     function render() {
       const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + offset);
+      const last = new Date(base.getFullYear(), base.getMonth() + months - 1, 1);
+      el.querySelector('[data-range]')!.textContent = months > 1
+        ? `${MONTHS[base.getMonth()]} ${base.getFullYear() !== last.getFullYear() ? base.getFullYear() + ' ' : ''}– ${MONTHS[last.getMonth()]} ${last.getFullYear()}`
+        : `${MONTHS[base.getMonth()]} ${base.getFullYear()}`;
       let html = '';
       for (let m = 0; m < months; m++) {
         const first = new Date(base.getFullYear(), base.getMonth() + m, 1);
@@ -76,32 +142,70 @@ const embed = `https://calendar.google.com/calendar/embed?src=${encodeURICompone
           const s = iso(new Date(first.getFullYear(), first.getMonth(), d));
           const past = s < today;
           const b = isBusy(s);
+          const { price, season } = dayPrice(s);
           const inSel = sel.length === 2 ? s >= sel[0] && s <= sel[1] : sel[0] === s;
-          const cls = past ? 'past' : b ? 'busy' : 'free';
-          html += `<button type="button" class="avc__d ${cls}${inSel ? ' sel' : ''}" data-d="${s}" ${past || b ? 'disabled' : ''} aria-label="${d} de ${MONTHS[first.getMonth()]}${b ? ', ocupado' : past ? '' : ', libre'}">${d}</button>`;
+          const edge = sel.length === 2 && (s === sel[0] || s === sel[1]);
+          const cls = [past ? 'past' : 'free', b ? 'busy' : '', inSel ? 'sel' : '', edge ? 'edge' : '', s === today ? 'today' : '', `s-${season}`].filter(Boolean).join(' ');
+          const label = `${d} de ${MONTHS[first.getMonth()]}${b ? ', reservado' : past ? ', pasado' : ', libre'}, ${price} € el día`;
+          html += `<button type="button" class="avc__d ${cls}" data-d="${s}" ${past || b ? 'disabled' : ''} aria-label="${label}"><b>${d}</b><small>${price}€</small></button>`;
         }
         html += '</div></div>';
       }
       box.innerHTML = html;
-      el.querySelector<HTMLButtonElement>('[data-prev]')!.disabled = offset <= 0;
+      el.querySelector<HTMLButtonElement>('[data-prev]')!.disabled = offset <= -BACK;
+      el.querySelector<HTMLButtonElement>('[data-next]')!.disabled = offset >= AHEAD - months;
     }
 
-    function updatePick() {
-      const pick = el.querySelector<HTMLElement>('.avc__pick')!;
-      if (sel.length < 2) { pick.hidden = true; return; }
-      const f = (s: string) => s.split('-').reverse().join('/');
-      pick.hidden = false;
-      el.querySelector('[data-pick-text]')!.textContent = `Del ${f(sel[0])} al ${f(sel[1])}`;
-      const params = new URLSearchParams({ modelo: el.dataset.model!, salida: sel[0], llegada: sel[1] });
+    function update() {
       const go = el.querySelector<HTMLAnchorElement>('[data-pick-go]')!;
       const form = document.querySelector<HTMLFormElement>('form.qf');
-      go.href = form ? '#' + form.id : `${import.meta.env.BASE_URL}contacto/?${params}#presupuesto`;
-      go.onclick = form ? () => {
+      const params = sel.length === 2 ? new URLSearchParams({ modelo: el.dataset.model!, salida: sel[0], llegada: sel[1] }) : null;
+      go.href = !params ? '#' : form ? '#' + form.id : `${import.meta.env.BASE_URL}contacto/?${params}#presupuesto`;
+      go.onclick = !params ? (e) => e.preventDefault() : form ? () => {
         (form.querySelector(`[name=modelo][value=${el.dataset.model}]`) as HTMLInputElement).checked = true;
         (form.querySelector('[name=salida]') as HTMLInputElement).value = sel[0];
         (form.querySelector('[name=llegada]') as HTMLInputElement).value = sel[1];
         form.dispatchEvent(new Event('input'));
       } : null;
+
+      if (!hasSummary) {
+        const pick = el.querySelector<HTMLElement>('.avc__pick')!;
+        if (sel.length < 2) { pick.hidden = true; return; }
+        const r = estimate(info.prices, parseDate(sel[0])!, parseDate(sel[1])!)!;
+        pick.hidden = false;
+        el.querySelector('[data-pick-text]')!.textContent = `${fmt(sel[0])} → ${fmt(sel[1])} · ${r.days} días · ${eur(r.total)} aprox.`;
+        return;
+      }
+
+      go.setAttribute('aria-disabled', String(sel.length < 2));
+      el.querySelector<HTMLElement>('[data-clear]')!.hidden = sel.length === 0;
+      const dates = el.querySelector<HTMLElement>('[data-sum-dates]')!;
+      const lines = el.querySelector<HTMLElement>('[data-sum-lines]')!;
+      const total = el.querySelector<HTMLElement>('[data-sum-total]')!;
+      const km = el.querySelector<HTMLElement>('[data-sum-km]')!;
+      const warn = el.querySelector<HTMLElement>('[data-sum-warn]')!;
+      const wa = el.querySelector<HTMLAnchorElement>('[data-pick-wa]')!;
+      if (sel.length === 0) {
+        dates.textContent = 'Elige en el calendario el día de recogida y el de devolución.';
+        lines.innerHTML = '<li><span>Sin fechas seleccionadas</span><span>—</span></li>';
+        total.textContent = '0 €'; km.textContent = ''; warn.hidden = true;
+        wa.href = `https://wa.me/${info.wa}?text=${encodeURIComponent(`Hola, quiero consultar disponibilidad de la ${info.name}.`)}`;
+        return;
+      }
+      if (sel.length === 1) {
+        dates.innerHTML = `<strong>Recogida:</strong> ${fmt(sel[0])}<br><span class="avc__muted">Ahora elige el día de devolución.</span>`;
+        lines.innerHTML = '<li><span>Falta la fecha de devolución</span><span>—</span></li>';
+        total.textContent = '0 €'; km.textContent = ''; warn.hidden = true;
+        return;
+      }
+      const r = estimate(info.prices, parseDate(sel[0])!, parseDate(sel[1])!)!;
+      dates.innerHTML = `<strong>${fmt(sel[0])}</strong> → <strong>${fmt(sel[1])}</strong><br><span class="avc__muted">${r.days} días de alquiler</span>`;
+      lines.innerHTML = Object.entries(r.breakdown).map(([k, x]: any) => `<li><span>${x.days} d × ${x.rate} € <em>(${info.seasons[k]})</em></span><span>${eur(x.days * x.rate)}</span></li>`).join('');
+      total.textContent = eur(r.total);
+      km.textContent = r.unlimitedKm ? 'Kilómetros ilimitados incluidos' : `${r.days * 250} km incluidos (250 km/día)`;
+      warn.hidden = !r.belowMin;
+      warn.textContent = `El mínimo general es de ${info.minDays} días; para eventos especiales, consúltanos.`;
+      wa.href = `https://wa.me/${info.wa}?text=${encodeURIComponent(`Hola, quiero reservar la ${info.name} del ${sel[0].split('-').reverse().join('/')} al ${sel[1].split('-').reverse().join('/')} (${r.days} días, ${eur(r.total)} aprox.). ¿Está disponible?`)}`;
     }
 
     box.addEventListener('click', (e) => {
@@ -110,49 +214,94 @@ const embed = `https://calendar.google.com/calendar/embed?src=${encodeURICompone
       const d = t.dataset.d!;
       if (sel.length !== 1 || d < sel[0]) sel = [d];
       else {
-        // no permitir rangos que crucen días ocupados
-        const crosses = busy.some(([a, b]) => a <= d && b >= sel[0]);
+        const crosses = busy.some(([a, b]) => a <= d && b >= sel[0]); // no cruzar días reservados
         sel = crosses ? [d] : [sel[0], d];
       }
-      render(); updatePick();
+      render(); update();
     });
-    el.querySelector('[data-prev]')!.addEventListener('click', () => { offset = Math.max(0, offset - 1); render(); });
-    el.querySelector('[data-next]')!.addEventListener('click', () => { offset = Math.min(12, offset + 1); render(); });
+    el.querySelector('[data-clear]')?.addEventListener('click', () => { sel = []; render(); update(); });
+    el.querySelector('[data-prev]')!.addEventListener('click', () => { offset = Math.max(-BACK, offset - 1); render(); });
+    el.querySelector('[data-next]')!.addEventListener('click', () => { offset = Math.min(AHEAD - months, offset + 1); render(); });
 
     try {
       busy = await loadBusy(el.dataset.cal!, el.dataset.key!);
-      render();
+      render(); update();
     } catch {
       // Plan B: calendario público de Google embebido
       box.innerHTML = `<iframe src="${el.dataset.embed}" title="Disponibilidad" loading="lazy" style="border:0;width:100%;height:520px"></iframe>`;
       el.querySelector('.avc__top')!.setAttribute('hidden', '');
-      el.querySelector('.avc__hint')!.setAttribute('hidden', '');
       el.querySelector('.avc__legend')!.setAttribute('hidden', '');
     }
   });
 </script>
 
 <style>
-  .avc { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.2rem; box-shadow: var(--shadow); }
-  .avc__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .6rem; }
-  .avc__title { margin: 0; color: var(--pine); }
-  .avc__nav { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; font-size: 1.4rem; line-height: 1; cursor: pointer; color: var(--pine); }
-  .avc__nav:disabled { opacity: .35; cursor: default; }
-  .avc__months { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem; min-height: 280px; }
+  .avc { display: grid; gap: 1.5rem; align-items: start; }
+  .avc--summary { grid-template-columns: minmax(0, 1fr) 340px; }
+  .avc__main { background: #fff; border-radius: var(--radius); padding: 1.2rem; box-shadow: 0 0 0 1px var(--line), var(--shadow); min-width: 0; }
+  .avc__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .avc__range { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.1rem; color: var(--forest); text-transform: capitalize; text-align: center; }
+  .avc__nav { width: 40px; height: 40px; border-radius: 10px; border: 0; background: var(--forest); color: #fff; cursor: pointer; display: grid; place-items: center; }
+  .avc__nav :global(svg) { width: 18px; height: 18px; }
+  .avc__nav[data-prev] :global(svg) { transform: rotate(180deg); }
+  .avc__nav:disabled { opacity: .3; cursor: default; }
+  .avc__months { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 1.2rem; min-height: 280px; }
   .avc__loading { color: var(--muted); }
-  :global(.avc__mname) { font-weight: 700; text-transform: capitalize; margin: 0 0 .5rem; text-align: center; color: var(--pine); }
-  :global(.avc__grid) { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  :global(.avc__dow) { text-align: center; font-size: .75rem; font-weight: 650; color: var(--muted); padding-bottom: 2px; }
-  :global(.avc__d) { aspect-ratio: 1; border: 0; border-radius: 8px; font: inherit; font-size: .9rem; cursor: pointer; display: grid; place-items: center; }
-  :global(.avc__d.free) { background: #e5f3ea; color: #1d5c37; }
-  :global(.avc__d.free:hover) { background: #c9e8d4; }
-  :global(.avc__d.busy) { background: #fbe3dd; color: #b4381a; text-decoration: line-through; cursor: not-allowed; }
-  :global(.avc__d.past) { background: transparent; color: #c5c9c7; cursor: default; }
-  :global(.avc__d.sel) { background: var(--pine) !important; color: #fff !important; }
-  .avc__legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .85rem; color: var(--muted); margin-top: 1rem; }
+  :global(.avc__month) { border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
+  :global(.avc__mname) { margin: 0; padding: .7rem; background: var(--forest); color: #fff; text-align: center; font-family: var(--display); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: .95rem; }
+  :global(.avc__grid) { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; padding: .6rem; }
+  :global(.avc__dow) { text-align: center; font-size: .72rem; font-weight: 700; color: var(--muted); padding: .2rem 0 .3rem; }
+  :global(.avc__d) { border: 0; border-radius: 8px; font: inherit; cursor: pointer; display: grid; place-content: center; gap: 1px; padding: .35rem 0; min-height: 48px; line-height: 1.1; transition: transform .12s, background .15s; }
+  :global(.avc__d b) { font-size: .92rem; font-weight: 700; }
+  :global(.avc__d small) { font-size: .66rem; font-weight: 700; }
+  :global(.avc__d.free) { background: var(--sand); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+  :global(.avc__d.free small) { color: var(--pine); }
+  :global(.avc__d.free:hover) { background: #fff; box-shadow: inset 0 0 0 2px var(--pine); transform: translateY(-1px); }
+  :global(.avc__d.busy) { background: #e0475b; color: #fff; cursor: not-allowed; }
+  :global(.avc__d.busy small) { color: #fff; opacity: .9; }
+  :global(.avc__d.past) { background: #e9ecea; color: #7b8580; cursor: default; }
+  :global(.avc__d.past small) { color: #7b8580; }
+  :global(.avc__d.past.busy) { background: #e0a3ab; color: #fff; }
+  :global(.avc__d.past.busy small) { color: #fff; }
+  :global(.avc__d.today) { box-shadow: inset 0 0 0 2px var(--terra); }
+  :global(.avc__d.sel) { background: var(--pine) !important; color: #fff !important; box-shadow: none; }
+  :global(.avc__d.sel small) { color: #fff !important; }
+  :global(.avc__d.edge) { background: var(--forest) !important; }
+  .avc__legend { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.1rem; font-size: .82rem; color: var(--muted); margin-top: 1rem; }
   .avc__legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: .3rem; }
-  .avc__legend .free { background: #e5f3ea; } .avc__legend .busy { background: #fbe3dd; } .avc__legend .sel { background: var(--pine); }
-  .avc__pick { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1rem; padding: .8rem 1rem; background: var(--sand); border-radius: 12px; }
+  .avc__legend .free { background: var(--sand); box-shadow: inset 0 0 0 1px var(--line); } .avc__legend .busy { background: #e0475b; } .avc__legend .past { background: #e9ecea; } .avc__legend .sel { background: var(--forest); }
+  .avc__legend-note { margin-left: auto; font-style: italic; }
+
+  /* Resumen */
+  .avc__sum { position: sticky; top: 96px; display: grid; gap: .8rem; background: #fff; border-radius: var(--radius); padding: 1.2rem; box-shadow: 0 0 0 1px var(--line), var(--shadow-lg); }
+  .avc__sum-head { display: flex; gap: .8rem; align-items: center; }
+  .avc__sum-ic { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; background: var(--forest); color: var(--terra); flex: none; }
+  .avc__sum-ic :global(svg) { width: 20px; height: 20px; }
+  .avc__sum-t { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.15rem; color: var(--ink); }
+  .avc__sum-s { margin: 0; font-size: .85rem; color: var(--muted); }
+  .avc__box { border-radius: 12px; padding: .85rem 1rem; box-shadow: inset 0 0 0 1px var(--line); font-size: .92rem; }
+  .avc__box p { margin: 0; }
+  .avc__box--price { background: var(--sand); }
+  .avc__box-h { font-size: .72rem !important; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--pine); margin-bottom: .4rem !important; }
+  .avc__lines { list-style: none; padding: 0; margin: 0 0 .6rem; display: grid; gap: .3rem; }
+  .avc__lines :global(li) { display: flex; justify-content: space-between; gap: .8rem; font-size: .88rem; }
+  .avc__lines :global(em) { font-style: normal; color: var(--muted); }
+  .avc__total { display: flex; justify-content: space-between; align-items: baseline; padding: .6rem .8rem; background: #fff; border-radius: 10px; box-shadow: 0 0 0 1px var(--line); }
+  .avc__total strong { font-family: var(--display); font-size: 1.6rem; color: var(--pine); }
+  .avc__km { font-size: .8rem !important; color: var(--muted); margin-top: .45rem !important; }
+  .avc__warn { font-size: .82rem !important; font-weight: 700; color: var(--ink); margin-top: .35rem !important; padding-left: .6rem; box-shadow: inset 3px 0 0 var(--terra); }
+  .avc__disc { margin: 0; font-size: .78rem; color: var(--muted); }
+  :global(.avc__muted) { color: var(--muted); font-size: .85rem; }
+  .avc__go[aria-disabled='true'] { opacity: .45; pointer-events: none; }
+  .avc__go, .avc__wa { width: 100%; }
+  .avc__clear { border: 0; background: none; color: var(--muted); font: inherit; font-size: .85rem; text-decoration: underline; cursor: pointer; }
+
+  .avc__pick { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; padding: .8rem 1rem; background: var(--sand); border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); }
   .avc__pick p { margin: 0; font-weight: 650; color: var(--pine); }
-  .avc__hint { font-size: .85rem; color: var(--muted); margin: .8rem 0 0; }
+
+  @media (max-width: 1020px) {
+    .avc--summary { grid-template-columns: minmax(0, 1fr); }
+    .avc__sum { position: static; }
+    .avc__legend-note { margin-left: 0; }
+  }
 </style>
