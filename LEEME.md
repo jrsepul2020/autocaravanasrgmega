@@ -34,7 +34,7 @@ Hoja: https://docs.google.com/spreadsheets/d/15ci4BIAbpV3NxUKtrd-QioHKiVRa55dwzi
 (compartida como *Cualquier persona con el enlace → Lector*; el ID está en `src/data/sheet.ts` → `sheetId`).
 
 **Pestañas**
-- **Tarifas**: una fila por vehículo y periodo (Periodo, Desde, Hasta, Vehículo y el precio por día de 1 día, 2 días, 3–4 días, 5–6 días y 7 días o más). Para cambiar de tarifas, añade un periodo nuevo con sus fechas. El "desde" de la web es el precio de 3–4 días.
+- **Tarifas**: una fila por vehículo y periodo (Periodo, Desde, Hasta, Vehículo y el precio por día de 2 días, 3–4 días, 5–6 días y 7 días o más). Para cambiar de tarifas, añade un periodo nuevo con sus fechas. El "desde" de la web es el precio de 3–4 días.
 - **Tarifas especiales**: precio total cerrado. Con fechas (puentes, Navidad, Fin de Año) se aplica si el cliente elige justo esas fechas y esos días salen marcados en el calendario; sin fechas (escapadas de fin de semana) sale como ejemplo de precio. `Mostrar` = SI/NO.
 - **Condiciones**: kilómetros, exceso, mínimo, fianza… El texto de la columna B sale tal cual en la web (tarifas, calculadora, datos clave, condiciones).
 - **Ofertas**: una fila por banner (portada y página de Ofertas). `SI` para mostrarla; caducan solas al pasar "Válida hasta". **Precio antes €/día (opcional)** sale tachado con el sello de % de descuento; si está vacío, se compara con el precio "desde" del vehículo. El sello solo aparece con un descuento del 5 % o más. Por ley, el "precio antes" debe ser el más bajo aplicado en los 30 días previos.
@@ -45,7 +45,9 @@ Hoja: https://docs.google.com/spreadsheets/d/15ci4BIAbpV3NxUKtrd-QioHKiVRa55dwzi
 - Los días se cuentan por noches: viernes a domingo = 2 días.
 - Precio = precio por día del tramo × días, según el periodo en el que empieza el alquiler. Si las fechas coinciden justo con una tarifa especial, se usa su precio cerrado; si solo se solapan, se avisa de que hay tarifa especial.
 - Si la fecha no está en ningún periodo, la web no calcula precio y pide que os consulten.
-- Todos los precios se muestran como orientativos y negociables.
+- Con 1 noche la web no calcula precio: recuerda el mínimo de 3 días y pide que llamen.
+- Todos los precios se muestran como orientativos, invitando a llamar o preguntar por fechas o casos concretos.
+- Al pulsar "Pedir esta reserva" o "Consultar estas fechas" en el calendario se abre una ventana de consulta con las fechas y el precio ya puestos.
 
 **Dónde salen precios**: Tarifas (tablas y tarifas especiales), fichas de cada vehículo (caja de precio y tabla), calendario (precio por día y resumen) y ofertas. Se actualizan en vivo (unos 5 minutos). Los títulos y descripciones de Google no llevan precios a propósito.
 

@@ -130,4 +130,4 @@ export const display = { showFrom: true };
 
 /* ---------- Aviso que acompaña a todos los precios ---------- */
 export const priceDisclaimer =
-  'Precios orientativos con IVA. Todo es negociable: pregúntanos por tus fechas y por las ofertas vigentes.';
+  'Precios orientativos con IVA. Llámanos o pregúntanos por tus fechas, casos concretos y ofertas vigentes.';

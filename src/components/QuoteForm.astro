@@ -27,7 +27,7 @@ const { preselect, title = 'Consulta disponibilidad y precio', compact = false, 
     ))}
   </fieldset>
 
-  <div class="qf__row">
+  <div class="qf__row qf__dates">
     <div class="field"><label for={`${id}-from`}>Recogida</label><input id={`${id}-from`} type="date" name="salida" required /></div>
     <div class="field"><label for={`${id}-to`}>Devolución</label><input id={`${id}-to`} type="date" name="llegada" required /></div>
   </div>
@@ -92,13 +92,15 @@ const { preselect, title = 'Consulta disponibilidad y precio', compact = false, 
       est.hidden = false;
       if (!q.ok) {
         est.querySelector('[data-total]')!.textContent = 'Consultar';
-        est.querySelector('[data-detail]')!.textContent = `${n} · Aún no hay tarifa publicada para estas fechas: te damos precio al momento.`;
+        est.querySelector('[data-detail]')!.textContent = q.short
+          ? `${n} · El alquiler mínimo es de 3 días; para menos días, llámanos o pregúntanos.`
+          : `${n} · Aún no hay tarifa publicada para estas fechas: te damos precio al momento.`;
         lastText = `${n}, pido precio`;
         return;
       }
       est.querySelector('[data-total]')!.textContent = eur(q.total);
       est.querySelector('[data-detail]')!.textContent = [
-        q.pack ? `${q.pack.name} (precio cerrado)` : `${n} × ${q.perDay} €/día (tarifa ${tierLabel(q.tier)})`,
+        q.pack ? `${q.pack.name} (precio cerrado)` : `${n} × ${q.perDay} €/día (tarifa ${tierLabel(q.tier!)})`,
         km,
         q.overlapsPack ? `Coincide con «${q.overlapsPack.name}», que tiene tarifa especial: pregúntanos` : '',
       ].filter(Boolean).join(' · ');

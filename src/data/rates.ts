@@ -14,7 +14,6 @@
 export type VehicleId = 'mileo' | 'camper';
 
 export const TIERS = [
-  { key: 'd1', label: '1 día', min: 1, max: 1 },
   { key: 'd2', label: '2 días', min: 2, max: 2 },
   { key: 'd34', label: '3–4 días', min: 3, max: 4 },
   { key: 'd56', label: '5–6 días', min: 5, max: 6 },
@@ -35,8 +34,8 @@ export const rates: Rates = {
     {
       name: 'Noviembre y diciembre 2026', from: '2026-11-01', to: '2026-12-31',
       rates: {
-        camper: { d1: 99, d2: 89, d34: 79, d56: 75, d7: 69 },
-        mileo: { d1: 119, d2: 109, d34: 99, d56: 95, d7: 89 },
+        camper: { d2: 89, d34: 79, d56: 75, d7: 69 },
+        mileo: { d2: 109, d34: 99, d56: 95, d7: 89 },
       },
     },
   ],
@@ -50,8 +49,8 @@ export const rates: Rates = {
   conditions: [
     { k: 'Kilómetros', v: 'Hasta 250 km de viaje incluidos' },
     { k: 'Exceso de kilómetros', v: '0,40 €/km' },
-    { k: 'Alquiler mínimo', v: '1 día (sujeto a disponibilidad)' },
-    { k: 'Precios', v: 'Orientativos, con IVA incluido. Todo es negociable: pregúntanos.' },
+    { k: 'Alquiler mínimo', v: '3 días (para menos días, consúltanos)' },
+    { k: 'Precios', v: 'Orientativos, con IVA incluido. Llámanos o pregúntanos por tus fechas o casos concretos.' },
     { k: 'Fianza', v: 'A confirmar' },
     { k: 'Entrega y devolución', v: 'Horario a convenir' },
   ],
@@ -60,7 +59,8 @@ export const rates: Rates = {
 const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const todayIso = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
-export const tierFor = (days: number): TierKey => TIERS.find((t) => days >= t.min && days <= t.max)!.key;
+/** Tramo para esos días (undefined si son menos de 2: alquiler de 1 día solo bajo consulta). */
+export const tierFor = (days: number): TierKey | undefined => TIERS.find((t) => days >= t.min && days <= t.max)?.key;
 export const tierLabel = (k: TierKey) => TIERS.find((t) => t.key === k)!.label;
 
 /** Días de alquiler = noches entre recogida y devolución (mínimo 1). */
@@ -79,8 +79,8 @@ export const dayRate = (r: Rates, v: VehicleId, iso: string) => periodFor(r, iso
 export const packsOn = (r: Rates, iso: string) => r.packs.filter((p) => p.from && iso >= p.from && iso <= p.to);
 
 export type Quote =
-  | { ok: true; days: number; total: number; perDay: number; tier: TierKey; period?: Period; pack?: Pack; overlapsPack?: Pack }
-  | { ok: false; days: number };
+  | { ok: true; days: number; total: number; perDay: number; tier?: TierKey; period?: Period; pack?: Pack; overlapsPack?: Pack }
+  | { ok: false; days: number; short?: boolean };
 
 /** Precio orientativo de un alquiler. */
 export function quote(r: Rates, v: VehicleId, from: string, to: string): Quote {
@@ -89,6 +89,7 @@ export function quote(r: Rates, v: VehicleId, from: string, to: string): Quote {
   if (exact) return { ok: true, days, total: exact.prices[v]!, perDay: Math.round(exact.prices[v]! / days), tier: tierFor(days), pack: exact };
   const period = periodFor(r, from);
   const tier = tierFor(days);
+  if (!tier) return { ok: false, days, short: true };
   const perDay = period?.rates[v]?.[tier];
   if (!perDay) return { ok: false, days };
   const overlapsPack = r.packs.find((p) => p.from && p.from <= to && p.to >= from && p.prices[v]);

@@ -23,7 +23,7 @@ export const GET: APIRoute = () => {
     '',
     `> Empresa local de alquiler de autocaravanas y campers con recogida y devolución en Salteras (Sevilla), a ${site.distanceToSevilla}. Dos vehículos Benimar: Mileo 268 y Camper 120 UP. Alquiler con seguro, asistencia 24 h, mascotas y parking gratis.`,
     '',
-    `Última actualización: ${today}. Precios orientativos con IVA y negociables; consulta siempre ofertas y disponibilidad.`,
+    `Última actualización: ${today}. Precios orientativos con IVA; para fechas o casos concretos, consultar por teléfono o WhatsApp.`,
     '',
     '## Datos clave',
     ...keyFacts().map((f) => `- **${f.k}:** ${f.v}`),

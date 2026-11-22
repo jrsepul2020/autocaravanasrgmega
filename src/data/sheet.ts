@@ -124,7 +124,7 @@ export function normalize(csv: Partial<Record<TabKey, string>>): LiveData {
     const [h = [], ...rows] = parseCsv(csv.tarifas);
     const c = { name: col(h, ['periodo']), from: col(h, ['desde']), to: col(h, ['hasta']), veh: col(h, ['vehiculo', 'modelo']) };
     const tiers: [TierKey, number][] = [
-      ['d1', col(h, ['1 dia'])], ['d2', col(h, ['2 dias'])], ['d34', col(h, ['3–4', '3-4', '3 a 4'])],
+      ['d2', col(h, ['2 dias'])], ['d34', col(h, ['3–4', '3-4', '3 a 4'])],
       ['d56', col(h, ['5–6', '5-6', '5 a 6'])], ['d7', col(h, ['7 dias', '7 o mas'])],
     ];
     if (c.name >= 0 && c.veh >= 0 && c.from >= 0 && c.to >= 0) {

@@ -13,6 +13,7 @@
  * - summary: muestra el panel "Resumen de tu reserva" con el precio calculado.
  */
 import Icon from './Icon.astro';
+import QuoteForm from './QuoteForm.astro';
 import { site, priceDisclaimer } from '../data/site';
 import type { Vehicle } from '../data/vehicles';
 interface Props { vehicle: Vehicle; months?: number; summary?: boolean }
@@ -66,6 +67,18 @@ const data = JSON.stringify({ name: vehicle.name, short: vehicle.short, wa: site
       <a class="btn btn--primary btn--sm" data-pick-go href="#">Consultar estas fechas</a>
     </div>
   )}
+
+  <!-- Ventana de consulta: se abre al pulsar "Pedir esta reserva" / "Consultar estas fechas" -->
+  <dialog class="avc__dlg" data-dlg aria-labelledby={`dlg-t-${vehicle.id}`}>
+    <div class="avc__dlg-head">
+      <div>
+        <p class="avc__dlg-t" id={`dlg-t-${vehicle.id}`}>Consulta estas fechas</p>
+        <p class="avc__dlg-s" data-dlg-dates></p>
+      </div>
+      <button type="button" class="avc__dlg-x" data-dlg-close aria-label="Cerrar"><span aria-hidden="true">×</span></button>
+    </div>
+    <QuoteForm compact id={`dlg-${vehicle.id}`} preselect={vehicle.id} title="Tus datos de contacto" />
+  </dialog>
 </div>
 
 <script>
@@ -147,22 +160,15 @@ const data = JSON.stringify({ name: vehicle.name, short: vehicle.short, wa: site
 
     function update() {
       const go = el.querySelector<HTMLAnchorElement>('[data-pick-go]')!;
-      const form = document.querySelector<HTMLFormElement>('form.qf');
-      const params = sel.length === 2 ? new URLSearchParams({ modelo: el.dataset.model!, salida: sel[0], llegada: sel[1] }) : null;
-      go.href = !params ? '#' : form ? '#' + form.id : `${import.meta.env.BASE_URL}contacto/?${params}#presupuesto`;
-      go.onclick = !params ? (e) => e.preventDefault() : form ? () => {
-        (form.querySelector(`[name=modelo][value=${el.dataset.model}]`) as HTMLInputElement).checked = true;
-        (form.querySelector('[name=salida]') as HTMLInputElement).value = sel[0];
-        (form.querySelector('[name=llegada]') as HTMLInputElement).value = sel[1];
-        form.dispatchEvent(new Event('input'));
-      } : null;
+      go.href = '#';
+      go.onclick = (e) => { e.preventDefault(); if (sel.length === 2) openDialog(); };
 
       if (!hasSummary) {
         const pick = el.querySelector<HTMLElement>('.avc__pick')!;
         if (sel.length < 2) { pick.hidden = true; return; }
         const q = quote(currentRates(), model, sel[0], sel[1]);
         pick.hidden = false;
-        el.querySelector('[data-pick-text]')!.textContent = `${fmt(sel[0])} → ${fmt(sel[1])} · ${q.days} ${q.days === 1 ? 'día' : 'días'} · ${q.ok ? eur(q.total) + ' aprox.' : 'pídenos precio'}`;
+        el.querySelector('[data-pick-text]')!.textContent = `${fmt(sel[0])} → ${fmt(sel[1])} · ${q.days} ${q.days === 1 ? 'día' : 'días'} · ${q.ok ? eur(q.total) + ' aprox.' : q.short ? 'mínimo 3 días, consúltanos' : 'pídenos precio'}`;
         return;
       }
 
@@ -194,10 +200,10 @@ const data = JSON.stringify({ name: vehicle.name, short: vehicle.short, wa: site
       if (q.ok) {
         lines.innerHTML = q.pack
           ? `<li><span>${q.pack.name} <em>(precio cerrado)</em></span><span>${eur(q.total)}</span></li>`
-          : `<li><span>${n} × ${q.perDay} € <em>(tarifa ${tierLabel(q.tier)})</em></span><span>${eur(q.total)}</span></li>`;
+          : `<li><span>${n} × ${q.perDay} € <em>(tarifa ${tierLabel(q.tier!)})</em></span><span>${eur(q.total)}</span></li>`;
         total.textContent = eur(q.total);
       } else {
-        lines.innerHTML = '<li><span>Aún no hay tarifa publicada para estas fechas</span><span>—</span></li>';
+        lines.innerHTML = `<li><span>${q.short ? 'El alquiler mínimo es de 3 días; para menos, llámanos' : 'Aún no hay tarifa publicada para estas fechas'}</span><span>—</span></li>`;
         total.textContent = 'Consultar';
       }
       const kmTxt = condition(rr, 'kilometros'), exc = condition(rr, 'exceso');
@@ -207,6 +213,24 @@ const data = JSON.stringify({ name: vehicle.name, short: vehicle.short, wa: site
       warn.textContent = ov ? `Tus fechas coinciden con «${ov.name}», que tiene tarifa especial: pregúntanos.` : '';
       wa.href = `https://wa.me/${info.wa}?text=${encodeURIComponent(`Hola, quiero reservar la ${info.name} del ${sel[0].split('-').reverse().join('/')} al ${sel[1].split('-').reverse().join('/')} (${n}${q.ok ? `, ${eur(q.total)} aprox.` : ''}). ¿Está disponible?`)}`;
     }
+
+    // Ventana de consulta con las fechas ya puestas
+    const dlg = el.querySelector<HTMLDialogElement>('[data-dlg]')!;
+    const dform = dlg.querySelector<HTMLFormElement>('form.qf')!;
+    function openDialog() {
+      (dform.querySelector(`[name=modelo][value=${model}]`) as HTMLInputElement).checked = true;
+      (dform.querySelector('[name=salida]') as HTMLInputElement).value = sel[0];
+      (dform.querySelector('[name=llegada]') as HTMLInputElement).value = sel[1];
+      dform.dispatchEvent(new Event('input'));
+      const q = quote(currentRates(), model, sel[0], sel[1]);
+      dlg.querySelector('[data-dlg-dates]')!.textContent = `${info.name} · ${fmt(sel[0])} → ${fmt(sel[1])} · ${q.days} ${q.days === 1 ? 'día' : 'días'}`;
+      dlg.showModal();
+      document.documentElement.classList.add('dlg-open');
+      setTimeout(() => dform.querySelector<HTMLInputElement>('[name=nombre]')?.focus({ preventScroll: true }), 50);
+    }
+    dlg.querySelector('[data-dlg-close]')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', () => document.documentElement.classList.remove('dlg-open'));
 
     box.addEventListener('click', (e) => {
       const t = (e.target as HTMLElement).closest<HTMLButtonElement>('.avc__d');
@@ -236,6 +260,24 @@ const data = JSON.stringify({ name: vehicle.name, short: vehicle.short, wa: site
 </script>
 
 <style>
+  /* Ventana de consulta: hoja inferior en móvil, ventana centrada en escritorio */
+  .avc__dlg { border: 0; padding: 0; width: min(100% - 24px, 480px); max-height: min(92vh, 860px); border-radius: 20px; background: #fff; color: var(--ink); box-shadow: 0 30px 80px -20px rgba(0,0,0,.45); overflow: auto; overscroll-behavior: contain; }
+  .avc__dlg::backdrop { background: rgba(14,24,19,.55); backdrop-filter: blur(2px); }
+  .avc__dlg[open] { animation: dlg-in .25s cubic-bezier(.2,.8,.2,1); }
+  @keyframes dlg-in { from { opacity: 0; transform: translateY(16px); } }
+  .avc__dlg-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.2rem .9rem; background: var(--forest); color: #fff; }
+  .avc__dlg-t { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.25rem; }
+  .avc__dlg-s { margin: .15rem 0 0; font-size: .9rem; color: var(--on-dark); }
+  .avc__dlg-x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,.15); color: #fff; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+  .avc__dlg-x:hover { background: rgba(255,255,255,.28); }
+  .avc__dlg :global(form.qf) { box-shadow: none; border-radius: 0; }
+  .avc__dlg :global(.qf__models), .avc__dlg :global(.qf__dates) { display: none; }
+  :global(html.dlg-open) { overflow: hidden; }
+  @media (max-width: 600px) {
+    .avc__dlg { width: 100%; max-width: none; margin: auto 0 0; border-radius: 20px 20px 0 0; max-height: 92vh; }
+    .avc__dlg[open] { animation-name: dlg-up; }
+    @keyframes dlg-up { from { transform: translateY(100%); } }
+  }
   .avc { display: grid; gap: 1.5rem; align-items: start; }
   .avc--summary { grid-template-columns: minmax(0, 1fr) 340px; }
   .avc__main { background: #fff; border-radius: var(--radius); padding: 1.2rem; box-shadow: 0 0 0 1px var(--line), var(--shadow); min-width: 0; }

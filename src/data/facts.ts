@@ -13,8 +13,8 @@ export function keyFacts() {
     { k: 'Qué', v: `Alquiler de autocaravanas y campers en Sevilla. Empresa local con dos vehículos Benimar: ${m.name} (${m.type.toLowerCase()}, 4 plazas) y ${c.name} (${c.type.toLowerCase()}, 4 plazas).` },
     { k: 'Dónde', v: `Recogida y devolución en ${site.address.street}, ${site.address.postalCode} ${site.address.city} (Sevilla), a ${site.distanceToSevilla}. Polígono cerrado y protegido, al lado de Santiponce y muy cerca de Itálica.` },
     { k: 'Precio', v: display.showFrom && fromPrice(c) && fromPrice(m)
-      ? `${c.short} desde ${fromPrice(c)} €/día y ${m.short} desde ${fromPrice(m)} €/día (alquiler de 3–4 días); el precio por día baja cuantos más días alquilas. Orientativos, con IVA: pregúntanos.`
-      : 'Según el modelo y los días de alquiler, con IVA. Son orientativos y negociables: pregúntanos por tus fechas.' },
+      ? `${c.short} desde ${fromPrice(c)} €/día y ${m.short} desde ${fromPrice(m)} €/día (alquiler de 3–4 días); el precio por día baja cuantos más días alquilas. Orientativos, con IVA: llámanos o pregúntanos por tus fechas o casos concretos.`
+      : 'Según el modelo y los días de alquiler, con IVA. Son orientativos: llámanos o pregúntanos por tus fechas o casos concretos.' },
     { k: 'Mínimo', v: condition(rates, 'minimo') || 'Consúltanos' },
     { k: 'Kilómetros', v: [condition(rates, 'kilometros'), condition(rates, 'exceso') && `exceso ${condition(rates, 'exceso')}`].filter(Boolean).join('; ') },
     { k: 'Incluido', v: 'Seguro, asistencia en carretera 24 h, menaje, mesa y sillas, gas y kit de limpieza. Mascotas y parking para tu coche gratis.' },

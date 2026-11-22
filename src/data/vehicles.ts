@@ -198,7 +198,7 @@ export const fromPrice = (v: Vehicle) => fromRate(rates, v.id);
  * Sustituye marcadores de precio en textos (títulos, descripciones, FAQ…)
  * por los precios actuales (los de Google Sheets si están configurados):
  *   {camper.desde} {mileo.desde} {all.desde}   precio "desde" (tramo 3–4 días)
- *   {camper.max} {all.max}                      precio/día más alto (1 día)
+ *   {camper.max} {all.max}                      precio/día más alto (2 días)
  *   {camper.min} {all.min}                      precio/día más bajo (7 días o más)
  */
 export function px(text: string): string {

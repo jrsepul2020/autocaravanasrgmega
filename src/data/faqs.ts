@@ -8,19 +8,19 @@ export const faqs: Faq[] = [
     // Única respuesta con cifras de precio en las preguntas frecuentes. Con el interruptor "Mostrar precios desde" en NO, sin cifras.
     get a() {
       return display.showFrom
-        ? 'En RG MEGA la Camper 120 UP cuesta desde {camper.desde} €/día y la Benimar Mileo 268 desde {mileo.desde} €/día en alquileres de 3–4 días; cuantos más días, más barato sale el día. Puentes, Navidad y Fin de Año tienen tarifa especial. El seguro, la asistencia 24 h y el equipamiento están incluidos. Son precios orientativos y todo es negociable: pregúntanos por tus fechas.'
-        : 'Depende del modelo y de los días de alquiler: cuantos más días, más barato sale el día, y la Camper 120 UP es la opción más económica. El seguro, la asistencia 24 h y el equipamiento están incluidos. Son precios orientativos y negociables: pregúntanos por tus fechas.';
+        ? 'En RG MEGA la Camper 120 UP cuesta desde {camper.desde} €/día y la Benimar Mileo 268 desde {mileo.desde} €/día en alquileres de 3–4 días; cuantos más días, más barato sale el día. Puentes, Navidad y Fin de Año tienen tarifa especial. El seguro, la asistencia 24 h y el equipamiento están incluidos. Son precios orientativos: llámanos o pregúntanos por tus fechas o casos concretos.'
+        : 'Depende del modelo y de los días de alquiler: cuantos más días, más barato sale el día, y la Camper 120 UP es la opción más económica. El seguro, la asistencia 24 h y el equipamiento están incluidos. Son precios orientativos: llámanos o pregúntanos por tus fechas o casos concretos.';
     },
     tags: ['precio', 'home', 'barata'],
   },
   {
     q: '¿Cuál es el alquiler mínimo?',
-    a: 'Puedes alquilarla desde 1 día (sujeto a disponibilidad). Lo más habitual es un fin de semana (viernes a domingo, 2 días), un puente o una semana. Para eventos especiales (un partido del Sevilla o del Betis, ver al Real Madrid en el Bernabéu, un concierto…) consúltanos: nos adaptamos.',
+    a: 'El alquiler mínimo es de 3 días. Lo más habitual es un fin de semana largo, un puente o una semana; para escapadas más cortas tenemos tarifa de fin de semana (viernes a domingo). Para eventos especiales (un partido del Sevilla o del Betis, ver al Real Madrid en el Bernabéu, un concierto…) consúltanos: nos adaptamos.',
     tags: ['precio', 'finde', 'puente', 'home'],
   },
   {
     q: '¿Puedo alquilar una autocaravana para ir al fútbol o a un evento?',
-    a: 'Sí. Es un plan cada vez más habitual: partidos del Sevilla FC o del Real Betis fuera de casa, un fin de semana para ver al Real Madrid en el Santiago Bernabéu, conciertos, el Gran Premio de Jerez o El Rocío. Se puede alquilar desde 1 día (sujeto a disponibilidad), así que encaja incluso para un partido.',
+    a: 'Sí. Es un plan cada vez más habitual: partidos del Sevilla FC o del Real Betis fuera de casa, un fin de semana para ver al Real Madrid en el Santiago Bernabéu, conciertos, el Gran Premio de Jerez o El Rocío. El mínimo general es de 3 días, pero para un partido o un evento concreto llámanos y lo vemos.',
     tags: ['home', 'finde', 'eventos'],
   },
   {
