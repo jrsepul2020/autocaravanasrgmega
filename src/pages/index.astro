@@ -8,7 +8,7 @@ import FaqList from '../components/FaqList.astro';
 import Location from '../components/Location.astro';
 import OfferCard from '../components/OfferCard.astro';
 import CtaBand from '../components/CtaBand.astro';
-import { offers, site } from '../data/site';
+import { offers, site, waLink } from '../data/site';
 import { vehicles, getVehicle, fromPrice } from '../data/vehicles';
 import { rutas } from '../data/rutas';
 import { faqsBy } from '../data/faqs';
@@ -242,16 +242,28 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
 
   <Location />
 
-  <!-- DUDAS -->
+  <!-- DATOS CLAVE -->
   <section class="section">
-    <div class="narrow">
-      <div class="kf-wrap"><KeyFacts /></div>
-      <div class="section-head">
-        <h2>Dudas frecuentes</h2>
+    <div class="container"><KeyFacts /></div>
+  </section>
+
+  <!-- DUDAS -->
+  <section class="section section--sand" aria-labelledby="faq-t">
+    <div class="container faqs">
+      <div class="faqs__aside">
+        <h2 id="faq-t">Dudas frecuentes</h2>
         <p class="lead">Lo que más nos preguntáis antes de reservar.</p>
+        <div class="faqs__help">
+          <p class="faqs__help-t">¿No encuentras tu duda?</p>
+          <p>Te contestamos nosotros, sin centralitas, normalmente en minutos.</p>
+          <div class="faqs__help-btns">
+            <a class="btn btn--wa btn--sm" href={waLink('Hola, tengo una duda sobre el alquiler')} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
+            <a class="btn btn--ghost btn--sm" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>
+          </div>
+        </div>
+        <p class="more"><a href="/preguntas-frecuentes/">Ver todas las preguntas <Icon name="arrow" /></a></p>
       </div>
-      <FaqList items={faqsBy('home', 6)} />
-      <p class="more"><a href="/preguntas-frecuentes/">Ver todas las preguntas frecuentes <Icon name="arrow" /></a></p>
+      <div class="faqs__list"><FaqList items={faqsBy('home', 6)} /></div>
     </div>
   </section>
 
@@ -357,7 +369,9 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .cmp__link :global(svg) { width: 15px; height: 15px; }
   @media (max-width: 760px) {
     .cmp__t, .cmp__t thead, .cmp__t tbody { display: block; }
-    .cmp__t tr { display: grid; grid-template-columns: 1fr 1fr; }
+    .cmp__t { table-layout: auto; }
+    .cmp__t tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .cmp__t th, .cmp__t td { min-width: 0; overflow-wrap: anywhere; }
     .cmp__t thead td { display: none; }
     .cmp__t th, .cmp__t td { padding: .8rem .7rem; }
     .cmp__t tbody th { grid-column: 1 / -1; padding: 1rem 0 0; border-bottom: 0; }
@@ -368,7 +382,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .cmp__veh strong { font-size: 1.2rem; }
     .cmp__t thead th:first-of-type { padding-left: 0; }
     .cmp__from b { font-size: 1.7rem; }
-    .cmp__btns .btn { width: 100%; }
+    .cmp__btns .btn { width: 100%; white-space: normal; padding-inline: .6em; }
   }
 
   /* PLANES: composición abierta, sin cajas */
@@ -401,7 +415,19 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .reviews__head h2 { margin-bottom: .4em; }
   @media (min-width: 700px) { .reviews :global(.rv__grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-  .kf-wrap { margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+  /* DUDAS */
+  .faqs { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+  .faqs__aside { position: sticky; top: 100px; }
+  .faqs__aside h2 { margin-bottom: .3em; }
+  .faqs__help { margin-top: 2rem; padding: 1.3rem 1.4rem; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+  .faqs__help-t { margin: 0 0 .2rem; font-family: var(--display); font-weight: 700; font-size: 1.15rem; }
+  .faqs__help p { margin: 0 0 1rem; color: var(--muted); font-size: .95rem; }
+  .faqs__help .faqs__help-t { color: var(--ink); margin-bottom: .2rem; }
+  .faqs__help-btns { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .faqs__list { background: #fff; border-radius: 20px; padding: .4rem 1.6rem; box-shadow: 0 0 0 1px var(--line); }
+  .faqs__list :global(.faq) { border-top: 0; }
+  .faqs__list :global(details:last-child) { border-bottom: 0; }
+  @media (max-width: 900px) { .faqs { grid-template-columns: minmax(0, 1fr); } .faqs__aside { position: static; } }
   .more { margin: 1.6rem 0 0; }
   .more a { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--forest); text-decoration: none; }
   .more a:hover { text-decoration: underline; }
@@ -430,7 +456,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .hv__cap { left: .7rem; right: .7rem; bottom: .65rem; flex-direction: column; align-items: flex-start; gap: .15rem; }
     .hv__name strong { font-size: 1.1rem; }
     .hv__name small { display: none; }
-    .hv__price { font-size: .78rem; }
+    .hv__price { font-size: .78rem; white-space: normal; }
     .hv__price b { font-size: 1.25rem; }
     .finder__card { padding: 1.1rem; margin-top: -56px; }
     .search { grid-template-columns: minmax(0, 1fr); }
