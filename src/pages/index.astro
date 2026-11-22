@@ -12,7 +12,6 @@ import { offers, site } from '../data/site';
 import { vehicles, getVehicle, fromPrice } from '../data/vehicles';
 import { rutas } from '../data/rutas';
 import { faqsBy } from '../data/faqs';
-import imgBanner from '../assets/img/viaja-a-tu-ritmo.webp';
 import imgCadiz from '../assets/img/ruta-camper-costa.webp';
 import imgAracena from '../assets/img/escapada-sierra-aracena.webp';
 import imgAlgarve from '../assets/img/escapada-algarve.webp';
@@ -37,6 +36,21 @@ const planes = [
   { img: imgPlanEventos, t: 'Fútbol y eventos', d: 'Sevilla, Betis, el Bernabéu, conciertos… Consúltanos aunque sean menos de 3 días.', href: '/alquiler-autocaravana-eventos-futbol-sevilla/' },
   { img: imgPlanVacaciones, t: 'Vacaciones largas', d: 'Más de 7 días con km ilimitados y tarifa reducida desde 15 días.', href: '/tarifas/' },
   { img: imgCadiz, t: 'Ofertas temporada baja', d: 'De octubre a marzo, la forma más barata de viajar en autocaravana.', href: '/ofertas-alquiler-autocaravana-sevilla/' },
+];
+
+// Comparativa Mileo 268 / Camper 120 UP (datos de las fichas de cada vehículo)
+const mileo = getVehicle('mileo'), camper = getVehicle('camper');
+const kfv = (v: typeof mileo, re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value ?? '';
+const compara = [
+  { k: 'Tipo', m: mileo.type, c: camper.type },
+  { k: 'Plazas para viajar', m: kfv(mileo, /viaje/i), c: kfv(camper, /viaje/i) },
+  { k: 'Plazas para dormir', m: kfv(mileo, /dormir/i), c: '2 (hasta 4 con la litera)' },
+  { k: 'Camas', m: 'Camas gemelas convertibles en doble (170 × 210) + cama basculante eléctrica', c: 'Cama doble + litera trasera desmontable' },
+  { k: 'Baño', m: 'Completo, con ducha independiente y agua caliente', c: 'Con ventana, ducha y agua caliente' },
+  { k: 'Tamaño y conducción', m: 'Perfilada, ≈ 3 m de alto, con gran garaje trasero', c: 'Solo ≈ 6 m: aparca como un turismo largo' },
+  { k: 'Lo mejor', m: 'Espacio, salón face to face y calefacción Truma', c: 'Placa solar de 120 W y nevera de 138 L' },
+  { k: 'Carnet', m: kfv(mileo, /carnet/i), c: kfv(camper, /carnet/i) },
+  { k: 'Ideal para', m: mileo.idealFor, c: camper.idealFor },
 ];
 
 const destinoImg: Record<string, { img: ImageMetadata; name: string; d: string }> = {
@@ -130,15 +144,48 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     </div>
   </section>
 
-  <!-- BANNER -->
-  <section class="ritmo" aria-labelledby="ritmo-t">
-    <div class="ritmo__copy">
-      <span class="eyebrow">Libertad total</span>
-      <h2 id="ritmo-t">Viaja a tu ritmo</h2>
-      <p>Para donde quieras, duerme frente al mar o en la sierra y vuelve cuando te apetezca. Tu casa va contigo.</p>
-      <a class="btn btn--light" href="/calendario-disponibilidad/">Consultar disponibilidad <Icon name="arrow" class="i-arrow" /></a>
+  <!-- COMPARATIVA -->
+  <section class="cmp" aria-labelledby="cmp-t">
+    <div class="container">
+      <div class="cmp__head">
+        <span class="eyebrow">Cuál elegir</span>
+        <h2 id="cmp-t">¿Mileo 268 o Camper 120 UP?</h2>
+        <p>Las dos son Benimar nuevas, se conducen con carnet B y salen de Sevilla con todo incluido. La diferencia está en el espacio y en el tipo de viaje.</p>
+      </div>
+      <table class="cmp__t">
+        <caption class="visually-hidden">Comparativa entre la autocaravana Benimar Mileo 268 y la Camper 120 UP de alquiler en Sevilla</caption>
+        <thead>
+          <tr>
+            <td></td>
+            {[mileo, camper].map((v) => (
+              <th scope="col">
+                <a class="cmp__veh" href={v.slug}>
+                  <Image src={v.hero} alt="" widths={[240, 400]} sizes="(max-width: 700px) 45vw, 200px" />
+                  <span><strong>{v.short}</strong><small>{v.type}</small></span>
+                </a>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {compara.map((row) => (
+            <tr><th scope="row">{row.k}</th><td>{row.m}</td><td>{row.c}</td></tr>
+          ))}
+          <tr class="cmp__price">
+            <th scope="row">Precio</th>
+            {[mileo, camper].map((v) => (
+              <td>
+                <span class="cmp__from">desde <b><span data-from={v.id}>{fromPrice(v)}</span> €</b>/día</span>
+                <span class="cmp__btns">
+                  <a class="btn btn--light btn--sm" href={v.calSlug}><Icon name="calendar" /> Disponibilidad</a>
+                  <a class="cmp__link" href={v.slug}>Ver ficha <Icon name="arrow" /></a>
+                </span>
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <Image src={imgBanner} alt="Autocaravana Benimar en una carretera de montaña al atardecer" class="ritmo__img" widths={[700, 1100, 1536]} sizes="(max-width: 860px) 100vw, 50vw" />
   </section>
 
   <!-- PARA CADA PLAN -->
@@ -282,12 +329,47 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .sale__more a:hover :global(svg) { transform: translateX(3px); }
   @media (max-width: 900px) { .sale__grid { grid-template-columns: minmax(0, 1fr); } }
 
-  /* BANNER */
-  .ritmo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--forest); color: #fff; min-height: 440px; overflow: hidden; }
-  .ritmo__copy { align-self: center; padding: 3rem 2.5rem 3rem max(16px, calc((100vw - var(--max)) / 2)); }
-  .ritmo h2 { color: #fff; font-size: clamp(2rem, 3.8vw, 2.8rem); margin-bottom: .35em; }
-  .ritmo p { color: var(--on-dark); font-size: 1.1rem; max-width: 40ch; margin-bottom: 1.6rem; }
-  .ritmo__img { width: 100%; height: 100%; min-height: 440px; max-height: 540px; object-fit: cover; object-position: center 60%; }
+  /* COMPARATIVA */
+  .cmp { background: var(--forest); color: #fff; padding: clamp(64px, 8vw, 104px) 0; }
+  .cmp__head { max-width: 760px; margin-bottom: 2.4rem; }
+  .cmp__head .eyebrow { color: rgba(255,255,255,.85); }
+  .cmp__head h2 { color: #fff; font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: .35em; }
+  .cmp__head p { color: var(--on-dark); font-size: 1.08rem; margin: 0; max-width: 60ch; }
+  .cmp__t { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .cmp__t thead td { width: 22%; }
+  .cmp__t th, .cmp__t td { text-align: left; vertical-align: top; padding: 1rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,.14); }
+  .cmp__t thead th { border-bottom: 0; padding-bottom: 1.2rem; }
+  .cmp__t tbody th { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.65); padding-left: 0; padding-top: 1.15rem; }
+  .cmp__t tbody td { color: #fff; font-size: 1rem; line-height: 1.45; }
+  .cmp__t tbody td + td { border-left: 1px solid rgba(255,255,255,.14); }
+  .cmp__veh { display: flex; align-items: center; gap: 1rem; color: #fff; text-decoration: none; }
+  .cmp__veh :global(img) { width: 120px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; flex: none; }
+  .cmp__veh span { display: grid; line-height: 1.2; }
+  .cmp__veh strong { font-family: var(--display); font-size: 1.5rem; }
+  .cmp__veh small { color: var(--on-dark); font-size: .85rem; font-weight: 500; }
+  .cmp__veh:hover strong { text-decoration: underline; text-underline-offset: 4px; }
+  .cmp__price td, .cmp__price th { border-bottom: 0; padding-top: 1.4rem; }
+  .cmp__from { display: block; color: var(--on-dark); font-size: .95rem; margin-bottom: .9rem; }
+  .cmp__from b { font-family: var(--display); font-size: 2.2rem; color: #fff; letter-spacing: -.02em; margin-left: .2rem; }
+  .cmp__btns { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem 1.2rem; }
+  .cmp__link { display: inline-flex; align-items: center; gap: .35rem; color: #fff; font-weight: 600; text-decoration: none; border-bottom: 2px solid rgba(255,255,255,.4); }
+  .cmp__link:hover { color: #fff; border-bottom-color: #fff; }
+  .cmp__link :global(svg) { width: 15px; height: 15px; }
+  @media (max-width: 760px) {
+    .cmp__t, .cmp__t thead, .cmp__t tbody { display: block; }
+    .cmp__t tr { display: grid; grid-template-columns: 1fr 1fr; }
+    .cmp__t thead td { display: none; }
+    .cmp__t th, .cmp__t td { padding: .8rem .7rem; }
+    .cmp__t tbody th { grid-column: 1 / -1; padding: 1rem 0 0; border-bottom: 0; }
+    .cmp__t tbody td { font-size: .92rem; }
+    .cmp__t tbody td:first-of-type { padding-left: 0; }
+    .cmp__veh { flex-direction: column; align-items: flex-start; gap: .6rem; }
+    .cmp__veh :global(img) { width: 100%; }
+    .cmp__veh strong { font-size: 1.2rem; }
+    .cmp__t thead th:first-of-type { padding-left: 0; }
+    .cmp__from b { font-size: 1.7rem; }
+    .cmp__btns .btn { width: 100%; }
+  }
 
   /* PLANES: composición abierta, sin cajas */
   .plans-sec__head { max-width: 52rem; }
@@ -336,9 +418,6 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
     .search { grid-template-columns: 1fr 1fr; }
     .search__f:first-child, .search__go { grid-column: 1 / -1; }
     .perks { grid-template-columns: 1fr 1fr; }
-    .ritmo { grid-template-columns: minmax(0, 1fr); }
-    .ritmo__img { order: -1; aspect-ratio: 16/9; height: auto; min-height: 0; }
-    .ritmo__copy { padding: 2rem 16px 2.8rem; }
     .dest { grid-template-columns: minmax(0, 1fr); }
     .dest__card { aspect-ratio: 16/10; }
     .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
