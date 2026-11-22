@@ -110,18 +110,18 @@ export const specialDates: { name: string; from: string; to: string }[] = [
 // Respaldo si Google Sheets no responde. vehicle y price son opcionales (etiqueta "Camper 120 UP · desde 110 €/día").
 export const offers: { title: string; text: string; until: string; vehicle?: string; price?: number | null; antes?: number | null }[] = [
   {
-    title: 'Puente de diciembre y Navidad',
-    text: 'Reserva ya tu autocaravana para el puente de la Constitución o las vacaciones de Navidad. Quedan pocas fechas.',
+    title: 'Una semana en la Camper 120 UP',
+    text: 'Alquila 7 días o más y cada día te sale más barato. Perfecta para dos y fácil de aparcar en cualquier pueblo.',
     until: '2026-12-31',
     vehicle: 'Camper 120 UP',
-    price: 145,
+    price: 69,
   },
   {
-    title: 'Invierno a precio de temporada baja',
-    text: 'De enero a marzo, en estancias de más de 14 días. La Mileo 268, desde 140 €/día.',
-    until: '2027-03-31',
+    title: 'Una semana en la Mileo 268',
+    text: '7 días o más con la Mileo 268 al mejor precio por día: espacio para 4, baño completo y garaje para todo.',
+    until: '2026-12-31',
     vehicle: 'Mileo 268',
-    price: 140,
+    price: 89,
   },
 ];
 
