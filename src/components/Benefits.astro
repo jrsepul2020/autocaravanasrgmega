@@ -17,13 +17,13 @@ const items = [
 <style>
   .bf { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1.6rem 2rem; }
   .bf li { display: flex; gap: 1rem; align-items: flex-start; }
-  .bf__i { width: 52px; height: 52px; flex: none; border-radius: 16px; display: grid; place-items: center; background: var(--pine-dark); color: var(--sub); box-shadow: var(--shadow); }
+  .bf__i { width: 52px; height: 52px; flex: none; border-radius: 16px; display: grid; place-items: center; background: var(--pine-dark); color: #fff; box-shadow: var(--shadow); }
   .bf__i :global(svg) { width: 26px; height: 26px; }
   .bf li:nth-child(3n+2) .bf__i { background: var(--price); color: #fff; }
   .bf li:nth-child(3n) .bf__i { background: var(--pine-2); color: #fff; }
   .bf strong { display: block; color: var(--pine); font-size: 1.05rem; margin-bottom: .15rem; }
   .bf p { margin: 0; color: var(--muted); font-size: .95rem; }
-  :global(.section--pine) .bf__i { background: rgba(250,176,44,.14); color: var(--sub); box-shadow: inset 0 0 0 1px rgba(250,176,44,.3); }
+  :global(.section--pine) .bf__i { background: rgba(255,255,255,.12); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
   :global(.section--pine) .bf li:nth-child(3n+2) .bf__i { background: var(--price); color: #fff; box-shadow: 0 8px 20px -8px rgba(60,95,77,.7); }
   :global(.section--pine) .bf li:nth-child(3n) .bf__i { background: rgba(255,255,255,.1); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
   :global(.section--pine) .bf strong { color: #fff; }

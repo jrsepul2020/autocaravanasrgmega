@@ -67,7 +67,7 @@ ul { padding-left: 1.2em; }
   color: var(--forest); margin-bottom: .9rem;
 }
 .eyebrow::before { content: ''; width: 1.8em; height: 2px; border-radius: 2px; background: var(--terra); }
-.section--pine .eyebrow, .hero .eyebrow { color: var(--terra); }
+.section--pine .eyebrow, .hero .eyebrow { color: rgba(255,255,255,.85); }
 .lead { font-size: 1.18rem; color: var(--muted); max-width: 62ch; }
 .section-head { max-width: 760px; margin-bottom: 2.2rem; }
 .section-head h2 { margin-bottom: .3em; }
