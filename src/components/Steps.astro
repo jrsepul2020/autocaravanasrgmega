@@ -13,22 +13,17 @@ const steps = [
   ))}
 </ol>
 <style>
-  .st { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 1.2rem; position: relative; }
-  .st li { position: relative; background: #fff; border-radius: var(--radius); padding: 1.6rem 1.4rem 1.5rem; box-shadow: var(--shadow); }
-  .st__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
-  .st__n { font-family: var(--display); font-weight: 700; font-size: 3.4rem; line-height: .9; color: var(--terra); letter-spacing: -.03em; }
-  .st__i { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--pine-dark); color: #fff; }
-  .st__i :global(svg) { width: 22px; height: 22px; }
-  .st li:last-child .st__i { background: var(--price); color: #fff; }
-  .st h3 { margin: 0 0 .35rem; font-size: 1.25rem; }
+  .st { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 2rem 2rem; }
+  .st li { border-top: 2px solid var(--line); padding-top: 1.2rem; }
+  .st__top { display: flex; align-items: center; gap: .8rem; margin-bottom: .9rem; }
+  .st__n { font-family: var(--display); font-weight: 700; font-size: 2.6rem; line-height: .9; color: var(--forest); letter-spacing: -.03em; }
+  .st__i { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--sand-2); color: var(--forest); }
+  .st__i :global(svg) { width: 20px; height: 20px; }
+  .st h3 { margin: 0 0 .35rem; font-size: 1.2rem; }
   .st p { margin: 0; color: var(--muted); font-size: .95rem; }
   /* Sobre banda oscura */
-  :global(.section--pine) .st li { background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
-  :global(.section--pine) .st h3 { color: #fff; }
+  :global(.section--pine) .st li { border-top-color: rgba(255,255,255,.2); }
+  :global(.section--pine) .st__n, :global(.section--pine) .st h3 { color: #fff; }
   :global(.section--pine) .st p { color: var(--on-dark); }
   :global(.section--pine) .st__i { background: rgba(255,255,255,.12); color: #fff; }
-  :global(.section--pine) .st li:last-child { background: #fff; color: var(--ink); }
-  :global(.section--pine) .st li:last-child .st__n { color: #fff; }
-  :global(.section--pine) .st li:last-child h3, :global(.section--pine) .st li:last-child p { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.22); }
-  :global(.section--pine) .st li:last-child .st__i { background: var(--pine-dark); color: #fff; }
 </style>

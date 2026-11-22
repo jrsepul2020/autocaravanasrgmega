@@ -26,11 +26,11 @@ const reviews = [
   </div>
 </div>
 <style>
-  .rv__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1rem; }
-  .rv__card { margin: 0; background: #fff; border-radius: var(--radius); padding: 1.3rem 1.3rem 1.2rem; box-shadow: 0 0 0 1px rgba(31,74,56,.08), 0 10px 24px -16px rgba(31,74,56,.35); display: flex; flex-direction: column; gap: .75rem; }
+  .rv__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 2rem 2.5rem; }
+  .rv__card { margin: 0; padding: 1.2rem 0 0; border-top: 2px solid var(--line); display: flex; flex-direction: column; gap: .75rem; }
   .rv__stars { display: flex; gap: 2px; color: var(--terra); }
   .rv__stars :global(svg) { width: 16px; height: 16px; }
-  blockquote { margin: 0; font-size: .95rem; line-height: 1.55; color: var(--ink); flex: 1; }
+  blockquote { margin: 0; font-size: 1rem; line-height: 1.55; color: var(--ink); flex: 1; }
   figcaption { display: flex; align-items: center; gap: .65rem; font-size: .88rem; }
   figcaption > span:last-child { display: grid; line-height: 1.3; }
   figcaption strong { color: var(--ink); }
@@ -38,7 +38,7 @@ const reviews = [
   .rv__av { width: 38px; height: 38px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--sand-2); color: var(--forest); font-family: var(--display); font-weight: 700; font-size: .9rem; }
   .rv__card:nth-child(2) .rv__av { background: var(--forest); color: #fff; }
   .rv__card:nth-child(3) .rv__av { background: var(--terra); color: var(--ink); }
-  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1rem; padding: 1rem 1.3rem; background: #fff; border-radius: var(--radius); box-shadow: 0 0 0 1px rgba(31,74,56,.08); }
+  .rv__gbp { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1.2rem 0 0; border-top: 2px solid var(--line); }
   .rv__gbp p { margin: 0; flex: 1; min-width: 220px; }
   :global(.rv__g) { width: 28px; height: 28px; }
 </style>

@@ -22,8 +22,8 @@ const more = [
       </div>
       <div class="grid grid-3">
         {rutas.map((r) => (
-          <a class="card rt" href={`/rutas/${r.slug}/`}>
-            <span class="pill">{r.days} · {r.km}</span>
+          <a class="rt" href={`/rutas/${r.slug}/`}>
+            <span class="rt__meta">{r.days} · {r.km}</span>
             <h2>{r.title}</h2>
             <p>{r.intro}</p>
             <span class="rt__more">Ver ruta →</span>
@@ -32,16 +32,20 @@ const more = [
       </div>
       <h2 style="margin-top:3rem">Más ideas de ruta</h2>
       <div class="grid grid-3">
-        {more.map((m) => <div class="card"><h3>{m.t}</h3><p style="margin:0">{m.d}</p></div>)}
+        {more.map((m) => <div class="rt rt--plain"><h3>{m.t}</h3><p>{m.d}</p></div>)}
       </div>
     </div>
   </section>
   <CtaBand title="¿Ya sabes a dónde vas?" text="Cuéntanos tu ruta y te recomendamos el vehículo ideal." />
 </Base>
 <style>
-  .rt { text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: .7rem; transition: .2s; }
-  .rt:hover { border-color: var(--terra-ink); color: var(--ink); transform: translateY(-2px); }
+  .grid-3 { gap: 2.5rem 2rem; }
+  .rt { text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: .6rem; border-top: 2px solid var(--line); padding-top: 1.2rem; transition: border-color .2s; }
+  a.rt:hover { border-top-color: var(--forest); color: var(--ink); }
+  a.rt:hover h2 { color: var(--forest); }
+  .rt__meta { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .rt h3 { margin: 0; }
   .rt h2 { font-size: 1.35rem; margin: 0; }
   .rt p { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
-  .rt__more { color: var(--terra-ink); font-weight: 650; }
+  .rt__more { color: var(--forest); font-weight: 700; }
 </style>

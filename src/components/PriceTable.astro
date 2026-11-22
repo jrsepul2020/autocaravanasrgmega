@@ -46,7 +46,7 @@ const order: SeasonKey[] = ['baja', 'media', 'alta', 'especial'];
   )}
 </div>
 <style>
-  .pt__scroll { overflow-x: auto; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow-lg); }
+  .pt__scroll { overflow-x: auto; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
   table { width: 100%; border-collapse: collapse; min-width: 560px; }
   th, td { padding: .9rem 1rem; text-align: center; border-bottom: 1px solid var(--line); }
   thead th { background: var(--pine-dark); color: #fff; font-family: var(--display); font-size: 1.05rem; }
@@ -61,9 +61,7 @@ const order: SeasonKey[] = ['baja', 'media', 'alta', 'especial'];
   tbody tr:nth-child(even) { background: var(--sand); }
   .pt__note { font-size: .9rem; color: var(--muted); margin: .9rem 0 0; }
   .pt__cond { margin-top: 1.5rem; }
-  .pt__cond > div { background: var(--pine-dark); color: #fff; border-radius: 14px; padding: 1.2rem 1.3rem; font-size: .92rem; }
-  .pt__cond > div:last-child { background: var(--terra); color: var(--ink); }
-  .pt__cond > div:last-child .pt__h { color: #fff; }
+  .pt__cond > div { border-top: 2px solid var(--line); padding-top: 1rem; font-size: .93rem; color: var(--ink); }
   .pt__cond ul { margin: 0; padding-left: 1.1em; }
-  .pt__h { font-family: var(--display); font-weight: 600; font-size: 1.1rem; color: #fff; margin-bottom: .5rem; }
+  .pt__h { font-family: var(--display); font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: .5rem; }
 </style>
