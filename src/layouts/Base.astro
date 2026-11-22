@@ -7,6 +7,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import '../data/remote'; // lee Google Sheets al compilar
 import { site, display } from '../data/site';
 import { vehicles, fromPrice, px } from '../data/vehicles';
+import { rates } from '../data/rates';
 
 interface Props {
   title: string;
@@ -36,7 +37,7 @@ const business = {
   image: ogImage,
   telephone: site.phone,
   email: site.email,
-  priceRange: px('{all.desde}€ - {all.max}€ / día'),
+  priceRange: '€€',
   address: {
     '@type': 'PostalAddress',
     streetAddress: site.address.street,
@@ -62,8 +63,7 @@ const business = {
   makesOffer: vehicles.map((v) => ({
     '@type': 'Offer',
     priceCurrency: 'EUR',
-    price: fromPrice(v),
-    priceSpecification: { '@type': 'UnitPriceSpecification', price: fromPrice(v), priceCurrency: 'EUR', unitText: 'DAY' },
+    ...(fromPrice(v) && display.showFrom ? { price: fromPrice(v), priceSpecification: { '@type': 'UnitPriceSpecification', price: fromPrice(v), priceCurrency: 'EUR', unitText: 'DAY' } } : {}),
     itemOffered: { '@type': 'Product', name: `Alquiler ${v.name} en Sevilla`, url: site.url + v.slug },
   })),
 };
@@ -124,6 +124,7 @@ const allSchema = [business, webSite, webPage, ...(crumbsSchema ? [crumbsSchema]
   </main>
   <Footer />
   <MobileBar />
+  <script is:inline type="application/json" id="rg-rates" set:html={JSON.stringify(rates)} />
   <script>import '../scripts/live';</script>
 </body>
 </html>

@@ -1,67 +1,72 @@
 ---
-import { seasons, pricing, type SeasonKey } from '../data/site';
+/**
+ * Tarifas por tramos de días + tarifas especiales + condiciones.
+ * El HTML sale de src/data/rates.ts y scripts/live.ts lo repinta en vivo con la hoja.
+ */
+import { pricing } from '../data/site';
+import { rates, ratesTableHtml, packsHtml, conditionsHtml, type VehicleId } from '../data/rates';
 import PriceNote from './PriceNote.astro';
-import { vehicles, type Vehicle } from '../data/vehicles';
-interface Props { only?: Vehicle['id']; showConditions?: boolean }
+interface Props { only?: VehicleId; showConditions?: boolean }
 const { only, showConditions = true } = Astro.props;
-const list = only ? vehicles.filter((v) => v.id === only) : vehicles;
-const order: SeasonKey[] = ['baja', 'media', 'alta', 'especial'];
+const packs = packsHtml(rates, only);
 ---
 <div class="pt">
-  <div class="pt__scroll">
-    <table>
-      <caption class="visually-hidden">Precios por día del alquiler de autocaravanas en Sevilla</caption>
-      <thead>
-        <tr>
-          <th scope="col">Temporada</th>
-          {list.map((v) => <th scope="col" colspan="2">{v.short}</th>)}
-        </tr>
-        <tr class="pt__sub">
-          <th></th>
-          {list.map(() => <><th scope="col">3-14 días</th><th scope="col">+14 días</th></>)}
-        </tr>
-      </thead>
-      <tbody>
-        {order.map((k) => (
-          <tr>
-            <th scope="row">
-              <span class="pt__dot" style={`background:${seasons[k].color}`}></span>
-              <strong>{seasons[k].label}</strong>
-              <small>{seasons[k].when}</small>
-            </th>
-            {list.map((v) => <><td><b><span data-p={`${v.id}.${k}.short`}>{v.prices[k].short}</span> €<small>/día</small></b></td><td><b><span data-p={`${v.id}.${k}.long`}>{v.prices[k].long}</span> €<small>/día</small></b></td></>)}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+  <div data-rates-table data-only={only} set:html={ratesTableHtml(rates, only)} />
+  <p class="pt__note">Precio por día con IVA, según los días de alquiler (se cuentan noches: viernes a domingo = 2 días). Seguro, asistencia 24 h y equipamiento incluidos.</p>
+
+  <div class="pt__packs" data-packs-wrap hidden={!packs}>
+    <h3 class="pt__h3">Tarifas especiales <small>precio cerrado</small></h3>
+    <div data-packs data-only={only} set:html={packs} />
   </div>
-  <p class="pt__note">Precio por día con IVA incluido · Alquiler mínimo {pricing.minDays} días · Seguro, asistencia 24 h y equipamiento incluidos.</p>
+
   <PriceNote />
+
   {showConditions && (
-    <div class="pt__cond grid grid-3">
-      <div><p class="pt__h">Kilometraje</p><ul><li>{pricing.km.shortStay}</li><li>{pricing.km.longStay}</li><li>Exceso: {pricing.km.excess}</li></ul></div>
+    <div class="pt__cond">
+      <div><p class="pt__h">Condiciones</p><div data-conditions set:html={conditionsHtml(rates)} /></div>
       <div><p class="pt__h">Pago de la reserva</p><ul>{pricing.payment.map((p) => <li>{p}</li>)}</ul></div>
       <div><p class="pt__h">Cancelación</p><ul>{pricing.cancellation.map((p) => <li>{p}</li>)}</ul></div>
     </div>
   )}
 </div>
+
 <style>
-  .pt__scroll { overflow-x: auto; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
-  table { width: 100%; border-collapse: collapse; min-width: 560px; }
-  th, td { padding: .9rem 1rem; text-align: center; border-bottom: 1px solid var(--line); }
-  thead th { background: var(--pine-dark); color: #fff; font-family: var(--display); font-size: 1.05rem; }
-  .pt__sub th { background: var(--pine); color: rgba(255,255,255,.85); font-family: var(--font); font-size: .8rem; font-weight: 600; padding: .5rem; }
-  tbody th { text-align: left; font-weight: 400; max-width: 340px; }
-  tbody th strong { display: inline; color: var(--pine); }
-  tbody th small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.4; margin-top: .2rem; }
-  .pt__dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: .5rem; box-shadow: 0 0 0 3px rgba(0,0,0,.06); }
-  td b { font-family: var(--display); font-size: 1.35rem; color: var(--price); font-variant-numeric: tabular-nums; }
-  td b small { font-size: .62em; font-weight: 500; margin-left: .1em; }
-  tbody tr:last-child > * { border-bottom: 0; }
-  tbody tr:nth-child(even) { background: var(--sand); }
   .pt__note { font-size: .9rem; color: var(--muted); margin: .9rem 0 0; }
-  .pt__cond { margin-top: 1.5rem; }
+  .pt__packs { margin-top: 2rem; }
+  .pt__h3 { font-size: 1.2rem; margin: 0 0 .8rem; }
+  .pt__h3 small { font-family: var(--font); font-size: .8rem; font-weight: 600; color: var(--muted); margin-left: .4rem; }
+  .pt :global(.pn) { margin-top: 1.2rem; }
+  .pt__cond { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.5rem 2rem; margin-top: 2rem; }
   .pt__cond > div { border-top: 2px solid var(--line); padding-top: 1rem; font-size: .93rem; color: var(--ink); }
   .pt__cond ul { margin: 0; padding-left: 1.1em; }
   .pt__h { font-family: var(--display); font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: .5rem; }
+</style>
+<style is:global>
+  /* Tabla por tramos (HTML generado en rates.ts, también en vivo) */
+  .rt-period + .rt-period { margin-top: 1.6rem; }
+  .rt-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .8rem; margin: 0 0 .6rem; }
+  .rt-title strong { font-family: var(--display); font-size: 1.15rem; color: var(--ink); }
+  .rt-title span { font-size: .88rem; color: var(--muted); }
+  .rt-scroll { overflow-x: auto; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+  .rt { width: 100%; border-collapse: collapse; min-width: 340px; }
+  .rt th, .rt td { padding: .8rem 1rem; text-align: center; border-bottom: 1px solid var(--line); }
+  .rt thead th { background: var(--forest); color: #fff; font-family: var(--display); font-size: 1.02rem; }
+  .rt tbody th { text-align: left; font-weight: 600; color: var(--ink); }
+  .rt tbody tr:last-child > * { border-bottom: 0; }
+  .rt tbody tr:nth-child(even) { background: var(--sand); }
+  .rt td b { font-family: var(--display); font-size: 1.3rem; color: var(--price); font-variant-numeric: tabular-nums; }
+  .rt td small { font-size: .8rem; color: var(--muted); margin-left: .15rem; }
+  .rt-ask { font-size: .85rem; color: var(--muted); }
+  .rt-empty { padding: 1rem 1.2rem; background: var(--sand); border-radius: var(--radius); }
+  .rt-packs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .rt-packs li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem 1.5rem; padding: .85rem 0; border-bottom: 1px solid var(--line); }
+  .rt-pack-name { display: grid; }
+  .rt-pack-name strong { color: var(--ink); }
+  .rt-pack-name small { color: var(--muted); font-size: .85rem; }
+  .rt-pack-prices { display: flex; flex-wrap: wrap; gap: .3rem 1.4rem; font-size: .92rem; color: var(--muted); }
+  .rt-pack-prices b { font-family: var(--display); font-size: 1.2rem; color: var(--price); margin-left: .25rem; }
+  .rt-cond { margin: 0; display: grid; gap: .55rem; }
+  .rt-cond div { display: grid; }
+  .rt-cond dt { font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--forest); }
+  .rt-cond dd { margin: 0; }
 </style>

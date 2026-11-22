@@ -1,16 +1,19 @@
 /**
- * En el navegador: lee Google Sheets y actualiza precios, ofertas y fechas
- * especiales sin volver a publicar la web. Marcas en el HTML:
- *   data-p="mileo.baja.short"   → precio/día de esa temporada
- *   data-p3="camper.baja"       → precio de 3 días (tarifa 3-14 días)
- *   data-from="mileo" | "all"   → precio "desde" (el más bajo)
- *   [data-offers] + <template>  → lista de ofertas activas
- *   [data-special] + <template> → lista de fechas de temporada especial
- * Lanza el evento "rg:live" (detail = datos) para el calculador del formulario.
+ * En el navegador: lee Google Sheets y actualiza tarifas, ofertas y condiciones
+ * sin volver a publicar la web. Marcas en el HTML:
+ *   data-from="mileo" | "camper" | "all"  → precio "desde" (tramo 3–4 días)
+ *   [data-rates-table] (data-only)        → tabla de tarifas por tramos
+ *   [data-packs] (data-only)              → tarifas especiales
+ *   [data-conditions]                     → condiciones (km, mínimo, fianza…)
+ *   data-cond="kilómetros"                → texto de una condición
+ *   [data-offers] + <template>            → lista de ofertas activas
+ * Lanza el evento "rg:live" para el calendario y el formulario.
  */
-import { fetchLive, sheetId, offerDeal, offerLeft, offerVehicleId, type LiveData } from '../data/sheet';
+import { fetchLive, sheetId, mergeRates, offerDeal, offerLeft, offerVehicleId, type LiveData } from '../data/sheet';
+import { fromRate, ratesTableHtml, packsHtml, conditionsHtml, condition, type VehicleId } from '../data/rates';
+import { baseRates } from './rates-client';
 
-const KEY = 'rg-live-v1';
+const KEY = 'rg-live-v2';
 const TTL = 5 * 60 * 1000;
 
 async function load(): Promise<LiveData | null> {
@@ -23,8 +26,6 @@ async function load(): Promise<LiveData | null> {
   return d;
 }
 
-const fmtDate = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-
 function fill(tpl: HTMLTemplateElement, values: Record<string, string>) {
   const node = tpl.content.cloneNode(true) as DocumentFragment;
   node.querySelectorAll<HTMLElement>('[data-f]').forEach((el) => { el.textContent = values[el.dataset.f!] ?? ''; el.hidden = !el.textContent; });
@@ -32,41 +33,19 @@ function fill(tpl: HTMLTemplateElement, values: Record<string, string>) {
 }
 
 export function apply(d: LiveData) {
-  const price = (path: string) => {
-    const [v, s, k] = path.split('.') as any;
-    return (d.prices as any)[v]?.[s]?.[k] as number | undefined;
-  };
-  document.querySelectorAll<HTMLElement>('[data-p]').forEach((el) => {
-    const n = price(el.dataset.p!); if (n) el.textContent = String(n);
-  });
-  document.querySelectorAll<HTMLElement>('[data-p3]').forEach((el) => {
-    const n = price(el.dataset.p3 + '.short'); if (n) el.textContent = String(n * 3).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  });
-  const minOf = (v: string) => {
-    const p = (d.prices as any)[v]; if (!p) return undefined;
-    const all = Object.values(p).map((x: any) => x.long).filter(Boolean) as number[];
-    return all.length === 4 ? Math.min(...all) : undefined; // solo si la tabla del vehículo está completa
-  };
+  const r = mergeRates(baseRates(), d.rates);
+  (window as any).__rgRates = r;
+  const only = (el: HTMLElement) => (el.dataset.only || undefined) as VehicleId | undefined;
+
   document.querySelectorAll<HTMLElement>('[data-from]').forEach((el) => {
     const v = el.dataset.from!;
-    const n = v === 'all' ? Math.min(...['mileo', 'camper'].map(minOf).filter(Boolean) as number[]) : minOf(v);
-    if (n && Number.isFinite(n)) el.textContent = String(n);
+    const list = (v === 'all' ? ['mileo', 'camper'] : [v]).map((x) => fromRate(r, x as VehicleId)).filter((n): n is number => !!n);
+    if (list.length) el.textContent = String(Math.min(...list));
   });
-
-  if (d.hero) {
-    const names: Record<string, string> = { mileo: 'Mileo 268', camper: 'Camper 120 UP' };
-    const n = d.hero.price ?? minOf(d.hero.vehicle);
-    document.querySelectorAll<HTMLElement>('[data-hero-text]').forEach((el) => {
-      // Portada: si la oferta destacada queda sin texto, se oculta el aviso
-      const box = el.closest<HTMLElement>('.hero__offer');
-      if (box) { box.hidden = !d.hero!.text; if (d.hero!.text) el.textContent = d.hero!.text; return; }
-      el.textContent = d.hero!.text || `${names[d.hero!.vehicle]} desde`;
-    });
-    if (n) document.querySelectorAll<HTMLElement>('[data-hero-price]').forEach((el) => { el.textContent = String(n); });
-  } else {
-    // Sin pestaña "Portada": precio automático del vehículo indicado en la página
-    document.querySelectorAll<HTMLElement>('[data-hero-price][data-auto]').forEach((el) => { const n = minOf(el.dataset.auto!); if (n) el.textContent = String(n); });
-  }
+  document.querySelectorAll<HTMLElement>('[data-rates-table]').forEach((el) => { el.innerHTML = ratesTableHtml(r, only(el)); });
+  document.querySelectorAll<HTMLElement>('[data-packs]').forEach((el) => { el.innerHTML = packsHtml(r, only(el)); el.closest<HTMLElement>('[data-packs-wrap]')?.toggleAttribute('hidden', !el.innerHTML.trim()); });
+  document.querySelectorAll<HTMLElement>('[data-conditions]').forEach((el) => { el.innerHTML = conditionsHtml(r); });
+  document.querySelectorAll<HTMLElement>('[data-cond]').forEach((el) => { const t = condition(r, el.dataset.cond!); if (t) el.textContent = t; });
 
   const today = new Date().toISOString().slice(0, 10);
   if (d.offers) {
@@ -74,11 +53,9 @@ export function apply(d: LiveData) {
     document.querySelectorAll<HTMLElement>('[data-offers]').forEach((box) => {
       const tpl = box.querySelector('template'); if (!tpl) return;
       box.querySelectorAll(':scope > :not(template)').forEach((n) => n.remove());
-      let base: Record<string, number> = {};
-      try { base = JSON.parse(box.dataset.base || '{}'); } catch {}
       active.forEach((o) => {
         const vid = offerVehicleId(o.vehicle);
-        const deal = offerDeal(o.price, o.antes, minOf(vid) ?? base[vid]);
+        const deal = offerDeal(o.price, o.antes, fromRate(r, vid));
         const frag = fill(tpl, {
           title: o.title, text: o.text, vehicle: o.vehicle || '', amount: o.price ? String(o.price) : '',
           antes: deal ? `${deal.antes} €` : '', wasLabel: deal ? (o.antes ? 'Antes' : 'Tarifa habitual') : '',
@@ -92,33 +69,11 @@ export function apply(d: LiveData) {
       const wrap = box.closest<HTMLElement>('[data-offers-wrap]') ?? box;
       wrap.hidden = active.length === 0;
     });
-    document.querySelectorAll<HTMLElement>('[data-offers-marquee]').forEach((box) => {
-      const track = box.querySelector('.marquee__track'); if (!track) return;
-      const sample = track.querySelector('.marquee__item'); if (!sample) return;
-      const labels = active.length
-        ? active.map((o) => (o.price ? `${o.title} · desde ${o.price} €/día` : o.title))
-        : ['Consulta nuestras ofertas especiales de alquiler'];
-      const items = [...labels, ...labels].map((label) => {
-        const node = sample.cloneNode(true) as HTMLElement;
-        const text = node.querySelector('span');
-        if (text) text.textContent = label;
-        return node;
-      });
-      track.replaceChildren(...items);
-    });
   }
-  if (d.special) {
-    const upcoming = d.special.filter((x) => x.to >= today);
-    document.querySelectorAll<HTMLElement>('[data-special]').forEach((box) => {
-      const tpl = box.querySelector('template'); if (!tpl) return;
-      box.querySelectorAll(':scope > :not(template)').forEach((n) => n.remove());
-      upcoming.forEach((x) => box.append(fill(tpl, { name: x.name, from: fmtDate(x.from), to: fmtDate(x.to) })));
-    });
-  }
-  // Interruptor "Mostrar precios desde" de la pestaña Portada
+  // Interruptor "Mostrar precios desde" de la pestaña Ajustes
   if (d.showFrom !== null && d.showFrom !== undefined) document.documentElement.classList.toggle('no-from', !d.showFrom);
   (window as any).__rgLive = d;
-  window.dispatchEvent(new CustomEvent('rg:live', { detail: d }));
+  window.dispatchEvent(new CustomEvent('rg:live', { detail: r }));
 }
 
 if (sheetId) load().then((d) => d && apply(d));

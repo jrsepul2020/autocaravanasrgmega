@@ -8,13 +8,13 @@ const upcoming = specialDates.filter((d) => d.to >= today).slice(0, 8);
 const fmt = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 const faqs = [
   { q: '¿Con cuánta antelación debo reservar para un puente?', a: 'Para puentes como el de diciembre, Semana Santa, Feria o El Rocío recomendamos reservar con 1-2 meses de antelación: solo tenemos dos vehículos y son las primeras fechas en ocuparse.', tags: [] },
-  { q: '¿Qué precio tiene el alquiler en puentes y festivos?', a: 'En puentes y festivos se aplica la tarifa de temporada especial (la tienes en la página de Tarifas). Si sumas días antes o después del puente, a esos días se les aplica la tarifa normal.', tags: [] },
+  { q: '¿Qué precio tiene el alquiler en puentes y festivos?', a: 'Los puentes y fechas como Navidad o Fin de Año tienen tarifa especial con precio cerrado (la tienes en la página de Tarifas). Si sumas días antes o después del puente, a esos días se les aplica la tarifa normal.', tags: [] },
   ...faqsBy('puente', 5),
 ];
 ---
 <LandingPage
   title="Alquiler de Autocaravana para Puentes y Festivos en Sevilla | RG MEGA"
-  description="Alquila una autocaravana en Sevilla para el puente de diciembre, Andalucía, Semana Santa, Feria, mayo o El Rocío. Mínimo 3 días, seguro incluido. Reserva con antelación."
+  description="Alquila una autocaravana en Sevilla para el puente de diciembre, Andalucía, Semana Santa, Feria, mayo o El Rocío. Seguro incluido. Reserva con antelación."
   h1="Alquiler de autocaravana para puentes en Sevilla"
   eyebrow="Puentes y festivos"
   lead="Los puentes son el momento perfecto para una escapada en autocaravana… y los primeros días en reservarse. Asegura tu fecha."
@@ -23,7 +23,7 @@ const faqs = [
   crumb="Puentes y festivos"
   faqs={faqs}
   waText="Hola, quiero alquilar una autocaravana para el puente de…"
-  bullets={['Puente de diciembre, Andalucía, Semana Santa, mayo…', 'Mínimo 3 días: encaja en cualquier puente', 'Entrega y devolución a la hora que pactemos', 'Solo 2 vehículos: reserva con antelación']}
+  bullets={['Puente de diciembre, Andalucía, Semana Santa, mayo…', 'Tarifa especial con precio cerrado', 'Entrega y devolución a la hora que pactemos', 'Solo 2 vehículos: reserva con antelación']}
 >
   <h2>Próximos puentes y festivos</h2>
   <div class="bridges">
@@ -33,10 +33,10 @@ const faqs = [
       </a>
     ))}
   </div>
-  <p><small>Fechas orientativas. Puedes ajustar recogida y devolución a tu gusto (mínimo 3 días).</small></p>
+  <p><small>Fechas orientativas. Puedes ajustar recogida y devolución a tu gusto</small></p>
   <h2>Un puente en autocaravana desde Sevilla</h2>
   <p>El <strong>puente de la Constitución y la Inmaculada</strong> es ideal para la Sierra de Aracena o Sierra Nevada; el <strong>puente de Andalucía</strong> (28 de febrero) para la costa de Cádiz sin aglomeraciones; y <strong>Semana Santa</strong> o el <strong>puente de mayo</strong> para recorrer el Algarve o los pueblos blancos con la primavera en pleno apogeo.</p>
-  <p>Durante la <strong>Feria de Abril</strong> y la <strong>Romería de El Rocío</strong> muchos sevillanos aprovechan para salir de la ciudad… o para tener su propio "alojamiento" sobre ruedas cerca de la aldea. Estas fechas se aplican con la <a href="/tarifas/">tarifa de temporada especial</a>.</p>
+  <p>Durante la <strong>Feria de Abril</strong> y la <strong>Romería de El Rocío</strong> muchos sevillanos aprovechan para salir de la ciudad… o para tener su propio "alojamiento" sobre ruedas cerca de la aldea. Son fechas de mucha demanda: pregúntanos precio con tiempo o mira las <a href="/tarifas/">tarifas especiales</a>.</p>
   <p>Escríbenos por WhatsApp con las fechas de tu puente y te confirmamos disponibilidad al momento, o <a href="/calendario-disponibilidad/">mira el calendario</a> de cada vehículo.</p>
 </LandingPage>
 <style>

@@ -33,7 +33,7 @@ export const rutas: Ruta[] = [
     tips: [
       'En verano, muchos municipios de la costa prohíben pernoctar en primera línea: usa campings o áreas de autocaravanas.',
       'La Camper 120 UP es ideal para esta ruta: cabe en los aparcamientos de playa y en las calles estrechas.',
-      'En temporada baja (octubre-marzo) tendrás las playas casi para ti y el alquiler más barato.',
+      'Fuera del verano tendrás las playas casi para ti.',
     ],
   },
   {
@@ -78,7 +78,7 @@ export const rutas: Ruta[] = [
     ],
     tips: [
       'La autopista A22 tiene peaje electrónico: activa el sistema de pago para matrículas extranjeras al cruzar la frontera.',
-      'A partir de 8 días de alquiler los kilómetros son ilimitados: ideal para alargar hasta el Alentejo.',
+      'Si quieres alargar hasta el Alentejo, cuéntanos la ruta: lo tenemos en cuenta en el kilometraje.',
       'En Portugal la pernocta fuera de áreas y campings está regulada: respeta las señales.',
     ],
   },

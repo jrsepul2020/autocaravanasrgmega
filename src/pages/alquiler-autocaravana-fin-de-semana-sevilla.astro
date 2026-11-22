@@ -5,8 +5,8 @@ import { faqsBy } from '../data/faqs';
 import { getVehicle } from '../data/vehicles';
 const cp = getVehicle('camper').prices, ml = getVehicle('mileo').prices;
 const faqs = [
-  { q: '¿Puedo alquilar una autocaravana solo para el fin de semana?', a: 'Sí. El alquiler mínimo es de 3 días, así que puedes recogerla el viernes y devolverla el domingo. Pacta con nosotros las horas de recogida y devolución.', tags: [] },
-  { q: '¿Cuánto cuesta un fin de semana en autocaravana desde Sevilla?', a: 'Depende del modelo y de la temporada: la Camper 120 UP en temporada baja es la opción más económica. Un fin de semana son 3 días e incluye 750 km, seguro y asistencia. Mira la tabla en Tarifas o calcula el precio exacto de tus fechas en el formulario.', tags: [] },
+  { q: '¿Puedo alquilar una autocaravana solo para el fin de semana?', a: 'Sí. Puedes recogerla el viernes y devolverla el domingo (2 días) o el lunes (3 días). Pacta con nosotros las horas de recogida y devolución.', tags: [] },
+  { q: '¿Cuánto cuesta un fin de semana en autocaravana desde Sevilla?', a: 'Tenemos tarifa especial de fin de semana, de viernes a domingo o de viernes a lunes, con seguro y asistencia incluidos; la Camper 120 UP es la opción más económica. Mira la tabla en Tarifas o calcula el precio exacto de tus fechas en el formulario.', tags: [] },
   ...faqsBy('finde', 6),
 ];
 ---
@@ -15,7 +15,7 @@ const faqs = [
   description={`Alquila una autocaravana o camper para el fin de semana en Sevilla: de viernes a domingo. Recogida el viernes, seguro incluido y mascotas gratis.`}
   h1="Alquiler de autocaravana para el fin de semana en Sevilla"
   eyebrow="Escapadas de fin de semana"
-  lead="Recoge el viernes, desconecta el sábado y vuelve el domingo. Alquiler mínimo de 3 días; la hora de entrega y devolución la pactamos contigo."
+  lead="Recoge el viernes, desconecta el sábado y vuelve el domingo. La hora de entrega y devolución la pactamos contigo."
   image={img}
   imageAlt="Camper de alquiler en un pueblo de Andalucía durante un fin de semana"
   crumb="Fin de semana"
@@ -24,9 +24,9 @@ const faqs = [
   bullets={['Recoge el viernes y devuelve el domingo', 'Entrega y devolución a la hora que pactemos', '750 km incluidos: de sobra para una escapada', 'Te explicamos todo en 20 minutos y a la carretera']}
 >
   <h2>Escapada de fin de semana en autocaravana desde Sevilla</h2>
-  <p>Una escapada de fin de semana es la mejor manera de probar el mundo de la autocaravana. Con nuestro <strong>alquiler mínimo de 3 días</strong> puedes recoger el vehículo el viernes por la mañana o a mediodía, dormir dos noches donde quieras y volver el domingo. La hora de devolución la acordamos contigo al reservar.</p>
+  <p>Una escapada de fin de semana es la mejor manera de probar el mundo de la autocaravana. Puedes recoger el vehículo el viernes por la mañana o a mediodía, dormir dos noches donde quieras y volver el domingo. La hora de devolución la acordamos contigo al reservar.</p>
   <h3>Precio del alquiler de autocaravana un fin de semana</h3>
-  <p>El precio depende del modelo y de la temporada; los fines de semana de puente y festivos se calculan con la <a href="/tarifas/">tarifa de temporada especial</a>. Usa el formulario para ver al momento el precio orientativo de tus fechas o echa un vistazo a las <a href="/ofertas-alquiler-autocaravana-sevilla/">ofertas activas</a>.</p>
+  <p>Tenemos <a href="/tarifas/">tarifa especial de fin de semana</a> (viernes a domingo y viernes a lunes), y los puentes tienen su propio precio cerrado. Usa el formulario para ver al momento el precio orientativo de tus fechas o echa un vistazo a las <a href="/ofertas-alquiler-autocaravana-sevilla/">ofertas activas</a>.</p>
   <h3>Ideas para un fin de semana en autocaravana</h3>
   <ul>
     <li><strong>Sierra de Aracena</strong> (1 h): pueblos como Alájar, Fuenteheridos y Aracena, jamón y castañares.</li>
@@ -35,6 +35,6 @@ const faqs = [
     <li><strong>Pueblos blancos</strong> (1 h 30): Grazalema, Zahara de la Sierra, Arcos y Setenil.</li>
   </ul>
   <h3>Un fin de semana de fútbol o de evento</h3>
-  <p>¿Partido del Sevilla o del Betis fuera de casa, o un fin de semana para ver al Real Madrid en el Santiago Bernabéu? La autocaravana es tu alojamiento y tu transporte. Y aunque el mínimo es de 3 días, para <a href="/alquiler-autocaravana-eventos-futbol-sevilla/">eventos especiales</a> nos adaptamos: consúltanos.</p>
+  <p>¿Partido del Sevilla o del Betis fuera de casa, o un fin de semana para ver al Real Madrid en el Santiago Bernabéu? La autocaravana es tu alojamiento y tu transporte. Y para <a href="/alquiler-autocaravana-eventos-futbol-sevilla/">eventos especiales</a> nos adaptamos: consúltanos.</p>
   <p>Más ideas en nuestras <a href="/rutas/">rutas en autocaravana desde Sevilla</a>. Los fines de semana se reservan rápido: <a href="/calendario-disponibilidad/">consulta la disponibilidad</a> y asegúrate tu fecha.</p>
 </LandingPage>

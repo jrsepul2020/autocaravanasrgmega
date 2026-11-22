@@ -1,42 +1,43 @@
 /**
  * ============================================================
- *  PRECIOS, OFERTAS Y FECHAS ESPECIALES DESDE GOOGLE SHEETS
+ *  PRECIOS, OFERTAS Y CONDICIONES DESDE GOOGLE SHEETS
  * ============================================================
- *
- *  1. Crea la hoja a partir de admin/plantilla-precios-rgmega.xlsx
- *     (pestañas: "Precios", "Ofertas", "Fechas especiales").
- *  2. Compartir → "Cualquier persona con el enlace" → Lector.
- *  3. Copia el ID de la URL de la hoja:
- *     https://docs.google.com/spreadsheets/d/  ESTE_ES_EL_ID  /edit
- *     y pégalo abajo en `sheetId`.
+ *  Pestañas: "Tarifas", "Tarifas especiales", "Condiciones", "Ofertas" y "Ajustes"
+ *  (la pestaña "CÓMO USAR" explica cada una). Las columnas se reconocen por su título.
+ *  Compartir → "Cualquier persona con el enlace" → Lector.
  *
  *  La web lee la hoja:
- *   - al compilar (los precios quedan escritos en el HTML para Google), y
+ *   - al compilar (los datos quedan escritos en el HTML para Google), y
  *   - en vivo en el navegador de cada visitante (los cambios se ven en
  *     unos minutos sin volver a subir la web).
- *  Si la hoja no responde, se usan los precios de vehicles.ts / site.ts.
+ *  Si la hoja no responde, se usan los valores de rates.ts / site.ts.
  */
+import type { Period, Pack, Condition, Rates, TierKey, VehicleId } from './rates';
+
 export const sheetId = '15ci4BIAbpV3NxUKtrd-QioHKiVRa55dwzitK-7Ho0TY';
 
-export const TABS = { precios: 'Precios', ofertas: 'Ofertas', fechas: 'Fechas especiales', portada: 'Portada' } as const;
+export const TABS = { tarifas: 'Tarifas', especiales: 'Tarifas especiales', condiciones: 'Condiciones', ofertas: 'Ofertas', ajustes: 'Ajustes' } as const;
 export type TabKey = keyof typeof TABS;
 
 export const csvUrl = (tab: TabKey) =>
   `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(TABS[tab])}`;
 
-export type SeasonKey = 'baja' | 'media' | 'alta' | 'especial';
-export type VehicleId = 'mileo' | 'camper';
+export type { VehicleId };
 export type Offer = { title: string; text: string; until: string; vehicle?: string; price?: number | null; antes?: number | null };
-/** Precio destacado de la portada. price null = automático (el más bajo del vehículo). */
-export type Hero = { vehicle: VehicleId; text: string; price: number | null };
 export type LiveData = {
-  prices: Partial<Record<VehicleId, Partial<Record<SeasonKey, { short: number; long: number }>>>>;
+  /** Partes de la tarifa leídas de la hoja (null = esa pestaña no respondió). */
+  rates: { periods: Period[] | null; packs: Pack[] | null; conditions: Condition[] | null };
   offers: Offer[] | null;
-  hero: Hero | null;
-  /** Pestaña Portada → "Mostrar precios desde" (SI/NO). null = sin dato. */
+  /** Pestaña Ajustes → "Mostrar precios desde" (SI/NO). null = sin dato. */
   showFrom: boolean | null;
-  special: { name: string; from: string; to: string }[] | null;
 };
+
+/** Mezcla la tarifa base con lo leído de la hoja. */
+export const mergeRates = (base: Rates, live: LiveData['rates'] | undefined): Rates => ({
+  periods: live?.periods ?? base.periods,
+  packs: live?.packs ?? base.packs,
+  conditions: live?.conditions ?? base.conditions,
+});
 
 /* ---------- CSV ---------- */
 export function parseCsv(text: string): string[][] {
@@ -81,10 +82,6 @@ export function toIso(s: string): string | null {
 }
 
 const vehicleOf = (s: string): VehicleId | null => (norm(s).includes('mileo') ? 'mileo' : norm(s).includes('camper') || norm(s).includes('120') ? 'camper' : null);
-const seasonOf = (s: string): SeasonKey | null => {
-  const n = norm(s);
-  return n.includes('baja') ? 'baja' : n.includes('media') ? 'media' : n.includes('alta') ? 'alta' : n.includes('especial') ? 'especial' : null;
-};
 const yes = (s: string) => ['si', 'sí', 'x', '1', 'true', 'verdadero', 'yes'].includes(norm(s));
 
 /** Texto de la etiqueta de precio de una oferta: "Camper 120 UP · desde 110 €/día" ('' si no tiene precio). */
@@ -118,15 +115,47 @@ function col(header: string[], any: string[], not: string[] = []) {
 }
 const at = (row: string[], i: number) => (i >= 0 ? row[i] ?? '' : '');
 
-/** Convierte el CSV de cada pestaña en datos. Ignora filas incompletas. Las cabeceras (fila 1) se saltan. */
+/** Convierte el CSV de cada pestaña en datos. Cada pestaña se valida por sus cabeceras
+ *  (si una pestaña no existe, Google devuelve la primera: así no se mezclan datos). */
 export function normalize(csv: Partial<Record<TabKey, string>>): LiveData {
-  const out: LiveData = { prices: {}, offers: null, special: null, hero: null, showFrom: null };
+  const out: LiveData = { rates: { periods: null, packs: null, conditions: null }, offers: null, showFrom: null };
 
-  if (csv.precios) {
-    for (const [veh, temp, short, long] of parseCsv(csv.precios).slice(1)) {
-      const v = vehicleOf(veh ?? ''), s = seasonOf(temp ?? ''), a = num(short ?? ''), b = num(long ?? '');
-      if (v && s && a) (out.prices[v] ??= {})[s] = { short: a, long: b ?? a };
+  if (csv.tarifas) {
+    const [h = [], ...rows] = parseCsv(csv.tarifas);
+    const c = { name: col(h, ['periodo']), from: col(h, ['desde']), to: col(h, ['hasta']), veh: col(h, ['vehiculo', 'modelo']) };
+    const tiers: [TierKey, number][] = [
+      ['d1', col(h, ['1 dia'])], ['d2', col(h, ['2 dias'])], ['d34', col(h, ['3–4', '3-4', '3 a 4'])],
+      ['d56', col(h, ['5–6', '5-6', '5 a 6'])], ['d7', col(h, ['7 dias', '7 o mas'])],
+    ];
+    if (c.name >= 0 && c.veh >= 0 && c.from >= 0 && c.to >= 0) {
+      const map = new Map<string, Period>();
+      for (const r of rows) {
+        const v = vehicleOf(at(r, c.veh)), from = toIso(at(r, c.from)), to = toIso(at(r, c.to));
+        if (!v || !from || !to) continue;
+        const key = `${from}|${to}`;
+        const p = map.get(key) ?? { name: at(r, c.name) || 'Tarifa', from, to, rates: {} };
+        p.rates[v] = Object.fromEntries(tiers.map(([k, i]) => [k, num(at(r, i))]).filter(([, n]) => n)) as Period['rates'][VehicleId];
+        map.set(key, p);
+      }
+      out.rates.periods = [...map.values()].sort((a, b) => a.from.localeCompare(b.from));
     }
+  }
+  if (csv.especiales) {
+    const [h = [], ...rows] = parseCsv(csv.especiales);
+    const c = { name: col(h, ['nombre']), from: col(h, ['desde']), to: col(h, ['hasta']), days: col(h, ['dias']), show: col(h, ['mostrar']), camper: col(h, ['camper']), mileo: col(h, ['mileo']) };
+    if (c.name >= 0 && c.days >= 0 && (c.camper >= 0 || c.mileo >= 0)) {
+      out.rates.packs = rows
+        .filter((r) => at(r, c.name) && (c.show < 0 || !at(r, c.show) || yes(at(r, c.show))))
+        .map((r) => ({
+          name: at(r, c.name), from: toIso(at(r, c.from)) ?? '', to: toIso(at(r, c.to)) ?? '', days: num(at(r, c.days)) ?? 1,
+          prices: Object.fromEntries([['camper', num(at(r, c.camper))], ['mileo', num(at(r, c.mileo))]].filter(([, n]) => n)),
+        }))
+        .filter((p) => Object.keys(p.prices).length);
+    }
+  }
+  if (csv.condiciones) {
+    const [h = [], ...rows] = parseCsv(csv.condiciones);
+    if (col(h, ['concepto']) === 0) out.rates.conditions = rows.filter((r) => r[0] && r[1]).map((r) => ({ k: r[0], v: r[1] }));
   }
   if (csv.ofertas) {
     const [h = [], ...rows] = parseCsv(csv.ofertas);
@@ -144,20 +173,11 @@ export function normalize(csv: Partial<Record<TabKey, string>>): LiveData {
         }));
     }
   }
-  if (csv.fechas) {
-    const list = parseCsv(csv.fechas).slice(1)
-      .map(([name, from, to]) => ({ name, from: toIso(from ?? ''), to: toIso(to ?? '') ?? toIso(from ?? '') }))
-      .filter((d): d is { name: string; from: string; to: string } => Boolean(d.name && d.from && d.to));
-    out.special = list.length ? list : null; // si la pestaña está vacía, se mantienen las fechas del código
-  }
-  if (csv.portada) {
-    const [h = [], row = []] = parseCsv(csv.portada);
-    const c = { veh: col(h, ['vehiculo', 'modelo']), text: col(h, ['texto']), price: col(h, ['precio'], ['texto', 'mostrar']), show: col(h, ['mostrar precio']) };
-    // Si la pestaña no existe, Google devuelve otra: solo la aceptamos si no tiene columnas de otras pestañas.
-    if (col(h, ['temporada', 'titulo']) < 0) {
-      const v = vehicleOf(at(row, c.veh));
-      if (c.veh >= 0 && c.text >= 0 && c.price >= 0 && v) out.hero = { vehicle: v, text: at(row, c.text), price: num(at(row, c.price)) };
-      if (c.show >= 0 && at(row, c.show)) out.showFrom = yes(at(row, c.show));
+  if (csv.ajustes) {
+    const [h = [], ...rows] = parseCsv(csv.ajustes);
+    if (col(h, ['ajuste']) === 0) {
+      const row = rows.find((r) => norm(r[0] ?? '').includes('mostrar precio'));
+      if (row?.[1]) out.showFrom = yes(row[1]);
     }
   }
   return out;

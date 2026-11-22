@@ -9,13 +9,17 @@ import QuoteForm from './QuoteForm.astro';
 import FaqList from './FaqList.astro';
 import Location from './Location.astro';
 import VehicleCard from './VehicleCard.astro';
-import { site, waLink, pricing } from '../data/site';
+import { site, waLink, display } from '../data/site';
+import { rates, condition } from '../data/rates';
 import { vehicles, fromPrice, type Vehicle } from '../data/vehicles';
 import type { Faq } from '../data/faqs';
 
 interface Props { vehicle: Vehicle; title: string; description: string; h1: string; faqs: Faq[] }
 const { vehicle: v, title, description, h1, faqs } = Astro.props;
 const other = vehicles.find((x) => x.id !== v.id)!;
+const tiersOf = rates.periods.flatMap((p) => Object.values(p.rates[v.id] ?? {})) as number[];
+const lowRate = tiersOf.length ? Math.min(...tiersOf) : undefined;
+const highRate = tiersOf.length ? Math.max(...tiersOf) : undefined;
 const product = {
   '@context': 'https://schema.org',
   '@type': 'Product',
@@ -24,15 +28,15 @@ const product = {
   category: v.type,
   image: new URL('/og-alquiler-autocaravanas-sevilla.jpg', site.url).href,
   description: v.tagline,
-  offers: {
+  ...(lowRate && display.showFrom ? { offers: {
     '@type': 'AggregateOffer',
     priceCurrency: 'EUR',
-    lowPrice: fromPrice(v),
-    highPrice: Math.max(...Object.values(v.prices).map((p) => p.short)),
-    offerCount: 8,
+    lowPrice: lowRate,
+    highPrice: highRate,
     availability: 'https://schema.org/InStock',
     seller: { '@id': `${site.url}/#negocio` },
-  },
+  } } : {}),
+
 };
 ---
 <Base title={title} description={description} schema={[product]} breadcrumbs={[{ name: `Alquiler ${v.short}`, url: v.slug }]}>
@@ -51,7 +55,7 @@ const product = {
         {v.keyFacts.map((f) => <li><small>{f.label}</small><strong>{f.value}</strong></li>)}
       </ul>
 
-      <p class="vp-tldr"><strong>En resumen:</strong> alquila la {v.name} ({v.type.toLowerCase()}) en Sevilla con recogida en Salteras, mínimo {pricing.minDays} días, seguro y asistencia 24 h incluidos y carnet B. Ideal para {v.idealFor.charAt(0).toLowerCase() + v.idealFor.slice(1)}.</p>
+      <p class="vp-tldr"><strong>En resumen:</strong> alquila la {v.name} ({v.type.toLowerCase()}) en Sevilla con recogida en Salteras, alquiler {condition(rates, 'minimo').replace(/\s*\(.*\)/, '').toLowerCase()} como mínimo, seguro y asistencia 24 h incluidos y carnet B. Ideal para {v.idealFor.charAt(0).toLowerCase() + v.idealFor.slice(1)}.</p>
 
       <div class="prose">
         <slot />
@@ -79,7 +83,7 @@ const product = {
     <aside class="vp-aside">
       <div class="vp-sticky">
         <div class="vp-price">
-          <p class="js-from"><small>Alquiler desde</small><strong><span data-from={v.id}>{fromPrice(v)}</span> €<span class="vp-unit">/día</span></strong></p>
+          {fromPrice(v) && <p class="js-from"><small>Alquiler desde</small><strong><span data-from={v.id}>{fromPrice(v)}</span> €<span class="vp-unit">/día</span></strong></p>}
           <div class="vp-note js-from"><PriceNote compact /></div>
           <a class="btn btn--wa" href={waLink(`Hola, me interesa alquilar la ${v.name}. ¿Tenéis disponibilidad para…?`)} target="_blank" rel="noopener"><Icon name="whatsapp" /> WhatsApp</a>
           <a class="btn btn--ghost" href={`tel:${site.phone}`}><Icon name="phone" /> {site.phoneDisplay}</a>

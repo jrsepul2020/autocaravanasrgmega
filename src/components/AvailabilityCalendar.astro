@@ -7,21 +7,18 @@
  * Se marca en rojo automáticamente. Los eventos con "DISPONIBLE" o "LIBRE" en el título se ignoran.
  *
  * - Muestra también los 3 meses anteriores con sus reservas (se puede navegar hacia atrás).
- * - Cada día lleva su precio orientativo según temporada (tarifa de 3 a 14 días).
- * - Los precios y fechas especiales se actualizan en vivo desde Google Sheets.
+ * - Cada día lleva su precio orientativo por día (tramo de 3–4 días del periodo).
+ * - Los días con tarifa especial (puentes, Navidad…) llevan una marca.
+ * - Las tarifas se actualizan en vivo desde Google Sheets (pestañas Tarifas y Tarifas especiales).
  * - summary: muestra el panel "Resumen de tu reserva" con el precio calculado.
  */
 import Icon from './Icon.astro';
-import { site, specialDates, pricing, seasons, priceDisclaimer } from '../data/site';
+import { site, priceDisclaimer } from '../data/site';
 import type { Vehicle } from '../data/vehicles';
 interface Props { vehicle: Vehicle; months?: number; summary?: boolean }
 const { vehicle, months = 2, summary = false } = Astro.props;
 const embed = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(vehicle.calendarId)}&ctz=Europe%2FMadrid&mode=MONTH&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&hl=es`;
-const data = JSON.stringify({
-  prices: vehicle.prices, special: specialDates, minDays: pricing.minDays,
-  seasons: Object.fromEntries(Object.entries(seasons).map(([k, v]) => [k, v.label.replace('Temporada ', '')])),
-  name: vehicle.name, short: vehicle.short, wa: site.whatsapp,
-});
+const data = JSON.stringify({ name: vehicle.name, short: vehicle.short, wa: site.whatsapp });
 ---
 <div class:list={['avc', { 'avc--summary': summary }]} data-cal={vehicle.calendarId} data-key={site.googleApiKey} data-months={months} data-model={vehicle.id} data-embed={embed} data-info={data}>
   <div class="avc__main">
@@ -36,7 +33,8 @@ const data = JSON.stringify({
       <span><i class="busy"></i> Reservado</span>
       <span><i class="past"></i> Pasado</span>
       <span><i class="sel"></i> Tu selección</span>
-      <span class="avc__legend-note">Precio por día orientativo (3 a 14 días)</span>
+      <span><i class="pk"></i> Tarifa especial</span>
+      <span class="avc__legend-note">Precio orientativo por día (alquiler de 3–4 días)</span>
     </div>
   </div>
 
@@ -71,7 +69,8 @@ const data = JSON.stringify({
 </div>
 
 <script>
-  import { estimate, parseDate, setSpecialDates } from '../scripts/pricing';
+  import { quote, dayRate, packsOn, condition, tierLabel, type VehicleId } from '../data/rates';
+  import { currentRates } from '../scripts/rates-client';
   type Range = [string, string];
   const pad = (n: number) => String(n).padStart(2, '0');
   const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -106,23 +105,11 @@ const data = JSON.stringify({
     let offset = 0;
     let busy: Range[] = [];
     let sel: string[] = [];
-    setSpecialDates(info.special);
-
-    // Precios y fechas especiales en vivo (Google Sheets)
-    const applyLive = (d: any) => {
-      if (!d) return;
-      if (d.prices?.[el.dataset.model!]) Object.assign(info.prices, d.prices[el.dataset.model!]);
-      if (d.special?.length) setSpecialDates(d.special);
-    };
-    applyLive((window as any).__rgLive);
-    window.addEventListener('rg:live', (e: any) => { applyLive(e.detail); render(); update(); });
+    const model = el.dataset.model as VehicleId;
+    // Tarifas en vivo (Google Sheets)
+    window.addEventListener('rg:live', () => { render(); update(); });
 
     const isBusy = (d: string) => busy.some(([a, b]) => d >= a && d <= b);
-    const dayPrice = (s: string) => {
-      const r = estimate(info.prices, parseDate(s)!, parseDate(s)!);
-      const k = Object.keys(r!.breakdown)[0];
-      return { price: info.prices[k].short as number, season: k };
-    };
 
     function render() {
       const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + offset);
@@ -142,12 +129,14 @@ const data = JSON.stringify({
           const s = iso(new Date(first.getFullYear(), first.getMonth(), d));
           const past = s < today;
           const b = isBusy(s);
-          const { price, season } = dayPrice(s);
+          const r = currentRates();
+          const price = dayRate(r, model, s);
+          const pk = packsOn(r, s).some((p) => p.prices[model]);
           const inSel = sel.length === 2 ? s >= sel[0] && s <= sel[1] : sel[0] === s;
           const edge = sel.length === 2 && (s === sel[0] || s === sel[1]);
-          const cls = [past ? 'past' : 'free', b ? 'busy' : '', inSel ? 'sel' : '', edge ? 'edge' : '', s === today ? 'today' : '', `s-${season}`].filter(Boolean).join(' ');
-          const label = `${d} de ${MONTHS[first.getMonth()]}${b ? ', reservado' : past ? ', pasado' : ', libre'}, ${price} € el día`;
-          html += `<button type="button" class="avc__d ${cls}" data-d="${s}" ${past || b ? 'disabled' : ''} aria-label="${label}"><b>${d}</b><small>${price}€</small></button>`;
+          const cls = [past ? 'past' : 'free', b ? 'busy' : '', inSel ? 'sel' : '', edge ? 'edge' : '', s === today ? 'today' : '', pk ? 'pk' : ''].filter(Boolean).join(' ');
+          const label = `${d} de ${MONTHS[first.getMonth()]}${b ? ', reservado' : past ? ', pasado' : ', libre'}${price ? `, ${price} € el día` : ''}${pk ? ', tarifa especial' : ''}`;
+          html += `<button type="button" class="avc__d ${cls}" data-d="${s}" ${past || b ? 'disabled' : ''} aria-label="${label}"><b>${d}</b><small>${price ? price + '€' : '·'}</small></button>`;
         }
         html += '</div></div>';
       }
@@ -171,9 +160,9 @@ const data = JSON.stringify({
       if (!hasSummary) {
         const pick = el.querySelector<HTMLElement>('.avc__pick')!;
         if (sel.length < 2) { pick.hidden = true; return; }
-        const r = estimate(info.prices, parseDate(sel[0])!, parseDate(sel[1])!)!;
+        const q = quote(currentRates(), model, sel[0], sel[1]);
         pick.hidden = false;
-        el.querySelector('[data-pick-text]')!.textContent = `${fmt(sel[0])} → ${fmt(sel[1])} · ${r.days} días · ${eur(r.total)} aprox.`;
+        el.querySelector('[data-pick-text]')!.textContent = `${fmt(sel[0])} → ${fmt(sel[1])} · ${q.days} ${q.days === 1 ? 'día' : 'días'} · ${q.ok ? eur(q.total) + ' aprox.' : 'pídenos precio'}`;
         return;
       }
 
@@ -198,14 +187,25 @@ const data = JSON.stringify({
         total.textContent = '0 €'; km.textContent = ''; warn.hidden = true;
         return;
       }
-      const r = estimate(info.prices, parseDate(sel[0])!, parseDate(sel[1])!)!;
-      dates.innerHTML = `<strong>${fmt(sel[0])}</strong> → <strong>${fmt(sel[1])}</strong><br><span class="avc__muted">${r.days} días de alquiler</span>`;
-      lines.innerHTML = Object.entries(r.breakdown).map(([k, x]: any) => `<li><span>${x.days} d × ${x.rate} € <em>(${info.seasons[k]})</em></span><span>${eur(x.days * x.rate)}</span></li>`).join('');
-      total.textContent = eur(r.total);
-      km.textContent = r.unlimitedKm ? 'Kilómetros ilimitados incluidos' : `${r.days * 250} km incluidos (250 km/día)`;
-      warn.hidden = !r.belowMin;
-      warn.textContent = `El mínimo general es de ${info.minDays} días; para eventos especiales, consúltanos.`;
-      wa.href = `https://wa.me/${info.wa}?text=${encodeURIComponent(`Hola, quiero reservar la ${info.name} del ${sel[0].split('-').reverse().join('/')} al ${sel[1].split('-').reverse().join('/')} (${r.days} días, ${eur(r.total)} aprox.). ¿Está disponible?`)}`;
+      const rr = currentRates();
+      const q = quote(rr, model, sel[0], sel[1]);
+      const n = `${q.days} ${q.days === 1 ? 'día' : 'días'}`;
+      dates.innerHTML = `<strong>${fmt(sel[0])}</strong> → <strong>${fmt(sel[1])}</strong><br><span class="avc__muted">${n} de alquiler (se cuentan noches)</span>`;
+      if (q.ok) {
+        lines.innerHTML = q.pack
+          ? `<li><span>${q.pack.name} <em>(precio cerrado)</em></span><span>${eur(q.total)}</span></li>`
+          : `<li><span>${n} × ${q.perDay} € <em>(tarifa ${tierLabel(q.tier)})</em></span><span>${eur(q.total)}</span></li>`;
+        total.textContent = eur(q.total);
+      } else {
+        lines.innerHTML = '<li><span>Aún no hay tarifa publicada para estas fechas</span><span>—</span></li>';
+        total.textContent = 'Consultar';
+      }
+      const kmTxt = condition(rr, 'kilometros'), exc = condition(rr, 'exceso');
+      km.textContent = [kmTxt, exc && `exceso ${exc}`].filter(Boolean).join(' · ');
+      const ov = q.ok ? q.overlapsPack : undefined;
+      warn.hidden = !ov;
+      warn.textContent = ov ? `Tus fechas coinciden con «${ov.name}», que tiene tarifa especial: pregúntanos.` : '';
+      wa.href = `https://wa.me/${info.wa}?text=${encodeURIComponent(`Hola, quiero reservar la ${info.name} del ${sel[0].split('-').reverse().join('/')} al ${sel[1].split('-').reverse().join('/')} (${n}${q.ok ? `, ${eur(q.total)} aprox.` : ''}). ¿Está disponible?`)}`;
     }
 
     box.addEventListener('click', (e) => {
@@ -266,13 +266,15 @@ const data = JSON.stringify({
   :global(.avc__d.past small) { color: #C3CAC6; font-weight: 500; }
   :global(.avc__d.past.busy) { background: #F6DADE; color: #C98A93; }
   :global(.avc__d.past.busy small) { color: #C98A93; }
+  :global(.avc__d.pk) { position: relative; }
+  :global(.avc__d.pk)::after { content: ''; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--terra); }
   :global(.avc__d.today) { box-shadow: inset 0 0 0 2px var(--terra); }
   :global(.avc__d.sel) { background: var(--pine) !important; color: #fff !important; box-shadow: none; }
   :global(.avc__d.sel small) { color: #fff !important; }
   :global(.avc__d.edge) { background: var(--forest) !important; }
   .avc__legend { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.1rem; font-size: .82rem; color: var(--muted); margin-top: 1rem; }
   .avc__legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: .3rem; }
-  .avc__legend .free { background: #E6F3EA; box-shadow: inset 0 0 0 1px #B7D8C3; } .avc__legend .busy { background: #e0475b; } .avc__legend .past { background: #fff; box-shadow: inset 0 0 0 1px #D5DBD8; } .avc__legend .sel { background: var(--forest); }
+  .avc__legend .free { background: #E6F3EA; box-shadow: inset 0 0 0 1px #B7D8C3; } .avc__legend .busy { background: #e0475b; } .avc__legend .past { background: #fff; box-shadow: inset 0 0 0 1px #D5DBD8; } .avc__legend .sel { background: var(--forest); } .avc__legend .pk { width: 8px; height: 8px; border-radius: 50%; background: var(--terra); vertical-align: 1px; }
   .avc__legend-note { margin-left: auto; font-style: italic; }
 
   /* Resumen */

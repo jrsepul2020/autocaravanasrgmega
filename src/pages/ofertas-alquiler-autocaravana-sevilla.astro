@@ -8,23 +8,23 @@ import { faqsBy } from '../data/faqs';
 const today = new Date().toISOString().slice(0, 10);
 const active = offers.filter((o) => o.until >= today);
 const faqs = [
-  { q: '¿Cuándo es más barato alquilar una autocaravana en Sevilla?', a: 'En temporada baja, de octubre a marzo (excepto Navidad, puentes y festivos), y todavía más si alquilas más de 14 días. La Camper 120 UP es nuestra opción más económica.', tags: [] },
-  { q: '¿Hay descuento por alquilar más días?', a: 'Sí. A partir de 15 días se aplica una tarifa reducida más baja por día y desde 8 días el kilometraje es ilimitado. Para un mes o más, pide presupuesto personalizado.', tags: [] },
+  { q: '¿Cuándo es más barato alquilar una autocaravana en Sevilla?', a: 'Cuantos más días alquilas, más barato sale cada día (la mejor tarifa es a partir de 7 días). La Camper 120 UP es nuestra opción más económica.', tags: [] },
+  { q: '¿Hay descuento por alquilar más días?', a: 'Sí. El precio por día baja a partir de 2, 3, 5 y 7 días de alquiler. Para un mes o más, pide presupuesto personalizado.', tags: [] },
   ...faqsBy('barata', 4),
 ];
 ---
 <LandingPage
   title="Ofertas Alquiler Autocaravanas Baratas en Sevilla | RG MEGA"
-  description="Ofertas de alquiler de autocaravanas baratas en Sevilla: descuentos por temporada y por estancias largas y km ilimitados. Todo incluido, sin sorpresas. Consulta las ofertas activas."
+  description="Ofertas de alquiler de autocaravanas baratas en Sevilla: precio por día más bajo cuantos más días alquilas y tarifas especiales de fin de semana. Todo incluido, sin sorpresas. Consulta las ofertas activas."
   h1="Ofertas de alquiler de autocaravanas baratas en Sevilla"
   eyebrow="Ofertas y precios bajos"
-  lead="Viajar en autocaravana no tiene por qué ser caro. Aprovecha la temporada baja y los descuentos por estancia larga."
+  lead="Viajar en autocaravana no tiene por qué ser caro. Cuantos más días, más barato sale cada día, y hay tarifas especiales de fin de semana."
   image={img}
   imageAlt="Autocaravana Benimar Mileo 268 en oferta de alquiler en Sevilla"
   crumb="Ofertas"
   faqs={faqs}
   waText="Hola, quiero información sobre las ofertas de alquiler de autocaravana"
-  bullets={['Precios más bajos de octubre a marzo', 'Kilómetros ilimitados a partir de 8 días', 'Tarifa reducida a partir de 15 días', 'Mascotas y parking gratis: sin extras ocultos']}
+  bullets={['El día sale más barato cuantos más días alquilas', 'Tarifas especiales de fin de semana y puentes', 'Precios orientativos: todo es negociable', 'Mascotas y parking gratis: sin extras ocultos']}
 >
   <div data-offers-wrap hidden={active.length === 0}>
     <h2>Ofertas activas</h2>
@@ -37,8 +37,8 @@ const faqs = [
   <p>Cuando comparas precios de <strong>alquiler de autocaravanas baratas en Sevilla</strong> fíjate en lo que incluye cada tarifa. Muchos precios "desde" no incluyen el seguro, el kit de cocina, la mesa y sillas, la limpieza o el suplemento por mascota. En RG MEGA <strong>todo eso está incluido</strong>, y además puedes dejar tu coche gratis en nuestro parking.</p>
   <h3>Cómo ahorrar en tu alquiler</h3>
   <ul>
-    <li><strong>Viaja en temporada baja</strong> (octubre a marzo): es cuando los precios son más bajos.</li>
-    <li><strong>Alarga el viaje</strong>: más de 7 días = km ilimitados; más de 14 días = tarifa reducida.</li>
+    <li><strong>Aprovecha las tarifas especiales</strong> de fin de semana y de puentes: tienen precio cerrado.</li>
+    <li><strong>Alarga el viaje</strong>: a partir de 7 días tienes el mejor precio por día.</li>
     <li><strong>Elige la Camper 120 UP</strong> si sois 2: es la más económica y gasta menos combustible.</li>
     <li><strong>Reserva pronto</strong>: con más de 30 días de antelación solo adelantas el 50 %.</li>
   </ul>

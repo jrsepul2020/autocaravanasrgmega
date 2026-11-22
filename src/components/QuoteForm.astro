@@ -5,12 +5,11 @@
  * - Envía por email (Web3Forms, si hay clave en site.ts) y siempre ofrece enviarlo por WhatsApp.
  */
 import Icon from './Icon.astro';
-import { site, seasons, priceDisclaimer, specialDates } from '../data/site';
+import { site, priceDisclaimer } from '../data/site';
 import { vehicles } from '../data/vehicles';
 
 interface Props { preselect?: 'mileo' | 'camper'; title?: string; compact?: boolean; id?: string }
 const { preselect, title = 'Consulta disponibilidad y precio', compact = false, id = 'presupuesto' } = Astro.props;
-const vehicleData = vehicles.map((v) => ({ id: v.id, name: v.name, prices: v.prices }));
 ---
 <form class:list={['qf', { 'qf--compact': compact }]} id={id} data-key={site.web3formsKey} data-wa={site.whatsapp} novalidate>
   <div class="qf__head">
@@ -59,19 +58,10 @@ const vehicleData = vehicles.map((v) => ({ id: v.id, name: v.name, prices: v.pri
   <p class="qf__msg" role="status"></p>
 </form>
 
-<script is:inline type="application/json" id="qf-data" set:html={JSON.stringify({ vehicles: vehicleData, seasons, special: specialDates })}></script>
-
 <script>
-  import { estimate, parseDate, setSpecialDates } from '../scripts/pricing';
-  const data = JSON.parse(document.getElementById('qf-data')!.textContent!);
-  setSpecialDates(data.special);
-  // Precios en vivo desde Google Sheets (scripts/live.ts)
-  const applyLive = (d: any) => {
-    if (!d) return;
-    for (const v of data.vehicles) if (d.prices?.[v.id]) Object.assign(v.prices, d.prices[v.id]);
-    setSpecialDates(d.special);
-  };
-  applyLive((window as any).__rgLive);
+  import { quote, condition, tierLabel, type VehicleId } from '../data/rates';
+  import { currentRates } from '../scripts/rates-client';
+  const NAMES: Record<string, string> = { mileo: 'Benimar Mileo 268', camper: 'Benimar Camper 120 UP' };
   const eur = (n: number) => n.toLocaleString('es-ES') + ' €';
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const isoToday = today.toISOString().slice(0, 10);
@@ -94,30 +84,36 @@ const vehicleData = vehicles.map((v) => ({ id: v.id, name: v.name, prices: v.pri
 
     function update() {
       if (from.value) to.min = from.value;
-      const a = parseDate(from.value), b = parseDate(to.value);
-      if (!a || !b || b < a) { est.hidden = true; lastText = ''; return; }
-      const v = data.vehicles.find((x: any) => x.id === model());
-      const r = estimate(v.prices, a, b);
-      if (!r) return;
+      if (!from.value || !to.value || to.value < from.value) { est.hidden = true; lastText = ''; return; }
+      const r = currentRates();
+      const q = quote(r, model() as VehicleId, from.value, to.value);
+      const n = `${q.days} ${q.days === 1 ? 'día' : 'días'}`;
+      const km = condition(r, 'kilometros');
       est.hidden = false;
-      const parts = Object.entries(r.breakdown).map(([k, x]: any) => `${x.days} d × ${x.rate} €/día (${data.seasons[k].label.replace('Temporada ', '')})`);
-      est.querySelector('[data-total]')!.textContent = eur(r.total);
-      est.querySelector('[data-detail]')!.textContent =
-        `${r.days} días · ${parts.join(' + ')} · ${r.unlimitedKm ? 'Km ilimitados' : '250 km/día incluidos'}` +
-        (r.belowMin ? ' · El mínimo general es de 3 días; para eventos especiales, consúltanos' : '');
-      lastText = `Precio orientativo: ${eur(r.total)} (${r.days} días)`;
+      if (!q.ok) {
+        est.querySelector('[data-total]')!.textContent = 'Consultar';
+        est.querySelector('[data-detail]')!.textContent = `${n} · Aún no hay tarifa publicada para estas fechas: te damos precio al momento.`;
+        lastText = `${n}, pido precio`;
+        return;
+      }
+      est.querySelector('[data-total]')!.textContent = eur(q.total);
+      est.querySelector('[data-detail]')!.textContent = [
+        q.pack ? `${q.pack.name} (precio cerrado)` : `${n} × ${q.perDay} €/día (tarifa ${tierLabel(q.tier)})`,
+        km,
+        q.overlapsPack ? `Coincide con «${q.overlapsPack.name}», que tiene tarifa especial: pregúntanos` : '',
+      ].filter(Boolean).join(' · ');
+      lastText = `Precio orientativo: ${eur(q.total)} (${n})`;
     }
     form.addEventListener('input', update);
-    window.addEventListener('rg:live', (e: any) => { applyLive(e.detail); update(); });
+    window.addEventListener('rg:live', update);
     update();
 
     function summary() {
       const fd = new FormData(form);
-      const v = data.vehicles.find((x: any) => x.id === model());
       const fmt = (s: string) => s ? s.split('-').reverse().join('/') : '¿?';
       return [
         `Hola, quiero consultar disponibilidad:`,
-        `🚐 Modelo: ${v.name}`,
+        `🚐 Modelo: ${NAMES[model()]}`,
         `📅 Del ${fmt(String(fd.get('salida') || ''))} al ${fmt(String(fd.get('llegada') || ''))}`,
         lastText && `💶 ${lastText}`,
         fd.get('nombre') && `👤 ${fd.get('nombre')}`,
@@ -140,7 +136,7 @@ const vehicleData = vehicles.map((v) => ({ id: v.id, name: v.name, prices: v.pri
       msg.textContent = 'Enviando…';
       const fd = new FormData(form);
       fd.append('access_key', key);
-      fd.append('subject', `Nueva consulta web – ${data.vehicles.find((x: any) => x.id === model()).name}`);
+      fd.append('subject', `Nueva consulta web – ${NAMES[model()]}`);
       fd.append('from_name', 'Web RG MEGA');
       fd.append('resumen', summary());
       try {

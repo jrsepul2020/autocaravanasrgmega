@@ -1,4 +1,5 @@
 ---
+import { rates, condition } from '../data/rates';
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { pricing } from '../data/site';
@@ -20,9 +21,9 @@ import { pricing } from '../data/site';
       </ul>
       <h2>Duración y kilometraje</h2>
       <ul>
-        <li>Alquiler mínimo: {pricing.minDays} días (para eventos especiales, <a href="/alquiler-autocaravana-eventos-futbol-sevilla/">consúltanos</a>).</li>
-        <li>{pricing.km.shortStay}. {pricing.km.longStay}.</li>
-        <li>Exceso de kilometraje: {pricing.km.excess}.</li>
+        <li>Alquiler mínimo: <span data-cond="minimo">{condition(rates, 'minimo')}</span>.</li>
+        <li>Kilómetros: <span data-cond="kilometros">{condition(rates, 'kilometros')}</span>; exceso: <span data-cond="exceso">{condition(rates, 'exceso')}</span>.</li>
+        <li>Fianza: <span data-cond="fianza">{condition(rates, 'fianza')}</span>.</li>
       </ul>
       <h2>Pago de la reserva</h2>
       <ul>{pricing.payment.map((p) => <li>{p}</li>)}</ul>

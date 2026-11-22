@@ -72,41 +72,10 @@ export const waLink = (text = 'Hola, quiero información sobre el alquiler de au
   `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(text)}`;
 
 /* ============================================================
- *  TARIFAS (€/día, IVA incluido). Mínimo 3 días.
+ *  TARIFAS: están en src/data/rates.ts (y en la hoja de Google).
+ *  Aquí solo quedan las condiciones de pago y cancelación.
  * ============================================================ */
-export type SeasonKey = 'baja' | 'media' | 'alta' | 'especial';
-
-export const seasons: Record<SeasonKey, { label: string; when: string; color: string }> = {
-  baja: {
-    label: 'Temporada baja',
-    when: 'De octubre a marzo (excepto Navidad, Gran Premio de Jerez, puentes y festivos)',
-    color: '#9DB8A9',
-  },
-  media: {
-    label: 'Temporada media',
-    when: 'Abril, mayo, del 1 al 15 de junio y del 16 al 30 de septiembre (excepto Semana Santa, Feria, Rocío, puentes y festivos)',
-    color: '#3C5F4D',
-  },
-  alta: {
-    label: 'Temporada alta',
-    when: 'Verano: julio y agosto (y segunda quincena de junio / primera de septiembre)',
-    color: '#1F4A38',
-  },
-  especial: {
-    label: 'Temporada especial',
-    when: 'Navidad, Semana Santa, Feria de Sevilla, Romería de El Rocío, Gran Premio de Jerez, puentes y festivos',
-    color: '#FAB02C',
-  },
-};
-
 export const pricing = {
-  minDays: 3,
-  longStayFrom: 15, // a partir de 15 días (más de 14) se aplica la tarifa larga
-  km: {
-    shortStay: '250 km/día (alquileres de 3 a 7 días)',
-    longStay: 'Kilómetros ilimitados en alquileres de más de 7 días',
-    excess: '0,40 €/km de exceso',
-  },
   payment: [
     'Reserva con más de 30 días de antelación: 50 % al reservar.',
     'Reserva con menos de 30 días de antelación: 100 % al reservar.',
@@ -156,17 +125,9 @@ export const offers: { title: string; text: string; until: string; vehicle?: str
   },
 ];
 
-/* ---------- Precio destacado de la portada (respaldo de la pestaña "Portada") ---------- */
-// price: null = automático (el precio más bajo de ese vehículo). text vacío = "<vehículo> desde".
-/** Interruptor de la hoja (pestaña Portada, "Mostrar precios desde"): false = se ocultan los "desde X €/día". */
+/** Interruptor de la hoja (pestaña Ajustes, "Mostrar precios desde"): false = se ocultan los "desde X €/día". */
 export const display = { showFrom: true };
-
-export const heroPrice: { vehicle: 'mileo' | 'camper'; text: string; price: number | null } = {
-  vehicle: 'camper',
-  text: '',
-  price: null,
-};
 
 /* ---------- Aviso que acompaña a todos los precios ---------- */
 export const priceDisclaimer =
-  'Precios orientativos. Consulta siempre nuestras ofertas especiales y promociones vigentes.';
+  'Precios orientativos con IVA. Todo es negociable: pregúntanos por tus fechas y por las ofertas vigentes.';

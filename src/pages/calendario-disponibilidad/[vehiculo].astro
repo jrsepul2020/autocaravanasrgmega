@@ -24,7 +24,7 @@ const kf = (re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value;
 ---
 <Base
   title={`Disponibilidad ${v.name} · Calendario y precio por día | RG MEGA Sevilla`}
-  description={`Calendario en tiempo real de la ${v.name} de alquiler en Sevilla: días libres y reservados, precio por día de cada temporada y presupuesto al momento.`}
+  description={`Calendario en tiempo real de la ${v.name} de alquiler en Sevilla: días libres y reservados, precio orientativo por día y presupuesto al momento.`}
   breadcrumbs={[{ name: 'Disponibilidad', url: '/calendario-disponibilidad/' }, { name: v.short, url: v.calSlug }]}
 >
   <section class="section" style="padding-top:2rem">
@@ -59,7 +59,7 @@ const kf = (re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value;
     <div class="container cv-split">
       <div>
         <h2>Precios por día de la {v.short}</h2>
-        <p>Tarifa de 3 a 14 días y tarifa reducida a partir de 15 días, según temporada.</p>
+        <p>Precio por día según los días de alquiler, más las tarifas especiales con precio cerrado.</p>
         <PriceTable only={v.id} />
       </div>
       <QuoteForm preselect={v.id} title={`Pide precio para la ${v.short}`} />

@@ -1,5 +1,5 @@
 import type { ImageMetadata } from 'astro';
-import type { SeasonKey } from './site';
+import { rates, fromRate, TIERS } from './rates';
 
 import mileoHero from '../assets/img/benimar-mileo-268-alquiler-sevilla.jpg';
 import mileoLateral from '../assets/img/mileo-268-lateral.jpg';
@@ -37,7 +37,6 @@ export type Vehicle = {
   idealFor: string;
   /** ID del Google Calendar de disponibilidad. Añade eventos ("Reservado") para marcar días ocupados. */
   calendarId: string;
-  prices: Record<SeasonKey, { short: number; long: number }>;
   hero: ImageMetadata;
   gallery: { src: ImageMetadata; alt: string }[];
   keyFacts: { label: string; value: string }[];
@@ -69,12 +68,6 @@ export const vehicles: Vehicle[] = [
     tagline: 'Autocaravana perfilada para 4 con camas gemelas, cama basculante y gran garaje',
     idealFor: 'Familias, dos parejas o quien busca máximo confort y espacio',
     calendarId: '235592fc8ab3959379d75357f22c526540195f14ecce48755c40dd889140119a@group.calendar.google.com',
-    prices: {
-      baja: { short: 150, long: 140 },
-      media: { short: 160, long: 150 },
-      especial: { short: 175, long: 165 },
-      alta: { short: 180, long: 170 },
-    },
     hero: mileoHero,
     gallery: [
       { src: mileoHero, alt: 'Autocaravana Benimar Mileo 268 de alquiler en Sevilla' },
@@ -142,12 +135,6 @@ export const vehicles: Vehicle[] = [
     tagline: 'Camper compacta de 6 m, fácil de conducir y aparcar, con baño, ducha y placa solar',
     idealFor: 'Parejas, escapadas de fin de semana y rutas por pueblos y ciudad',
     calendarId: 'f6f9f6470262a216a4f427c88590f67ea14e2085f12bb1443ce7095eec59d732@group.calendar.google.com',
-    prices: {
-      baja: { short: 120, long: 110 },
-      media: { short: 130, long: 120 },
-      especial: { short: 145, long: 130 },
-      alta: { short: 150, long: 135 },
-    },
     hero: camperHero,
     gallery: [
       { src: camperHero, alt: 'Camper Benimar 120 UP de alquiler en Sevilla recorriendo un pueblo andaluz' },
@@ -204,32 +191,23 @@ export const vehicles: Vehicle[] = [
 ];
 
 export const getVehicle = (id: Vehicle['id']) => vehicles.find((v) => v.id === id)!;
-export const fromPrice = (v: Vehicle) => Math.min(...Object.values(v.prices).map((p) => p.long));
+/** Precio "desde" (tramo 3–4 días de las tarifas vigentes). undefined si no hay tarifa cargada. */
+export const fromPrice = (v: Vehicle) => fromRate(rates, v.id);
 
 /**
  * Sustituye marcadores de precio en textos (títulos, descripciones, FAQ…)
  * por los precios actuales (los de Google Sheets si están configurados):
- *   {camper.desde} {mileo.desde} {all.desde}      precio "desde" (el más bajo)
- *   {camper.max} {all.max}                         precio/día más alto
- *   {camper.min}                                   precio/día más bajo de 3-14 días
- *   {mileo.media.short} {camper.baja.long}         precio de una temporada
- *   {camper.baja.x3} {mileo.media.x7} {mileo.alta.long.x15}   totales por días
+ *   {camper.desde} {mileo.desde} {all.desde}   precio "desde" (tramo 3–4 días)
+ *   {camper.max} {all.max}                      precio/día más alto (1 día)
+ *   {camper.min} {all.min}                      precio/día más bajo (7 días o más)
  */
 export function px(text: string): string {
-  const eur = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return text.replace(/\{(mileo|camper|all)\.([a-z]+)(?:\.([a-z]+))?(?:\.?x(\d+))?\}/g, (m, id, a, b, times) => {
+  return text.replace(/\{(mileo|camper|all)\.(desde|max|min)\}/g, (m, id, a) => {
     const list = id === 'all' ? vehicles : [getVehicle(id)];
-    const shorts = list.flatMap((v) => Object.values(v.prices).map((p) => p.short));
+    const all = rates.periods.flatMap((p) => list.flatMap((v) => TIERS.map((t) => p.rates[v.id]?.[t.key]).filter((n): n is number => !!n)));
     let n: number | undefined;
-    if (a === 'desde') n = Math.min(...list.map(fromPrice));
-    else if (a === 'max') n = Math.max(...shorts);
-    else if (a === 'min') n = Math.min(...shorts);
-    else if (id !== 'all') {
-      const p = (getVehicle(id).prices as any)[a];
-      const kind = b === 'long' ? 'long' : 'short';
-      if (p) n = p[kind];
-      if (n && times) n *= Number(times);
-    }
-    return n ? eur(n) : m;
+    if (a === 'desde') { const f = list.map(fromPrice).filter((x): x is number => !!x); n = f.length ? Math.min(...f) : undefined; }
+    else if (all.length) n = a === 'max' ? Math.max(...all) : Math.min(...all);
+    return n ? String(n) : m;
   });
 }

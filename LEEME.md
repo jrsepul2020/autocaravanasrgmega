@@ -22,36 +22,38 @@ Todo lo editable está en **`src/data/`**:
 | Qué cambiar | Archivo |
 |---|---|
 | Teléfono, email, horario, dirección, redes | `src/data/site.ts` |
-| **Precios** por temporada | **Google Sheets** (ver abajo). Valores de respaldo: `src/data/vehicles.ts` |
-| Fechas de temporada especial (puentes, Navidad, Feria, Rocío…) | **Google Sheets**. Respaldo: `src/data/site.ts` → `specialDates` |
+| **Tarifas** por tramos de días, tarifas especiales y condiciones | **Google Sheets** (ver abajo). Valores de respaldo: `src/data/rates.ts` |
 | Ofertas del banner | **Google Sheets**. Respaldo: `src/data/site.ts` → `offers` |
 | Preguntas frecuentes | `src/data/faqs.ts` |
 | Rutas | `src/data/rutas.ts` |
 
-### Precios, ofertas y fechas especiales (Google Sheets)
-Se gestionan desde una hoja de Google, **sin tocar código ni volver a subir la web**.
+### Tarifas, ofertas y condiciones (Google Sheets)
+Se gestionan desde una hoja de Google, **sin tocar código ni volver a subir la web**. La primera pestaña de la hoja, **CÓMO USAR**, lo explica todo.
 
-**Puesta en marcha (una sola vez)**
-1. Sube `admin/plantilla-precios-rgmega.xlsx` a Google Drive → clic derecho → *Abrir con → Hojas de cálculo de Google* → *Archivo → Guardar como Hojas de cálculo de Google*.
-2. Comprueba que las pestañas se llaman exactamente **Portada**, **Ofertas**, **Precios** y **Fechas especiales** (las columnas se reconocen por su título, puedes reordenarlas).
-3. *Compartir* → Acceso general: **Cualquier persona con el enlace** → **Lector**.
-4. Copia el ID de la URL (`https://docs.google.com/spreadsheets/d/`**ESTE_ID**`/edit`) y pégalo en `src/data/sheet.ts` → `sheetId`. Después `npm run build` y sube `dist/`.
+Hoja: https://docs.google.com/spreadsheets/d/15ci4BIAbpV3NxUKtrd-QioHKiVRa55dwzitK-7Ho0TY/edit
+(compartida como *Cualquier persona con el enlace → Lector*; el ID está en `src/data/sheet.ts` → `sheetId`).
 
-Hoja actual: https://docs.google.com/spreadsheets/d/15ci4BIAbpV3NxUKtrd-QioHKiVRa55dwzitK-7Ho0TY/edit
+**Pestañas**
+- **Tarifas**: una fila por vehículo y periodo (Periodo, Desde, Hasta, Vehículo y el precio por día de 1 día, 2 días, 3–4 días, 5–6 días y 7 días o más). Para cambiar de tarifas, añade un periodo nuevo con sus fechas. El "desde" de la web es el precio de 3–4 días.
+- **Tarifas especiales**: precio total cerrado. Con fechas (puentes, Navidad, Fin de Año) se aplica si el cliente elige justo esas fechas y esos días salen marcados en el calendario; sin fechas (escapadas de fin de semana) sale como ejemplo de precio. `Mostrar` = SI/NO.
+- **Condiciones**: kilómetros, exceso, mínimo, fianza… El texto de la columna B sale tal cual en la web (tarifas, calculadora, datos clave, condiciones).
+- **Ofertas**: una fila por banner (portada y página de Ofertas). `SI` para mostrarla; caducan solas al pasar "Válida hasta". **Precio antes €/día (opcional)** sale tachado con el sello de % de descuento; si está vacío, se compara con el precio "desde" del vehículo. El sello solo aparece con un descuento del 5 % o más. Por ley, el "precio antes" debe ser el más bajo aplicado en los 30 días previos.
+- **Ajustes**: **Mostrar precios desde** (SI/NO). Con `NO` se ocultan los "Alquiler desde X €/día" de las fichas (en vivo) y, al volver a publicar, la pregunta "¿Cuánto cuesta…?" y el dato "Precio" de los datos clave pasan a texto sin cifras.
+- Las pestañas **ANTIGUO …** ya no se usan; puedes borrarlas.
 
-**Uso diario**
-- **Portada**: casilla **D2 "Mostrar precios desde (SI/NO)"**. Con `NO` se ocultan los "Alquiler desde X €/día" de las fichas (en vivo, en unos minutos) y, al volver a publicar la web, la pregunta "¿Cuánto cuesta…?" y el dato "Precio" de los datos clave pasan a texto sin cifras. Las ofertas, la página de Tarifas y los precios del calendario se ven siempre. Las columnas A-C ya no se usan: la portada muestra las dos autocaravanas.
+**Cómo calcula la web**
+- Los días se cuentan por noches: viernes a domingo = 2 días.
+- Precio = precio por día del tramo × días, según el periodo en el que empieza el alquiler. Si las fechas coinciden justo con una tarifa especial, se usa su precio cerrado; si solo se solapan, se avisa de que hay tarifa especial.
+- Si la fecha no está en ningún periodo, la web no calcula precio y pide que os consulten.
+- Todos los precios se muestran como orientativos y negociables.
 
-**Dónde salen precios en la web**: Tarifas (tabla completa), fichas de cada vehículo (caja de precio y tabla), calendario (precio por día y resumen) y ofertas. Todos se actualizan en vivo desde la hoja. Los textos de Google (títulos y descripciones) no llevan precios a propósito, para que nunca muestren uno antiguo.
-- **Ofertas**: una fila por mini banner (portada y página de Ofertas). `SI` para mostrarla, `NO` para ocultarla; caducan solas al pasar "Válida hasta". Las columnas **Vehículo** y **Precio desde €/día** dan la foto del vehículo y el precio grande en rojo. **Precio antes €/día (opcional)** sale tachado con el sello de % de descuento; si lo dejas vacío, se compara con la tarifa habitual más baja de ese vehículo. El sello solo aparece si el descuento es de un 5 % o más, y "Quedan X días" sale cuando faltan 30 días o menos para "Válida hasta". No escribas el precio dentro del texto. Por ley, el "precio antes" debe ser el más bajo que hayas aplicado en los 30 días previos a la rebaja.
-- **Precios**: cambia solo los números (€/día) de las columnas C (3-14 días) y D (15 días o más). No cambies los nombres de vehículo ni de temporada.
-- **Fechas especiales**: nombre, desde y hasta (dd/mm/aaaa, ambos días incluidos). Esos días se cobran a tarifa de temporada especial en el calculador.
-- Los cambios se ven en la web en **unos 5 minutos** (precios de tablas, "desde", tarjetas, ficha de cada vehículo, ofertas, fechas especiales y el calculador del formulario).
-- No mezcles texto y números/fechas en una misma columna (Google descarta los valores que no encajan).
+**Dónde salen precios**: Tarifas (tablas y tarifas especiales), fichas de cada vehículo (caja de precio y tabla), calendario (precio por día y resumen) y ofertas. Se actualizan en vivo (unos 5 minutos). Los títulos y descripciones de Google no llevan precios a propósito.
 
-**Para Google (SEO)**: los títulos, descripciones, preguntas frecuentes y datos estructurados se escriben con los precios de la hoja **al compilar**. Si cambias mucho los precios, haz `npm run build` y vuelve a subir `dist/` cuando puedas para que Google vea los nuevos (los visitantes ya los ven al momento).
+**Para Google (SEO)**: la FAQ de precio, los datos clave, `llms.txt` y los datos estructurados se escriben con la hoja **al compilar**. Cuando cambies las tarifas, vuelve a publicar la web (subir a GitHub y `dist/` a Nominalia) para que Google vea los nuevos precios.
 
-Si la hoja no responde o se deja de compartir, la web usa automáticamente los precios guardados en el código.
+Si la hoja no responde, la web usa las tarifas guardadas en `src/data/rates.ts`.
+
+`admin/plantilla-precios-rgmega.xlsx` es la plantilla antigua (por temporadas) y ya no sirve.
 
 ### Carrusel de fotos
 Sube las fotos a **`src/assets/carrusel/`** (jpg, png o webp, idealmente horizontales y de al menos 1600 px de ancho). La web las comprime y convierte a WebP sola.

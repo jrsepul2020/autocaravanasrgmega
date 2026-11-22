@@ -8,19 +8,19 @@ export const faqs: Faq[] = [
     // Única respuesta con cifras de precio en las preguntas frecuentes. Con el interruptor "Mostrar precios desde" en NO, sin cifras.
     get a() {
       return display.showFrom
-        ? 'En RG MEGA la Camper 120 UP cuesta desde {camper.desde} €/día y la Benimar Mileo 268 desde {mileo.desde} €/día (temporada baja, más de 14 días). En temporada media y alta el precio va de {camper.media.short} a {all.max} €/día según modelo y duración. El seguro, la asistencia 24 h y todo el equipamiento están incluidos. Son precios orientativos: pregúntanos siempre por ofertas especiales y promociones.'
-        : 'Depende del modelo, la temporada y la duración del viaje: la Camper 120 UP es la opción más económica y la temporada baja (de octubre a marzo, salvo festivos) la más barata. El seguro, la asistencia 24 h y todo el equipamiento están incluidos. Tienes la tabla completa en Tarifas y el precio exacto de tus fechas en el formulario.';
+        ? 'En RG MEGA la Camper 120 UP cuesta desde {camper.desde} €/día y la Benimar Mileo 268 desde {mileo.desde} €/día en alquileres de 3–4 días; cuantos más días, más barato sale el día. Puentes, Navidad y Fin de Año tienen tarifa especial. El seguro, la asistencia 24 h y el equipamiento están incluidos. Son precios orientativos y todo es negociable: pregúntanos por tus fechas.'
+        : 'Depende del modelo y de los días de alquiler: cuantos más días, más barato sale el día, y la Camper 120 UP es la opción más económica. El seguro, la asistencia 24 h y el equipamiento están incluidos. Son precios orientativos y negociables: pregúntanos por tus fechas.';
     },
     tags: ['precio', 'home', 'barata'],
   },
   {
     q: '¿Cuál es el alquiler mínimo?',
-    a: 'El alquiler mínimo general es de 3 días, así un fin de semana (viernes a domingo) o un puente encajan perfectamente. Para eventos especiales (un partido del Sevilla o del Betis, ver al Real Madrid en el Bernabéu, un concierto…) consúltanos: nos adaptamos.',
+    a: 'Puedes alquilarla desde 1 día (sujeto a disponibilidad). Lo más habitual es un fin de semana (viernes a domingo, 2 días), un puente o una semana. Para eventos especiales (un partido del Sevilla o del Betis, ver al Real Madrid en el Bernabéu, un concierto…) consúltanos: nos adaptamos.',
     tags: ['precio', 'finde', 'puente', 'home'],
   },
   {
     q: '¿Puedo alquilar una autocaravana para ir al fútbol o a un evento?',
-    a: 'Sí. Es un plan cada vez más habitual: partidos del Sevilla FC o del Real Betis fuera de casa, un fin de semana para ver al Real Madrid en el Santiago Bernabéu, conciertos, el Gran Premio de Jerez o El Rocío. Aunque el mínimo general es de 3 días, para eventos especiales estudiamos cada caso.',
+    a: 'Sí. Es un plan cada vez más habitual: partidos del Sevilla FC o del Real Betis fuera de casa, un fin de semana para ver al Real Madrid en el Santiago Bernabéu, conciertos, el Gran Premio de Jerez o El Rocío. Se puede alquilar desde 1 día (sujeto a disponibilidad), así que encaja incluso para un partido.',
     tags: ['home', 'finde', 'eventos'],
   },
   {
@@ -45,7 +45,7 @@ export const faqs: Faq[] = [
   },
   {
     q: '¿Cuántos kilómetros están incluidos?',
-    a: 'En alquileres de 3 a 7 días se incluyen 250 km/día (el exceso se cobra a 0,40 €/km). En alquileres de más de 7 días el kilometraje es ilimitado.',
+    a: 'El alquiler incluye hasta 250 km de viaje; a partir de ahí, el exceso se cobra a 0,40 €/km. Si tienes pensada una ruta larga, cuéntanosla y lo ajustamos.',
     tags: ['precio', 'finde', 'puente'],
   },
   {
@@ -85,7 +85,7 @@ export const faqs: Faq[] = [
   },
   {
     q: '¿Alquiláis autocaravanas por meses o a largo plazo?',
-    a: 'Sí. A partir de 15 días se aplica una tarifa reducida y el kilometraje es ilimitado. Para alquileres de un mes o más, pídenos presupuesto personalizado.',
+    a: 'Sí. A partir de 7 días se aplica nuestra tarifa más baja por día, y para alquileres de un mes o más te hacemos un presupuesto personalizado.',
     tags: ['precio', 'barata'],
   },
   {
