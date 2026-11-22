@@ -65,7 +65,7 @@ const escapadas = [
   </div>
 
   <div class="container ftr__legal">
-    <p>© {year} RG MEGA Autocaravanas · Alquiler de autocaravanas en Sevilla</p>
+    <p>© {year} RG MEGA Autocaravanas · Alquiler de autocaravanas en Sevilla · Actualizado: <time datetime={new Date().toISOString().slice(0, 10)}>{new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</time></p>
     <nav aria-label="Legal">
       <a href="/aviso-legal/">Aviso legal</a>
       <a href="/politica-de-privacidad/">Privacidad</a>

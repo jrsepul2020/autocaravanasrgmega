@@ -75,7 +75,17 @@ const crumbsSchema = breadcrumbs && {
     '@type': 'ListItem', position: i + 1, name: b.name, item: new URL(b.url, site.url).href,
   })),
 };
-const allSchema = [business, ...(crumbsSchema ? [crumbsSchema] : []), ...schema];
+const buildDate = new Date().toISOString().slice(0, 10);
+const webSite = {
+  '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${site.url}/#web`,
+  url: site.url + '/', name: site.gbp.name, inLanguage: 'es-ES', publisher: { '@id': `${site.url}/#negocio` },
+};
+const webPage = {
+  '@context': 'https://schema.org', '@type': 'WebPage', '@id': `${canonical}#pagina`,
+  url: canonical, name: title, description, inLanguage: 'es-ES', dateModified: buildDate,
+  isPartOf: { '@id': `${site.url}/#web` }, about: { '@id': `${site.url}/#negocio` },
+};
+const allSchema = [business, webSite, webPage, ...(crumbsSchema ? [crumbsSchema] : []), ...schema];
 ---
 <!doctype html>
 <html lang="es">
@@ -100,6 +110,9 @@ const allSchema = [business, ...(crumbsSchema ? [crumbsSchema] : []), ...schema]
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="geo.region" content="ES-SE" />
   <meta name="geo.placename" content="Salteras, Sevilla" />
+  <meta name="geo.position" content={`${site.gbp.lat};${site.gbp.lng}`} />
+  <meta property="og:updated_time" content={buildDate} />
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="Resumen para asistentes de IA" />
   {allSchema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
 </head>
 <body>

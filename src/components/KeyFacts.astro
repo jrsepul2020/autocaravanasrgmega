@@ -1,0 +1,36 @@
+---
+/** "Datos clave": resumen citable para personas y buscadores con IA. */
+import Icon from './Icon.astro';
+import { keyFacts } from '../data/facts';
+interface Props { title?: string; only?: string[] }
+const { title = 'RG MEGA en 30 segundos', only } = Astro.props;
+const icons: Record<string, string> = { Qué: 'key', Dónde: 'pin', Precio: 'euro', Mínimo: 'calendar', Kilómetros: 'route', Incluido: 'shield', Requisitos: 'users', Horario: 'clock', Contacto: 'phone' };
+const facts = keyFacts().filter((f) => !only || only.includes(f.k));
+const updated = new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+---
+<section class="kf" aria-labelledby="kf-t">
+  <div class="kf__head">
+    <h2 id="kf-t">{title}</h2>
+    <p>Datos actualizados en <time datetime={new Date().toISOString().slice(0, 10)}>{updated}</time></p>
+  </div>
+  <dl class="kf__list">
+    {facts.map((f) => (
+      <div class="kf__item">
+        <dt><Icon name={icons[f.k] ?? 'check'} /> {f.k}</dt>
+        <dd>{f.v}</dd>
+      </div>
+    ))}
+  </dl>
+</section>
+<style>
+  .kf { background: #fff; border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line), var(--shadow); padding: clamp(1.3rem, 3vw, 2rem); }
+  .kf__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3rem 1.5rem; margin-bottom: 1.2rem; }
+  .kf__head h2 { margin: 0; font-size: clamp(1.4rem, 2.6vw, 1.8rem); }
+  .kf__head p { margin: 0; font-size: .85rem; color: var(--muted); }
+  .kf__list { margin: 0; display: grid; }
+  .kf__item { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: .8rem; padding: .75rem 0; border-top: 1px solid var(--line); }
+  dt { display: flex; align-items: flex-start; padding-top: .1rem; gap: .45rem; font-weight: 700; color: var(--forest); font-size: .92rem; }
+  dt :global(svg) { width: 18px; height: 18px; color: var(--terra); flex: none; }
+  dd { margin: 0; font-size: .93rem; color: var(--ink); }
+  @media (max-width: 480px) { .kf__item { grid-template-columns: minmax(0, 1fr); gap: .2rem; } }
+</style>

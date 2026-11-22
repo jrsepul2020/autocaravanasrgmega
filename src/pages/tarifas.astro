@@ -4,6 +4,7 @@ import PriceTable from '../components/PriceTable.astro';
 import QuoteForm from '../components/QuoteForm.astro';
 import FaqList from '../components/FaqList.astro';
 import CtaBand from '../components/CtaBand.astro';
+import KeyFacts from '../components/KeyFacts.astro';
 import { faqsBy } from '../data/faqs';
 import { specialDates } from '../data/site';
 import { px } from '../data/vehicles';
@@ -52,6 +53,9 @@ const fmt = (s: string) => new Date(s + 'T12:00:00').toLocaleDateString('es-ES',
     </div>
   </section>
 
+  <section class="section">
+    <div class="narrow"><KeyFacts title="Tarifas y condiciones en resumen" only={['Precio', 'Mínimo', 'Kilómetros', 'Incluido', 'Requisitos', 'Horario']} /></div>
+  </section>
   <section class="section">
     <div class="narrow prose">
       <h2>Alquilar una autocaravana en Sevilla con RG MEGA</h2>

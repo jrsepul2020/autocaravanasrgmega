@@ -2,6 +2,7 @@
 import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import KeyFacts from '../components/KeyFacts.astro';
 import Reviews from '../components/Reviews.astro';
 import FaqList from '../components/FaqList.astro';
 import Location from '../components/Location.astro';
@@ -265,6 +266,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   <!-- DUDAS -->
   <section class="section">
     <div class="narrow">
+      <div class="kf-wrap"><KeyFacts /></div>
       <div class="section-head">
         <h2>Dudas frecuentes</h2>
         <p class="lead">Lo que más nos preguntáis antes de reservar.</p>
@@ -440,6 +442,7 @@ const destinos = rutas.filter((r) => destinoImg[r.slug]).map((r) => ({ ...destin
   .reviews__stars { display: inline-flex; gap: 2px; color: var(--terra); }
   .reviews__stars :global(svg) { width: 18px; height: 18px; }
 
+  .kf-wrap { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
   .more { margin: 1.4rem 0 0; }
   .more a { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--forest); text-decoration: none; }
   .more a:hover { text-decoration: underline; }

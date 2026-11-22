@@ -9,7 +9,7 @@ import QuoteForm from './QuoteForm.astro';
 import FaqList from './FaqList.astro';
 import Location from './Location.astro';
 import VehicleCard from './VehicleCard.astro';
-import { site, waLink } from '../data/site';
+import { site, waLink, pricing } from '../data/site';
 import { vehicles, fromPrice, type Vehicle } from '../data/vehicles';
 import type { Faq } from '../data/faqs';
 
@@ -50,6 +50,8 @@ const product = {
       <ul class="vp-facts">
         {v.keyFacts.map((f) => <li><small>{f.label}</small><strong>{f.value}</strong></li>)}
       </ul>
+
+      <p class="vp-tldr"><strong>En resumen:</strong> alquila la {v.name} ({v.type.toLowerCase()}) en Sevilla desde <span data-from={v.id}>{fromPrice(v)}</span> €/día, con recogida en Salteras, mínimo {pricing.minDays} días, seguro y asistencia 24 h incluidos y carnet B. Ideal para {v.idealFor.charAt(0).toLowerCase() + v.idealFor.slice(1)}.</p>
 
       <div class="prose">
         <slot />
@@ -108,6 +110,8 @@ const product = {
   .vp-hero__head .lead { margin: 0; }
   .vp-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 3rem; padding-bottom: 4rem; }
   .vp-content h2 { margin-top: 2.6rem; }
+  .vp-tldr { margin: 0 0 1.6rem; padding: 1rem 1.2rem; background: var(--sand); border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); font-size: 1rem; }
+  .vp-tldr strong { color: var(--forest); }
   .vp-facts { list-style: none; padding: 0; margin: 0 0 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .6rem; }
   .vp-facts li { background: var(--pine-dark); border-radius: 12px; padding: .75rem .95rem; display: grid; }
   .vp-facts small { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--on-dark); }
