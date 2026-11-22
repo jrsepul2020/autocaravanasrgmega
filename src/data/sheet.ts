@@ -26,7 +26,7 @@ export const csvUrl = (tab: TabKey) =>
 
 export type SeasonKey = 'baja' | 'media' | 'alta' | 'especial';
 export type VehicleId = 'mileo' | 'camper';
-export type Offer = { title: string; text: string; until: string; vehicle?: string; price?: number | null };
+export type Offer = { title: string; text: string; until: string; vehicle?: string; price?: number | null; antes?: number | null };
 /** Precio destacado de la portada. price null = automático (el más bajo del vehículo). */
 export type Hero = { vehicle: VehicleId; text: string; price: number | null };
 export type LiveData = {
@@ -89,6 +89,27 @@ const yes = (s: string) => ['si', 'sí', 'x', '1', 'true', 'verdadero', 'yes'].i
 export const offerPriceLabel = (o: { vehicle?: string; price?: number | null }) =>
   o.price ? `${o.vehicle ? o.vehicle + ' · ' : ''}desde ${o.price} €/día` : '';
 
+/**
+ * Rebaja de una oferta: precio de referencia tachado y % de descuento.
+ * Referencia = "Precio antes" de la hoja o, si está vacío, la tarifa habitual más baja del vehículo.
+ * Solo hay rebaja si el descuento es de un 5 % o más (si no, no se muestra tachado ni %).
+ */
+export function offerDeal(price?: number | null, antes?: number | null, base?: number | null) {
+  const ref = antes || base || 0;
+  if (!price || !ref || ref <= price) return null;
+  const pct = Math.round((1 - price / ref) * 100);
+  return pct >= 5 ? { antes: ref, pct } : null;
+}
+
+/** "Quedan 9 días" si la oferta caduca en 30 días o menos ('' si no). */
+export function offerLeft(until: string, today = new Date()) {
+  if (!until || until >= '2999') return '';
+  const d = Math.ceil((new Date(until + 'T23:59:59').getTime() - today.getTime()) / 86400000);
+  return d < 0 || d > 30 ? '' : d <= 1 ? '¡Último día!' : `Quedan ${d} días`;
+}
+
+export const offerVehicleId = (label?: string): VehicleId => (norm(label || '').includes('mileo') ? 'mileo' : 'camper');
+
 /** Busca la columna cuya cabecera contiene alguna palabra de `any` y ninguna de `not`. */
 function col(header: string[], any: string[], not: string[] = []) {
   return header.findIndex((h) => { const n = norm(h); return any.some((w) => n.includes(w)) && !not.some((w) => n.includes(w)); });
@@ -109,14 +130,15 @@ export function normalize(csv: Partial<Record<TabKey, string>>): LiveData {
     const [h = [], ...rows] = parseCsv(csv.ofertas);
     const c = {
       show: col(h, ['mostrar']), title: col(h, ['titulo']), text: col(h, ['texto']),
-      veh: col(h, ['vehiculo', 'modelo']), price: col(h, ['precio'], ['texto']), until: col(h, ['hasta', 'valida', 'caduca']),
+      veh: col(h, ['vehiculo', 'modelo']), price: col(h, ['precio'], ['texto', 'antes']), until: col(h, ['hasta', 'valida', 'caduca']),
+      antes: col(h, ['antes', 'tachado']),
     };
     if (c.show >= 0 && c.title >= 0) {
       out.offers = rows
         .filter((r) => yes(at(r, c.show)) && at(r, c.title))
         .map((r) => ({
           title: at(r, c.title), text: at(r, c.text), until: toIso(at(r, c.until)) ?? '2999-12-31',
-          vehicle: at(r, c.veh), price: num(at(r, c.price)),
+          vehicle: at(r, c.veh), price: num(at(r, c.price)), antes: num(at(r, c.antes)),
         }));
     }
   }

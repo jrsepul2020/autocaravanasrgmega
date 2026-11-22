@@ -2,7 +2,8 @@
 import LandingPage from '../components/LandingPage.astro';
 import img from '../assets/img/mileo-268-lateral.jpg';
 import { offers } from '../data/site';
-import { offerPriceLabel } from '../data/sheet';
+import OfferCard from '../components/OfferCard.astro';
+import { vehicles, fromPrice } from '../data/vehicles';
 import { faqsBy } from '../data/faqs';
 const today = new Date().toISOString().slice(0, 10);
 const active = offers.filter((o) => o.until >= today);
@@ -27,9 +28,9 @@ const faqs = [
 >
   <div data-offers-wrap hidden={active.length === 0}>
     <h2>Ofertas activas</h2>
-    <div data-offers>
-      <template><div class="offer-box"><strong data-f="title"></strong><p data-f="text"></p><em class="offer-price" data-f="price"></em></div></template>
-      {active.map((o) => <div class="offer-box"><strong>{o.title}</strong><p>{o.text}</p><em class="offer-price" hidden={!o.price}>{offerPriceLabel(o)}</em></div>)}
+    <div class="offer-list" data-offers data-base={JSON.stringify(Object.fromEntries(vehicles.map((v) => [v.id, fromPrice(v)])))}>
+      <template><OfferCard /></template>
+      {active.map((o) => <OfferCard o={o} />)}
     </div>
   </div>
   <h2>Alquiler de autocaravana barato, pero sin sorpresas</h2>
@@ -44,10 +45,5 @@ const faqs = [
   <p>Consulta la <a href="/tarifas/">tabla completa de precios</a> o calcula tu presupuesto al instante con el formulario.</p>
 </LandingPage>
 <style>
-  .offer-box { padding: 1.1rem 0 1.2rem; border-top: 2px solid var(--line); }
-  .offer-box:last-of-type { border-bottom: 2px solid var(--line); margin-bottom: 1.5rem; }
-  .offer-box strong { display: block; color: var(--ink); font-size: 1.2rem; font-family: var(--display); font-weight: 700; }
-  .offer-box p { margin: .3rem 0 0; color: var(--muted); }
-  .offer-price { display: inline-block; margin-top: .5rem; font-style: normal; font-weight: 700; font-family: var(--display); font-size: 1.35rem; color: var(--price); }
-  .offer-price[hidden] { display: none; }
+  .offer-list { display: grid; gap: 1.4rem; margin: 1.2rem 0 2.5rem; padding: 1.4rem; background: var(--terra); border-radius: 22px; }
 </style>

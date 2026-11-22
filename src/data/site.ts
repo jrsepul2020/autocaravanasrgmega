@@ -139,7 +139,7 @@ export const specialDates: { name: string; from: string; to: string }[] = [
 
 /* ---------- Ofertas activas (déjalo vacío [] si no hay) ---------- */
 // Respaldo si Google Sheets no responde. vehicle y price son opcionales (etiqueta "Camper 120 UP · desde 110 €/día").
-export const offers: { title: string; text: string; until: string; vehicle?: string; price?: number | null }[] = [
+export const offers: { title: string; text: string; until: string; vehicle?: string; price?: number | null; antes?: number | null }[] = [
   {
     title: 'Puente de diciembre y Navidad',
     text: 'Reserva ya tu autocaravana para el puente de la Constitución o las vacaciones de Navidad. Quedan pocas fechas.',

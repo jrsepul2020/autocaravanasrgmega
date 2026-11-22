@@ -8,7 +8,7 @@
  *   [data-special] + <template> → lista de fechas de temporada especial
  * Lanza el evento "rg:live" (detail = datos) para el calculador del formulario.
  */
-import { fetchLive, sheetId, offerPriceLabel, type LiveData } from '../data/sheet';
+import { fetchLive, sheetId, offerDeal, offerLeft, offerVehicleId, type LiveData } from '../data/sheet';
 
 const KEY = 'rg-live-v1';
 const TTL = 5 * 60 * 1000;
@@ -74,14 +74,19 @@ export function apply(d: LiveData) {
     document.querySelectorAll<HTMLElement>('[data-offers]').forEach((box) => {
       const tpl = box.querySelector('template'); if (!tpl) return;
       box.querySelectorAll(':scope > :not(template)').forEach((n) => n.remove());
+      let base: Record<string, number> = {};
+      try { base = JSON.parse(box.dataset.base || '{}'); } catch {}
       active.forEach((o) => {
+        const vid = offerVehicleId(o.vehicle);
+        const deal = offerDeal(o.price, o.antes, minOf(vid) ?? base[vid]);
         const frag = fill(tpl, {
-          title: o.title, text: o.text, price: offerPriceLabel(o),
-          vehicle: o.vehicle || '', amount: o.price ? String(o.price) : '',
+          title: o.title, text: o.text, vehicle: o.vehicle || '', amount: o.price ? String(o.price) : '',
+          antes: deal ? `${deal.antes} €` : '', wasLabel: deal ? (o.antes ? 'Antes' : 'Tarifa habitual') : '',
+          pct: deal ? `-${deal.pct}%` : '', left: offerLeft(o.until),
           until: o.until && o.until < '2999' ? `Válida hasta el ${new Date(o.until + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}` : '',
         });
-        const card = frag.querySelector('.offer') as HTMLElement | null;
-        if (card) card.dataset.vehicle = /mileo/i.test(o.vehicle || '') ? 'mileo' : 'camper';
+        const card = frag.querySelector<HTMLElement>('[data-vehicle]');
+        if (card) card.dataset.vehicle = vid;
         box.append(frag);
       });
       const wrap = box.closest<HTMLElement>('[data-offers-wrap]') ?? box;
