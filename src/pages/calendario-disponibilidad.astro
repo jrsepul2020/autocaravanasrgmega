@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import AvailabilityCalendar from '../components/AvailabilityCalendar.astro';
+import { Image } from 'astro:assets';
 import QuoteForm from '../components/QuoteForm.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
@@ -10,7 +10,7 @@ import Steps from '../components/Steps.astro';
 ---
 <Base
   title="Disponibilidad Autocaravanas de Alquiler en Sevilla · Calendario | RG MEGA"
-  description="Consulta en tiempo real las fechas libres de nuestras autocaravanas de alquiler en Sevilla: Benimar Mileo 268 y Camper 120 UP. Selecciona tus días y pide precio al momento."
+  description="Elige autocaravana y consulta en tiempo real sus fechas libres en Sevilla: calendario de la Benimar Mileo 268 y de la Camper 120 UP con precio por día y presupuesto al momento."
   breadcrumbs={[{ name: 'Disponibilidad', url: '/calendario-disponibilidad/' }]}
 >
   <section class="section" style="padding-top:2rem">
@@ -18,18 +18,25 @@ import Steps from '../components/Steps.astro';
       <div class="section-head">
         <span class="eyebrow">Calendario actualizado</span>
         <h1>Disponibilidad de autocaravanas en Sevilla</h1>
-        <p class="lead">Cada día muestra su precio orientativo. Los días en rojo ya están reservados. Pulsa el día de recogida y el de devolución y verás el precio de tu viaje al momento.</p>
-        <div class="cal-jump">{vehicles.map((v) => <a class="btn btn--ghost btn--sm" href={`#cal-${v.id}`}>{v.name}</a>)}</div>
+        <p class="lead">Elige la autocaravana y verás su calendario en tiempo real: días libres, días reservados y el precio orientativo de cada día. Selecciona recogida y devolución y tendrás el precio de tu viaje al momento.</p>
       </div>
-      {vehicles.map((v) => (
-        <div class="cal-veh" id={`cal-${v.id}`}>
-          <div class="cal-head">
-            <h2><a href={v.slug}>{v.name}</a></h2>
-            <span class="pill pill--hot">desde <span data-from={v.id}>{fromPrice(v)}</span> €/día</span>
-          </div>
-          <AvailabilityCalendar vehicle={v} months={4} summary />
-        </div>
-      ))}
+      <div class="cal-pick">
+        {vehicles.map((v) => (
+          <a class="cal-opt" href={v.calSlug} data-cal={v.id}>
+            <Image src={v.hero} alt={v.gallery[0].alt} widths={[480, 800]} sizes="(max-width: 760px) 100vw, 560px" />
+            <span class="cal-opt__body">
+              <span class="cal-opt__type">{v.type}</span>
+              <h2>{v.name}</h2>
+              <span class="cal-opt__tag">{v.tagline}</span>
+              <span class="cal-opt__foot">
+                <span class="cal-opt__price">Desde <strong><span data-from={v.id}>{fromPrice(v)}</span> €/día</strong></span>
+                <span class="btn btn--primary btn--sm"><Icon name="calendar" /> Ver disponibilidad</span>
+              </span>
+            </span>
+          </a>
+        ))}
+      </div>
+      <div class="cal-pricenote"><PriceNote compact /></div>
       <p class="cal-note"><Icon name="calendar" /> El calendario se actualiza a diario. Si una fecha aparece libre pero tienes prisa, confírmala por WhatsApp: respondemos en minutos.</p>
     </div>
   </section>
@@ -47,12 +54,26 @@ import Steps from '../components/Steps.astro';
   </section>
   <CtaBand />
 </Base>
+<script>
+  // Si llega desde el buscador de la portada con un vehículo elegido, ir directamente a su calendario.
+  const qs = new URLSearchParams(location.search);
+  const m = qs.get('modelo');
+  const target = m && document.querySelector<HTMLAnchorElement>(`[data-cal="${m}"]`);
+  if (target) location.replace(target.href + location.search + '#presupuesto');
+</script>
 <style>
-  .cal-veh { margin-top: 2.2rem; scroll-margin-top: 90px; }
-  .cal-jump { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
-  .cal-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
-  .cal-head h2 { margin: 0; font-size: 1.5rem; }
-  .cal-head a { color: inherit; text-decoration: none; }
+  .cal-pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+  .cal-opt { display: flex; flex-direction: column; background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: 0 0 0 1px var(--line), var(--shadow); text-decoration: none; color: var(--ink); transition: box-shadow .3s, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .cal-opt:hover { box-shadow: 0 0 0 1px var(--line), var(--shadow-lg); transform: translateY(-3px); }
+  .cal-opt :global(img) { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .cal-opt__body { display: flex; flex-direction: column; gap: .4rem; padding: 1.2rem 1.4rem 1.4rem; flex: 1; }
+  .cal-opt__type { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .cal-opt h2 { margin: 0; font-size: 1.5rem; }
+  .cal-opt__tag { color: var(--muted); }
+  .cal-opt__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin-top: auto; padding-top: .8rem; }
+  .cal-opt__price strong { color: var(--price); font-size: 1.35rem; font-family: var(--display); }
+  .cal-pricenote { margin-top: 1rem; }
   .cal-note { display: flex; gap: .6rem; align-items: flex-start; margin-top: 1.5rem; color: var(--muted); }
-  .cal-note :global(svg) { width: 20px; height: 20px; flex: none; margin-top: .2rem; color: var(--terra-ink); }
+  .cal-note :global(svg) { width: 20px; height: 20px; flex: none; margin-top: .2rem; color: var(--terra); }
+  @media (max-width: 760px) { .cal-pick { grid-template-columns: minmax(0, 1fr); } }
 </style>

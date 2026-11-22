@@ -31,7 +31,7 @@ const facts = [
       </div>
       <a class="btn btn--primary btn--sm" href={v.slug}>Ver vehículo <Icon name="arrow" class="i-arrow" /></a>
     </div>
-    <a class="vc__dates" href={`/contacto/?modelo=${v.id}#presupuesto`}><Icon name="calendar" /> Consultar fechas de la {v.short}</a>
+    <a class="vc__dates" href={v.calSlug}><Icon name="calendar" /> Consultar fechas de la {v.short}</a>
   </div>
 </article>
 <style>

@@ -1,0 +1,108 @@
+---
+/** Calendario de disponibilidad de un solo vehículo: una URL indexable por autocaravana. */
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import AvailabilityCalendar from '../../components/AvailabilityCalendar.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import PriceNote from '../../components/PriceNote.astro';
+import PriceTable from '../../components/PriceTable.astro';
+import Steps from '../../components/Steps.astro';
+import { vehicles, fromPrice, type Vehicle } from '../../data/vehicles';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return vehicles.map((v) => ({
+    params: { vehiculo: v.calSlug.split('/').filter(Boolean).pop() },
+    props: { v },
+  }));
+}
+interface Props { v: Vehicle }
+const { v } = Astro.props;
+const other = vehicles.find((x) => x.id !== v.id)!;
+const kf = (re: RegExp) => v.keyFacts.find((f) => re.test(f.label))?.value;
+---
+<Base
+  title={`Disponibilidad ${v.name} · Calendario y precio por día | RG MEGA Sevilla`}
+  description={`Calendario en tiempo real de la ${v.name} de alquiler en Sevilla: días libres y reservados, precio por día de cada temporada y presupuesto al momento. Desde {${v.id}.desde} €/día.`}
+  breadcrumbs={[{ name: 'Disponibilidad', url: '/calendario-disponibilidad/' }, { name: v.short, url: v.calSlug }]}
+>
+  <section class="section" style="padding-top:2rem">
+    <div class="container">
+      <div class="cv-head">
+        <div class="section-head">
+          <span class="eyebrow">Calendario actualizado</span>
+          <h1>Disponibilidad de la {v.name}</h1>
+          <p class="lead">{v.type} de alquiler en Sevilla. Cada día muestra su precio orientativo y los días en rojo ya están reservados. Pulsa el día de recogida y el de devolución y verás el precio de tu viaje al momento.</p>
+          <ul class="cv-facts">
+            <li><Icon name="users" /> {kf(/viaje/i) ?? '4'} plazas</li>
+            <li><Icon name="bed" /> {kf(/dormir/i) ?? '4'} para dormir</li>
+            <li><Icon name="pin" /> Recogida en {site.address.city} (Sevilla)</li>
+          </ul>
+        </div>
+        <a class="cv-card" href={v.slug}>
+          <Image src={v.hero} alt={v.gallery[0].alt} widths={[360, 600]} sizes="(max-width: 900px) 100vw, 340px" />
+          <span class="cv-card__body">
+            <span class="cv-card__price">Desde <strong><span data-from={v.id}>{fromPrice(v)}</span> €/día</strong></span>
+            <PriceNote compact />
+            <span class="cv-card__link">Ver ficha de la {v.short} <Icon name="arrow" /></span>
+          </span>
+        </a>
+      </div>
+
+      <AvailabilityCalendar vehicle={v} months={4} summary />
+
+      <p class="cv-note"><Icon name="calendar" /> El calendario se actualiza a diario. Si una fecha aparece libre pero tienes prisa, confírmala por WhatsApp: respondemos en minutos.</p>
+      <p class="cv-other">¿Buscas otra opción? <a href={other.calSlug}>Ver la disponibilidad de la {other.name} <Icon name="arrow" /></a></p>
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container cv-split">
+      <div>
+        <h2>Precios por día de la {v.short}</h2>
+        <p>Tarifa de 3 a 14 días y tarifa reducida a partir de 15 días, según temporada.</p>
+        <PriceTable only={v.id} />
+      </div>
+      <QuoteForm preselect={v.id} title={`Pide precio para la ${v.short}`} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head center">
+        <h2>Así de fácil es reservar</h2>
+        <p class="lead">Del primer mensaje a la carretera en 4 pasos.</p>
+      </div>
+      <Steps />
+    </div>
+  </section>
+  <CtaBand />
+</Base>
+<style>
+  .cv-head { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 2rem; align-items: start; margin-bottom: 1.5rem; }
+  .cv-head .section-head { margin-bottom: 0; }
+  .cv-facts { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; font-weight: 600; color: var(--forest); }
+  .cv-facts li { display: flex; align-items: center; gap: .4rem; }
+  .cv-facts :global(svg) { width: 18px; height: 18px; color: var(--terra); }
+  .cv-card { display: block; background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: 0 0 0 1px var(--line), var(--shadow); text-decoration: none; color: var(--ink); }
+  .cv-card :global(img) { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .cv-card__body { display: grid; gap: .4rem; padding: 1rem 1.2rem 1.2rem; }
+  .cv-card__price { font-size: 1rem; }
+  .cv-card__price strong { color: var(--price); font-size: 1.35rem; font-family: var(--display); }
+  .cv-card__link { display: inline-flex; align-items: center; gap: .35rem; font-weight: 600; color: var(--forest); }
+  .cv-card__link :global(svg) { width: 16px; height: 16px; }
+  .cv-note, .cv-other { display: flex; flex-wrap: wrap; gap: .6rem; align-items: flex-start; margin-top: 1.5rem; color: var(--muted); }
+  .cv-note :global(svg) { width: 20px; height: 20px; flex: none; margin-top: .2rem; color: var(--terra); }
+  .cv-other { margin-top: .6rem; }
+  .cv-other a { display: inline-flex; align-items: center; gap: .35rem; font-weight: 600; color: var(--forest); }
+  .cv-other :global(svg) { width: 16px; height: 16px; }
+  .cv-split { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+  .cv-split h2 { margin-top: 0; }
+  @media (max-width: 900px) {
+    .cv-head, .cv-split { grid-template-columns: minmax(0, 1fr); }
+    .cv-card { max-width: 420px; }
+    .cv-card :global(img) { display: none; }
+  }
+</style>

@@ -31,6 +31,8 @@ export type Vehicle = {
   short: string;
   type: string;
   slug: string;
+  /** URL propia del calendario de disponibilidad de este vehículo. */
+  calSlug: string;
   tagline: string;
   idealFor: string;
   /** ID del Google Calendar de disponibilidad. Añade eventos ("Reservado") para marcar días ocupados. */
@@ -63,6 +65,7 @@ export const vehicles: Vehicle[] = [
     short: 'Mileo 268',
     type: 'Autocaravana perfilada',
     slug: '/alquilar-benimar-mileo-268/',
+    calSlug: '/calendario-disponibilidad/benimar-mileo-268/',
     tagline: 'Autocaravana perfilada para 4 con camas gemelas, cama basculante y gran garaje',
     idealFor: 'Familias, dos parejas o quien busca máximo confort y espacio',
     calendarId: '235592fc8ab3959379d75357f22c526540195f14ecce48755c40dd889140119a@group.calendar.google.com',
@@ -135,6 +138,7 @@ export const vehicles: Vehicle[] = [
     short: 'Camper 120 UP',
     type: 'Furgoneta camper',
     slug: '/alquilar-camper-120-up/',
+    calSlug: '/calendario-disponibilidad/camper-120-up/',
     tagline: 'Camper compacta de 6 m, fácil de conducir y aparcar, con baño, ducha y placa solar',
     idealFor: 'Parejas, escapadas de fin de semana y rutas por pueblos y ciudad',
     calendarId: 'f6f9f6470262a216a4f427c88590f67ea14e2085f12bb1443ce7095eec59d732@group.calendar.google.com',

@@ -32,6 +32,7 @@ export const GET: APIRoute = () => {
     ...vehicles.flatMap((v) => [
       `### ${v.name} (${v.type})`,
       `- Ficha: ${u(v.slug)}`,
+      `- Disponibilidad y precio por día: ${u(v.calSlug)}`,
       `- ${v.tagline}. Ideal para: ${v.idealFor}.`,
       `- ${v.keyFacts.map((f) => `${f.label}: ${f.value}`).join(' · ')}`,
       `- Precio por día (3-14 días / 15 días o más):`,

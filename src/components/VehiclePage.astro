@@ -70,6 +70,7 @@ const product = {
       <h2 id="disponibilidad">Disponibilidad de la {v.short}</h2>
       <p>Los días en verde están libres. Selecciona recogida y devolución para pedir tu precio.</p>
       <AvailabilityCalendar vehicle={v} />
+      <p class="vp-calmore"><a href={v.calSlug}><Icon name="calendar" /> Ver el calendario completo de la {v.short}, con precio por día y 4 meses a la vista</a></p>
 
       <h2 id="precios">Precios de alquiler de la {v.short}</h2>
       <PriceTable only={v.id} />
@@ -131,4 +132,7 @@ const product = {
     .vp-main { grid-template-columns: minmax(0, 1fr); }
     .vp-sticky { position: static; }
   }
+  .vp-calmore { margin-top: 1rem; }
+  .vp-calmore a { display: inline-flex; gap: .45rem; align-items: center; font-weight: 600; color: var(--forest); }
+  .vp-calmore :global(svg) { width: 18px; height: 18px; color: var(--terra); flex: none; }
 </style>
