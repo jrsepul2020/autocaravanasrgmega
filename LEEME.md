@@ -40,7 +40,9 @@ Se gestionan desde una hoja de Google, **sin tocar código ni volver a subir la 
 Hoja actual: https://docs.google.com/spreadsheets/d/15ci4BIAbpV3NxUKtrd-QioHKiVRa55dwzitK-7Ho0TY/edit
 
 **Uso diario**
-- **Portada**: el precio destacado del inicio ("Camper 120 UP desde 110 €/día"). Elige vehículo, el texto que va delante y, si quieres anunciar un precio concreto, escríbelo; vacío = el más bajo de ese vehículo.
+- **Portada**: casilla **D2 "Mostrar precios desde (SI/NO)"**. Con `NO` se ocultan los "Alquiler desde X €/día" de las fichas (en vivo, en unos minutos) y, al volver a publicar la web, la pregunta "¿Cuánto cuesta…?" y el dato "Precio" de los datos clave pasan a texto sin cifras. Las ofertas, la página de Tarifas y los precios del calendario se ven siempre. Las columnas A-C ya no se usan: la portada muestra las dos autocaravanas.
+
+**Dónde salen precios en la web**: Tarifas (tabla completa), fichas de cada vehículo (caja de precio y tabla), calendario (precio por día y resumen) y ofertas. Todos se actualizan en vivo desde la hoja. Los textos de Google (títulos y descripciones) no llevan precios a propósito, para que nunca muestren uno antiguo.
 - **Ofertas**: una fila por mini banner (portada y página de Ofertas). `SI` para mostrarla, `NO` para ocultarla; caducan solas al pasar "Válida hasta". Las columnas **Vehículo** y **Precio desde €/día** dan la foto del vehículo y el precio grande en rojo. **Precio antes €/día (opcional)** sale tachado con el sello de % de descuento; si lo dejas vacío, se compara con la tarifa habitual más baja de ese vehículo. El sello solo aparece si el descuento es de un 5 % o más, y "Quedan X días" sale cuando faltan 30 días o menos para "Válida hasta". No escribas el precio dentro del texto. Por ley, el "precio antes" debe ser el más bajo que hayas aplicado en los 30 días previos a la rebaja.
 - **Precios**: cambia solo los números (€/día) de las columnas C (3-14 días) y D (15 días o más). No cambies los nombres de vehículo ni de temporada.
 - **Fechas especiales**: nombre, desde y hasta (dd/mm/aaaa, ambos días incluidos). Esos días se cobran a tarifa de temporada especial en el calculador.
